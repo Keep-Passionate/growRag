@@ -4,15 +4,23 @@ from dataclasses import fields, replace
 
 from growrag.experience import (
     EvidenceRole,
+    ExperienceActivity,
     ExperienceLedger,
     ExperienceRecord,
+    PortfolioPolicy,
     SourceEvidence,
     TransferObservation,
 )
 from growrag.models import EnvironmentFingerprint, QueryTransformation
 from growrag.pipeline import TrustedReuseLayer, TrustedReuseResult
 from growrag.rewrite import PrecomputedPlanApplier
-from growrag.selection import DecisionReason, DeploymentAction
+from growrag.selection import (
+    DecisionReason,
+    DeploymentAction,
+    EnvironmentCompatibilityMode,
+    EnvironmentCompatibilityPolicy,
+    TrustedReuseGate,
+)
 
 ENVIRONMENT = EnvironmentFingerprint(
     corpus_id="toy-wiki",
@@ -95,10 +103,14 @@ def layer(
     plans: dict[tuple[str, str], str],
     *,
     max_candidates: int = 5,
+    gate: TrustedReuseGate | None = None,
+    portfolio_policy: PortfolioPolicy | None = None,
 ) -> TrustedReuseLayer:
     return TrustedReuseLayer(
         applier=PrecomputedPlanApplier(plans=plans),
         max_candidates=max_candidates,
+        gate=gate,
+        portfolio_policy=portfolio_policy,
     )
 
 
@@ -107,6 +119,8 @@ def decide(
     records: ExperienceLedger | tuple[ExperienceRecord, ...],
     *,
     signatures: frozenset[str] = frozenset({"intent"}),
+    activities: tuple[ExperienceActivity, ...] = (),
+    current_step: int | None = None,
 ):
     return reuse_layer.decide(
         records=records,
@@ -114,6 +128,8 @@ def decide(
         target_query=TARGET_QUERY,
         current_environment=ENVIRONMENT,
         current_signatures=signatures,
+        activities=activities,
+        current_step=current_step,
     )
 
 
@@ -133,6 +149,8 @@ def test_pipeline_runs_complete_query_side_reuse_from_ledger() -> None:
     assert result.max_candidates == 5
     assert result.eligible_experience_ids == ("exp-reuse",)
     assert result.candidate_experience_ids == ("exp-reuse",)
+    assert result.portfolio_enabled is False
+    assert result.hot_experience_ids == ("exp-reuse",)
     forbidden = {"gold", "answer", "retrieval_results", "paired_outcome"}
     assert {field.name for field in fields(TrustedReuseResult)}.isdisjoint(forbidden)
 
@@ -153,6 +171,37 @@ def test_inactive_or_environment_mismatched_records_never_enter_recall() -> None
     assert result.decision.reason is DecisionReason.NO_CANDIDATES
     assert result.eligible_experience_ids == ()
     assert result.candidate_experience_ids == ()
+    assert result.environment_rejected_experience_ids == ("wrong-environment",)
+
+
+def test_pipeline_and_gate_share_the_same_tiered_environment_policy() -> None:
+    ledger = ExperienceLedger()
+    older_retriever = replace(ENVIRONMENT, retriever_version="0")
+    add_active_experience(
+        ledger,
+        "soft-environment-change",
+        source_query="alpha beta",
+        environment=older_retriever,
+    )
+    gate = TrustedReuseGate(
+        environment_policy=EnvironmentCompatibilityPolicy(
+            mode=EnvironmentCompatibilityMode.TIERED,
+            minimum_score=0.9,
+            soft_mismatch_penalty=0.1,
+        )
+    )
+
+    result = decide(
+        layer(
+            {(TARGET_ID, "soft-environment-change"): "rewritten alpha beta"},
+            gate=gate,
+        ),
+        ledger,
+    )
+
+    assert result.eligible_experience_ids == ("soft-environment-change",)
+    assert result.decision.executed_action is DeploymentAction.REUSE
+    assert result.decision.traces[0].environment_soft_mismatches == ("retriever_version",)
 
 
 def test_missing_precomputed_plan_becomes_auditable_direct_fallback() -> None:
@@ -215,3 +264,37 @@ def test_gate_can_choose_more_applicable_candidate_over_nearer_candidate() -> No
     traces = {trace.experience_id: trace for trace in result.decision.traces}
     assert traces["nearer-lower-fit"].applicability_score == 0.5
     assert traces["farther-higher-fit"].applicability_score == 1.0
+
+
+def test_optional_hot_portfolio_limits_recall_without_deleting_cold_memory() -> None:
+    ledger = ExperienceLedger()
+    older = add_active_experience(ledger, "older", source_query="alpha beta")
+    newer = add_active_experience(ledger, "newer", source_query="alpha beta")
+    reuse_layer = layer(
+        {
+            (TARGET_ID, "older"): "older plan",
+            (TARGET_ID, "newer"): "newer plan",
+        },
+        portfolio_policy=PortfolioPolicy(
+            capacity=1,
+            half_life_steps=10,
+            minimum_priority=0.0,
+        ),
+    )
+
+    result = decide(
+        reuse_layer,
+        (older, newer),
+        activities=(
+            ExperienceActivity("older", last_validated_step=80),
+            ExperienceActivity("newer", last_validated_step=100),
+        ),
+        current_step=100,
+    )
+
+    assert result.portfolio_enabled is True
+    assert result.hot_experience_ids == ("newer",)
+    assert result.cold_experience_ids == ("older",)
+    assert result.candidate_experience_ids == ("newer",)
+    assert result.decision.executed_experience_id == "newer"
+    assert {record.experience_id for record in (older, newer)} == {"older", "newer"}

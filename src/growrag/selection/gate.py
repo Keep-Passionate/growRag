@@ -15,6 +15,10 @@ from typing import Any
 from growrag.experience.ledger import ExperienceRecord, ExperienceState
 from growrag.models import EnvironmentFingerprint, PreparedReuseCandidate
 from growrag.selection.applicability import ApplicabilityEstimate
+from growrag.selection.environment import (
+    EnvironmentCompatibilityPolicy,
+    EnvironmentMatchReport,
+)
 
 
 class DeploymentAction(StrEnum):
@@ -118,6 +122,10 @@ class CandidateGateTrace:
     recall_rank: int
     state: str
     environment_compatible: bool
+    environment_score: float
+    environment_mode: str
+    environment_hard_mismatches: tuple[str, ...]
+    environment_soft_mismatches: tuple[str, ...]
     provenance_valid: bool
     reliability_observations: int
     reliability_benefits: int
@@ -127,6 +135,10 @@ class CandidateGateTrace:
     reliability_valid: bool
     query_plan_valid: bool
     applicability_score: float | None
+    applicability_scorer_id: str | None
+    applicability_matched_signatures: tuple[str, ...]
+    applicability_required_signatures: tuple[str, ...]
+    applicability_matched_contraindications: tuple[str, ...]
     applicability_valid: bool
     passed: bool
     first_failure: str | None
@@ -168,9 +180,20 @@ class TrustedReuseGate:
         *,
         policy: GatePolicy | None = None,
         budget: QueryBudget | None = None,
+        environment_policy: EnvironmentCompatibilityPolicy | None = None,
     ) -> None:
         self.policy = policy or GatePolicy()
         self.budget = budget or QueryBudget()
+        self.environment_policy = environment_policy or EnvironmentCompatibilityPolicy()
+
+    def match_environment(
+        self,
+        reference: EnvironmentFingerprint,
+        current: EnvironmentFingerprint,
+    ) -> EnvironmentMatchReport:
+        """Return the exact environment report used by recall filtering and gating."""
+
+        return self.environment_policy.evaluate(reference, current)
 
     def decide(
         self,
@@ -277,9 +300,11 @@ class TrustedReuseGate:
         risk_upper, risk_measure = _risk_upper_bound(reliability)
 
         state_valid = record.state is ExperienceState.ACTIVE
-        environment_valid = transformation.environment.retrieval_compatible_with(
-            current_environment
+        environment_report = self.match_environment(
+            transformation.environment,
+            current_environment,
         )
+        environment_valid = environment_report.compatible
         provenance_valid = _is_specified(transformation.provenance)
 
         reliability_reasons: list[str] = []
@@ -310,10 +335,20 @@ class TrustedReuseGate:
         if applicability is None:
             applicability_reasons.append("missing_applicability_estimate")
             applicability_score = None
+            applicability_scorer_id = None
+            matched_signatures: tuple[str, ...] = ()
+            required_signatures: tuple[str, ...] = ()
+            matched_contraindications: tuple[str, ...] = ()
         else:
             applicability_score = applicability.score
+            applicability_scorer_id = applicability.scorer_id
+            matched_signatures = applicability.matched_signatures
+            required_signatures = applicability.required_signatures
+            matched_contraindications = applicability.matched_contraindications
             if not _is_specified(applicability.scorer_id):
                 applicability_reasons.append("missing_applicability_scorer")
+            if applicability.matched_contraindications:
+                applicability_reasons.append("applicability_contraindication_matched")
             if applicability.missing_features:
                 applicability_reasons.append("missing_applicability_features")
             if (
@@ -354,6 +389,10 @@ class TrustedReuseGate:
             recall_rank=candidate.recall_rank,
             state=record.state.value,
             environment_compatible=environment_valid,
+            environment_score=environment_report.score,
+            environment_mode=environment_report.mode.value,
+            environment_hard_mismatches=environment_report.hard_mismatches,
+            environment_soft_mismatches=environment_report.soft_mismatches,
             provenance_valid=provenance_valid,
             reliability_observations=reliability.n,
             reliability_benefits=reliability.benefit_count,
@@ -363,6 +402,10 @@ class TrustedReuseGate:
             reliability_valid=reliability_valid,
             query_plan_valid=query_plan_valid,
             applicability_score=applicability_score,
+            applicability_scorer_id=applicability_scorer_id,
+            applicability_matched_signatures=matched_signatures,
+            applicability_required_signatures=required_signatures,
+            applicability_matched_contraindications=matched_contraindications,
             applicability_valid=applicability_valid,
             passed=passed,
             first_failure=stage_reasons[0] if stage_reasons else None,
@@ -425,12 +468,15 @@ class TrustedReuseGate:
         return reasons
 
     @staticmethod
-    def _selection_key(item: _EvaluatedCandidate) -> tuple[float, float, int, str]:
+    def _selection_key(
+        item: _EvaluatedCandidate,
+    ) -> tuple[float, float, float, int, str]:
         applicability = item.trace.applicability_score
         assert applicability is not None  # Only valid candidates are ranked.
         return (
             -applicability,
             item.trace.risk_upper_bound,
+            -item.trace.environment_score,
             item.trace.recall_rank,
             item.trace.experience_id,
         )

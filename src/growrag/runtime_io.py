@@ -31,10 +31,21 @@ class RuntimeRequest:
     target_query_id: str
     target_query: str
     signatures: tuple[str, ...]
+    signature_extractor_id: str
+    signature_extractor_version: str
+    signature_input_scope: str
 
     def __post_init__(self) -> None:
         _require_non_empty(self.target_query_id, "target_query_id")
         _require_non_empty(self.target_query, "target_query")
+        _require_non_empty(self.signature_extractor_id, "signature_extractor_id")
+        _require_non_empty(
+            self.signature_extractor_version,
+            "signature_extractor_version",
+        )
+        if self.signature_input_scope.strip().casefold() != "query_only":
+            raise RuntimeIOError("signature_input_scope must be 'query_only'")
+        object.__setattr__(self, "signature_input_scope", "query_only")
         if not isinstance(self.signatures, tuple):
             raise RuntimeIOError("signatures must be a tuple of strings")
         for index, signature in enumerate(self.signatures):
@@ -111,6 +122,7 @@ def load_requests(path: str | os.PathLike[str]) -> tuple[RuntimeRequest, ...]:
         return ()
     requests: list[RuntimeRequest] = []
     seen_ids: set[str] = set()
+    signature_protocol: tuple[str, str, str] | None = None
     for line_number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
             raise RuntimeIOError(f"request JSONL line {line_number} is blank")
@@ -118,6 +130,15 @@ def load_requests(path: str | os.PathLike[str]) -> tuple[RuntimeRequest, ...]:
         request = _request_from_object(raw, f"request JSONL line {line_number}")
         if request.target_query_id in seen_ids:
             raise RuntimeIOError(f"duplicate target_query_id: {request.target_query_id}")
+        current_protocol = (
+            request.signature_extractor_id,
+            request.signature_extractor_version,
+            request.signature_input_scope,
+        )
+        if signature_protocol is None:
+            signature_protocol = current_protocol
+        elif current_protocol != signature_protocol:
+            raise RuntimeIOError("all requests must share one frozen signature protocol")
         seen_ids.add(request.target_query_id)
         requests.append(request)
     return tuple(requests)
@@ -203,7 +224,18 @@ def write_decision_jsonl(
 
 def _request_from_object(value: object, path: str) -> RuntimeRequest:
     raw = _expect_object(value, path)
-    _require_exact_keys(raw, {"target_query_id", "target_query", "signatures"}, path)
+    _require_exact_keys(
+        raw,
+        {
+            "target_query_id",
+            "target_query",
+            "signatures",
+            "signature_extractor_id",
+            "signature_extractor_version",
+            "signature_input_scope",
+        },
+        path,
+    )
     signatures_raw = _expect_list(raw["signatures"], f"{path}.signatures")
     signatures = tuple(
         _expect_string(item, f"{path}.signatures[{index}]")
@@ -213,6 +245,18 @@ def _request_from_object(value: object, path: str) -> RuntimeRequest:
         target_query_id=_expect_string(raw["target_query_id"], f"{path}.target_query_id"),
         target_query=_expect_string(raw["target_query"], f"{path}.target_query"),
         signatures=signatures,
+        signature_extractor_id=_expect_string(
+            raw["signature_extractor_id"],
+            f"{path}.signature_extractor_id",
+        ),
+        signature_extractor_version=_expect_string(
+            raw["signature_extractor_version"],
+            f"{path}.signature_extractor_version",
+        ),
+        signature_input_scope=_expect_string(
+            raw["signature_input_scope"],
+            f"{path}.signature_input_scope",
+        ),
     )
 
 

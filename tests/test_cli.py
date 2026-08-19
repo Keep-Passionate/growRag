@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from growrag.cli import main
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +81,38 @@ def test_file_demo_validates_and_emits_reuse_and_direct(tmp_path: Path, capsys) 
     assert artifacts[2]["decision"]["reason"] == "invalid_query_plan_fallback"
     forbidden = {"gold", "answer", "retrieval_results", "paired_outcome"}
     assert all(_nested_keys(artifact).isdisjoint(forbidden) for artifact in artifacts)
+
+
+def test_decide_rejects_legacy_v1_memory_even_though_it_is_audit_readable(
+    tmp_path: Path,
+) -> None:
+    raw = json.loads((FILE_DEMO / "memory.json").read_text(encoding="utf-8"))
+    raw["schema_version"] = 1
+    card = raw["records"][0]["transformation"]
+    card.pop("diagnosed_failure")
+    card.pop("gap_categories")
+    card.pop("contraindication_signature")
+    memory = tmp_path / "legacy-memory.json"
+    memory.write_text(json.dumps(raw), encoding="utf-8")
+
+    with pytest.raises(SystemExit) as exc_info:
+        main(
+            [
+                "decide",
+                "--config",
+                str(FILE_DEMO / "config.toml"),
+                "--memory",
+                str(memory),
+                "--requests",
+                str(FILE_DEMO / "requests.jsonl"),
+                "--plans",
+                str(FILE_DEMO / "plans.json"),
+                "--output",
+                str(tmp_path / "should-not-exist.jsonl"),
+            ]
+        )
+
+    assert exc_info.value.code == 2
 
 
 def _nested_keys(value: object) -> set[str]:

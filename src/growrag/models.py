@@ -5,6 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
+SUPPORTED_GAP_CATEGORIES = frozenset(
+    {"bridge_entity", "attribute", "relation", "evidence_span", "other"}
+)
+
 
 class Action(StrEnum):
     """Mutually exclusive actions evaluated for one target query."""
@@ -61,6 +65,12 @@ class QueryTransformation:
 
     This record deliberately stores no global trust score. Historical reliability
     and current-query applicability are separate experimental quantities.
+
+    ``diagnosed_failure`` and ``gap_categories`` describe what was missing on
+    the source query. ``atomic_units`` remain the concrete repair operations.
+    ``applicability_signature`` lists positive reuse conditions, while
+    ``contraindication_signature`` lists conditions under which reuse should be
+    avoided. These are source-card metadata, not post-retrieval control flow.
     """
 
     experience_id: str
@@ -76,6 +86,35 @@ class QueryTransformation:
     source_dataset_id: str = "unspecified"
     source_split: str = "unspecified"
     source_group_id: str = "unspecified"
+    diagnosed_failure: str = ""
+    gap_categories: tuple[str, ...] = ()
+    contraindication_signature: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.diagnosed_failure, str):
+            raise ValueError("diagnosed_failure must be a string")
+        object.__setattr__(self, "diagnosed_failure", self.diagnosed_failure.strip())
+        object.__setattr__(
+            self,
+            "gap_categories",
+            _normalize_gap_categories(self.gap_categories),
+        )
+        object.__setattr__(
+            self,
+            "applicability_signature",
+            _normalize_signature_tuple(
+                self.applicability_signature,
+                field_name="applicability_signature",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "contraindication_signature",
+            _normalize_signature_tuple(
+                self.contraindication_signature,
+                field_name="contraindication_signature",
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,3 +151,42 @@ class PreparedReuseCandidate:
 
 def _is_unspecified(value: str) -> bool:
     return not value.strip() or value.strip().casefold() in {"unset", "unspecified", "unknown"}
+
+
+def _normalize_gap_categories(values: tuple[str, ...]) -> tuple[str, ...]:
+    if not isinstance(values, tuple):
+        raise ValueError("gap_categories must be a tuple of strings")
+    normalized: list[str] = []
+    for index, value in enumerate(values):
+        if not isinstance(value, str):
+            raise ValueError(f"gap_categories[{index}] must be a string")
+        category = "_".join(value.strip().casefold().replace("-", " ").split())
+        if not category:
+            raise ValueError(f"gap_categories[{index}] must not be blank")
+        if category not in SUPPORTED_GAP_CATEGORIES:
+            supported = ", ".join(sorted(SUPPORTED_GAP_CATEGORIES))
+            raise ValueError(f"unsupported gap category {value!r}; expected one of: {supported}")
+        if category in normalized:
+            raise ValueError(f"duplicate normalized gap category: {category}")
+        normalized.append(category)
+    return tuple(normalized)
+
+
+def _normalize_signature_tuple(
+    values: tuple[str, ...],
+    *,
+    field_name: str,
+) -> tuple[str, ...]:
+    if not isinstance(values, tuple):
+        raise ValueError(f"{field_name} must be a tuple of strings")
+    normalized: list[str] = []
+    for index, value in enumerate(values):
+        if not isinstance(value, str):
+            raise ValueError(f"{field_name}[{index}] must be a string")
+        signature = " ".join(value.strip().casefold().split())
+        if not signature:
+            raise ValueError(f"{field_name}[{index}] must not be blank")
+        if signature in normalized:
+            raise ValueError(f"duplicate normalized {field_name}: {signature}")
+        normalized.append(signature)
+    return tuple(normalized)

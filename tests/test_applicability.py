@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from growrag.models import EnvironmentFingerprint, QueryTransformation
 from growrag.selection.applicability import SignatureApplicabilityScorer
 
@@ -53,3 +55,21 @@ def test_missing_signature_features_fail_closed() -> None:
     )
     assert estimate.score == 0.0
     assert estimate.missing_features
+
+
+def test_declared_contraindication_overrides_positive_signature_match() -> None:
+    experience = replace(
+        make_experience(),
+        contraindication_signature=("answer_already_explicit",),
+    )
+
+    estimate = SignatureApplicabilityScorer().score(
+        "which actor was born first gamma or delta",
+        experience,
+        current_signatures=frozenset({"comparison", "two_entity", "answer_already_explicit"}),
+    )
+
+    assert estimate.score == 0.0
+    assert estimate.matched_signatures == ("comparison", "two_entity")
+    assert estimate.matched_contraindications == ("answer_already_explicit",)
+    assert not estimate.missing_features

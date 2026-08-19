@@ -14,7 +14,7 @@ from growrag import __version__
 from growrag.config import ConfigError, load_pilot_config, load_runtime_config
 from growrag.demo import build_demo_decision
 from growrag.evaluation.oracle import analyze_oracle, read_oracle_csv
-from growrag.experience import SnapshotValidationError, load_snapshot
+from growrag.experience import SCHEMA_VERSION, SnapshotValidationError, load_snapshot
 from growrag.pipeline import TrustedReuseLayer
 from growrag.runtime_io import (
     RuntimeIOError,
@@ -107,6 +107,7 @@ def _run_memory_validate(path: Path) -> int:
                 "memory": str(path.resolve()),
                 "memory_snapshot_id": snapshot.memory_snapshot_id,
                 "schema_version": snapshot.schema_version,
+                "runtime_ready": snapshot.schema_version == SCHEMA_VERSION,
                 "record_count": len(snapshot.ledger),
                 "state_counts": dict(sorted(state_counts.items())),
             },
@@ -130,7 +131,7 @@ def _run_decide(
             "runtime decide requires actions.direct=true, actions.reuse=true, "
             "and actions.fresh=false"
         )
-    snapshot = load_snapshot(memory_path)
+    snapshot = load_snapshot(memory_path).require_runtime_ready()
     requests = load_requests(requests_path)
     plans = load_plan_bundle(plans_path)
     if (plans.applier_id, plans.application_version) != (
@@ -140,7 +141,7 @@ def _run_decide(
         raise RuntimeIOError("plan bundle applier identity/version differs from config")
     if config.candidate_recall.scorer != "source-query-jaccard-v1":
         raise ConfigError("unsupported candidate recall scorer: " + config.candidate_recall.scorer)
-    if config.applicability.scorer != "signature-coverage-v1":
+    if config.applicability.scorer != "signature-coverage-v2":
         raise ConfigError("unsupported applicability scorer: " + config.applicability.scorer)
 
     applier = plans.to_applier(
@@ -155,11 +156,13 @@ def _run_decide(
         gate=TrustedReuseGate(
             policy=config.gate_policy,
             budget=config.query_budget,
+            environment_policy=config.environment_compatibility,
         ),
         max_candidates=config.candidate_recall.maximum_candidates,
     )
     effective_config = {
         "environment": asdict(config.environment),
+        "environment_compatibility": asdict(config.environment_compatibility),
         "gate_policy": asdict(config.gate_policy),
         "query_budget": asdict(config.query_budget),
         "candidate_recall": asdict(config.candidate_recall),
@@ -179,7 +182,7 @@ def _run_decide(
         artifacts.append(
             {
                 "artifact_type": "trusted_reuse_decision",
-                "schema_version": 1,
+                "schema_version": 2,
                 "growrag_version": __version__,
                 "config_sha256": config_sha256,
                 "memory_snapshot_id": snapshot.memory_snapshot_id,
@@ -190,6 +193,15 @@ def _run_decide(
                     "max_candidates": result.max_candidates,
                     "eligible_experience_ids": list(result.eligible_experience_ids),
                     "candidate_experience_ids": list(result.candidate_experience_ids),
+                },
+                "portfolio": {
+                    "enabled": result.portfolio_enabled,
+                    "hot_experience_ids": list(result.hot_experience_ids),
+                    "cold_experience_ids": list(result.cold_experience_ids),
+                    "expired_experience_ids": list(result.expired_experience_ids),
+                    "environment_rejected_experience_ids": list(
+                        result.environment_rejected_experience_ids
+                    ),
                 },
                 "decision": asdict(result.decision),
             }

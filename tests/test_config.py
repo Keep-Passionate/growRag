@@ -8,7 +8,12 @@ import pytest
 from growrag.config import ConfigError, load_pilot_config, load_runtime_config
 from growrag.experience import LifecyclePolicy
 from growrag.models import EnvironmentFingerprint
-from growrag.selection import GatePolicy, QueryBudget
+from growrag.selection import (
+    EnvironmentCompatibilityMode,
+    EnvironmentCompatibilityPolicy,
+    GatePolicy,
+    QueryBudget,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = PROJECT_ROOT / "configs" / "pilot.example.toml"
@@ -33,6 +38,9 @@ def test_example_loads_into_typed_runtime_components() -> None:
     assert isinstance(config.environment, EnvironmentFingerprint)
     assert config.environment.corpus_id == "UNSET"
     assert config.environment.rewriter_version == "UNSET"
+    assert isinstance(config.environment_compatibility, EnvironmentCompatibilityPolicy)
+    assert config.environment_compatibility.mode is EnvironmentCompatibilityMode.STRICT
+    assert config.environment_compatibility.minimum_score == 1.0
     assert isinstance(config.lifecycle_policy, LifecyclePolicy)
     assert config.lifecycle_policy.promotion_min_observations == 3
     assert config.lifecycle_policy.promotion_min_direct_good_observations == 2
@@ -47,7 +55,7 @@ def test_example_loads_into_typed_runtime_components() -> None:
     assert config.query_budget.max_query_characters == 2048
     assert config.candidate_recall.scorer == "source-query-jaccard-v1"
     assert config.candidate_recall.maximum_candidates == 5
-    assert config.applicability.scorer == "signature-coverage-v1"
+    assert config.applicability.scorer == "signature-coverage-v2"
     assert config.application.applier_id == "UNSET"
     assert config.write_gate.minimum_source_gain == pytest.approx(0.05)
 
@@ -94,6 +102,10 @@ def test_fully_resolved_configuration_is_runtime_ready(tmp_path: Path) -> None:
         (
             lambda text: text.replace("good_threshold = 1.0", "good_threshold = nan"),
             r"\[evaluation\]\.good_threshold must be finite",
+        ),
+        (
+            lambda text: text.replace('mode = "strict"', 'mode = "guess"'),
+            r"invalid \[environment_compatibility\] policy",
         ),
     ],
 )

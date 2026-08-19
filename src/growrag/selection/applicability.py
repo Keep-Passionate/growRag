@@ -17,6 +17,7 @@ class ApplicabilityEstimate:
     required_signatures: tuple[str, ...]
     scorer_id: str
     missing_features: bool = False
+    matched_contraindications: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not 0.0 <= self.score <= 1.0:
@@ -44,7 +45,7 @@ class SignatureApplicabilityScorer:
     declared structural conditions, such as `comparison` and `two_entity`.
     """
 
-    scorer_id: str = "signature-coverage-v1"
+    scorer_id: str = "signature-coverage-v2"
 
     def score(
         self,
@@ -56,14 +57,33 @@ class SignatureApplicabilityScorer:
         del current_query  # Reserved for future calibrated models.
         required = tuple(
             sorted(
-                signature.strip().casefold()
+                _normalize_signature(signature)
                 for signature in experience.applicability_signature
                 if signature.strip()
             )
         )
         observed = frozenset(
-            signature.strip().casefold() for signature in current_signatures if signature.strip()
+            _normalize_signature(signature) for signature in current_signatures if signature.strip()
         )
+        contraindications = tuple(
+            sorted(
+                _normalize_signature(signature)
+                for signature in experience.contraindication_signature
+                if signature.strip()
+            )
+        )
+        matched_contraindications = tuple(
+            signature for signature in contraindications if signature in observed
+        )
+        matched = tuple(signature for signature in required if signature in observed)
+        if matched_contraindications:
+            return ApplicabilityEstimate(
+                score=0.0,
+                matched_signatures=matched,
+                required_signatures=required,
+                scorer_id=self.scorer_id,
+                matched_contraindications=matched_contraindications,
+            )
         if not required or not observed:
             return ApplicabilityEstimate(
                 score=0.0,
@@ -71,12 +91,17 @@ class SignatureApplicabilityScorer:
                 required_signatures=required,
                 scorer_id=self.scorer_id,
                 missing_features=True,
+                matched_contraindications=(),
             )
 
-        matched = tuple(signature for signature in required if signature in observed)
         return ApplicabilityEstimate(
             score=len(matched) / len(required),
             matched_signatures=matched,
             required_signatures=required,
             scorer_id=self.scorer_id,
+            matched_contraindications=(),
         )
+
+
+def _normalize_signature(value: str) -> str:
+    return " ".join(value.strip().casefold().split())

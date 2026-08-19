@@ -15,6 +15,7 @@ from typing import Any
 
 from growrag.experience.ledger import LifecyclePolicy
 from growrag.models import EnvironmentFingerprint
+from growrag.selection.environment import EnvironmentCompatibilityPolicy
 from growrag.selection.gate import GatePolicy, QueryBudget
 
 
@@ -73,6 +74,7 @@ class PilotConfig:
     actions: ActionSettings
     evaluation: EvaluationSettings
     environment: EnvironmentFingerprint
+    environment_compatibility: EnvironmentCompatibilityPolicy
     write_gate: WriteGateSettings
     lifecycle_policy: LifecyclePolicy
     gate_policy: GatePolicy
@@ -106,6 +108,7 @@ _TOP_LEVEL_SECTIONS = {
     "actions",
     "evaluation",
     "environment",
+    "environment_compatibility",
     "write_gate",
     "reliability",
     "candidate_recall",
@@ -136,6 +139,10 @@ _SECTION_FIELDS: dict[str, tuple[frozenset[str], frozenset[str]]] = {
                 "rewriter_version",
             }
         ),
+        frozenset(),
+    ),
+    "environment_compatibility": (
+        frozenset({"mode", "minimum_score", "soft_mismatch_penalty"}),
         frozenset(),
     ),
     "write_gate": (frozenset({"minimum_source_gain"}), frozenset()),
@@ -216,6 +223,31 @@ def load_pilot_config(
         for field in fields(EnvironmentFingerprint)
     }
     environment = EnvironmentFingerprint(**environment_values)
+    environment_compatibility = _construct_policy(
+        EnvironmentCompatibilityPolicy,
+        {
+            "mode": _string(
+                tables["environment_compatibility"],
+                "environment_compatibility",
+                "mode",
+            ),
+            "minimum_score": _bounded_number(
+                tables["environment_compatibility"],
+                "environment_compatibility",
+                "minimum_score",
+                minimum=0.0,
+                maximum=1.0,
+            ),
+            "soft_mismatch_penalty": _bounded_number(
+                tables["environment_compatibility"],
+                "environment_compatibility",
+                "soft_mismatch_penalty",
+                minimum=0.0,
+                maximum=1.0,
+            ),
+        },
+        section="environment_compatibility",
+    )
 
     write_gate = WriteGateSettings(
         minimum_source_gain=_bounded_number(
@@ -314,6 +346,7 @@ def load_pilot_config(
         actions=actions,
         evaluation=evaluation,
         environment=environment,
+        environment_compatibility=environment_compatibility,
         write_gate=write_gate,
         lifecycle_policy=lifecycle_policy,
         gate_policy=gate_policy,

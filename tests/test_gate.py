@@ -16,6 +16,8 @@ from growrag.selection import (
     CandidateGateTrace,
     DecisionReason,
     DeploymentAction,
+    EnvironmentCompatibilityMode,
+    EnvironmentCompatibilityPolicy,
     GateCandidate,
     GatePolicy,
     QueryBudget,
@@ -212,6 +214,27 @@ def test_unknown_or_mismatched_environment_cannot_reuse() -> None:
     assert decision.traces[0].first_failure == "environment_mismatch"
 
 
+def test_tiered_environment_policy_surfaces_soft_mismatch_without_hiding_it() -> None:
+    older_retriever = replace(ENVIRONMENT, retriever_version="0")
+    record = active_record("older-retriever", environment=older_retriever)
+    gate = TrustedReuseGate(
+        environment_policy=EnvironmentCompatibilityPolicy(
+            mode=EnvironmentCompatibilityMode.TIERED,
+            minimum_score=0.9,
+            soft_mismatch_penalty=0.1,
+        )
+    )
+
+    decision = decide(candidate("older-retriever", record=record), gate=gate)
+
+    assert decision.action is DeploymentAction.REUSE
+    trace = decision.traces[0]
+    assert trace.environment_score == 0.9
+    assert trace.environment_soft_mismatches == ("retriever_version",)
+    assert trace.environment_hard_mismatches == ()
+    assert trace.environment_mode == "tiered"
+
+
 def test_insufficient_reliability_cannot_be_rescued_by_high_applicability() -> None:
     weak_record = active_record("weak", observation_count=1)
 
@@ -227,6 +250,49 @@ def test_low_applicability_keeps_the_original_query() -> None:
     assert decision.intended_action is DeploymentAction.DIRECT
     assert decision.executed_action is DeploymentAction.DIRECT
     assert decision.traces[0].first_failure == "applicability_below_threshold"
+
+
+def test_gate_trace_keeps_structured_applicability_explanation() -> None:
+    estimate = ApplicabilityEstimate(
+        score=0.0,
+        matched_signatures=("author_question",),
+        required_signatures=("author_question",),
+        scorer_id="signature-coverage-v2",
+        matched_contraindications=("answer_already_explicit",),
+    )
+    item = candidate()
+    item = replace(item, applicability=estimate)
+
+    decision = decide(item)
+
+    trace = decision.traces[0]
+    assert trace.applicability_scorer_id == "signature-coverage-v2"
+    assert trace.applicability_matched_signatures == ("author_question",)
+    assert trace.applicability_matched_contraindications == ("answer_already_explicit",)
+
+
+def test_contraindication_is_a_hard_veto_even_when_score_threshold_is_zero() -> None:
+    gate = TrustedReuseGate(
+        policy=GatePolicy(
+            minimum_observations=2,
+            minimum_benefits=1,
+            maximum_risk_upper_bound=0.70,
+            minimum_applicability=0.0,
+        )
+    )
+    estimate = ApplicabilityEstimate(
+        score=0.0,
+        matched_signatures=("author_question",),
+        required_signatures=("author_question",),
+        scorer_id="signature-coverage-v2",
+        matched_contraindications=("answer_already_explicit",),
+    )
+    item = replace(candidate(), applicability=estimate)
+
+    decision = decide(item, gate=gate)
+
+    assert decision.action is DeploymentAction.DIRECT
+    assert "applicability_contraindication_matched" in (decision.traces[0].rejection_reasons)
 
 
 def test_invalid_applied_query_records_reuse_intent_but_safely_falls_back() -> None:

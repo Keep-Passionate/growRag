@@ -1,7 +1,7 @@
 # GrowRAG 当前项目记忆
 
 更新日期：2026-08-19
-状态：路线 A 已确认；可运行 v1 MVP 已实现，下一步接入 Gate 1 真实数据
+状态：路线 A 已确认；v1.1 已加入结构化经验卡、热记忆与可调风险门，下一步接入 Gate 1 真实数据
 权威性：当前入口；后续经双方确认后更新
 
 ## 已确认
@@ -26,6 +26,15 @@
 11. v1 先使用经验阈值、条件破坏率的 Wilson 上界和 risk–coverage；EMA、conformal、bandit/RL 均后置。
 12. v1 已实现经验账本、候选召回、适用性接口、可信 gate、target query plan 接口和离线 candidate-set oracle；真实检索器与数据尚未接入。
 13. v1 已提供严格 TOML 配置、可重启 JSON 经验快照、请求/计划文件协议、完整 TrustedReuseLayer、统一 `growrag` CLI 和文件化 DIRECT/REUSE 示例。
+14. Query variant 指同一信息需求送给检索器的不同表达；来源题 `q_s'`、历史变换卡和应用后的目标题 `q_t'` 必须分开。
+15. 经验卡采用 S2G 启发的结构化缺口元数据：来源失败诊断、gap category、修复原子、正向适用条件和禁用条件；它不是当前题看过证据后的 S2G gap item。
+16. 生命周期新增非破坏性 hot/cold/expired 视图：保守历史质量乘时间衰减后选 Top-K；衰减只改调用优先级，不能改写可靠度，未验证的调用不刷新年龄。
+17. 环境兼容提供 strict/tiered 两种策略；主实验默认 strict，tiered 只有在开发集校准后启用。
+18. 安全力度通过 risk–coverage 操作点选择，不追求一味严格；阈值在 calibration/dev 上选定后冻结。
+19. 检索后路线若继续，必须研究“跨题 gap→repair 经验能否安全替代 fresh repair”；单纯充分性判断和结构化 gap 已被 ReflectiveRAG、S2G-RAG 覆盖。
+20. Contraindication 是独立硬否决，不能因适用性阈值设为 0 而失效；signature 请求必须记录冻结的 query-only extractor ID/version。
+21. risk–coverage 的分母必须是完整目标题集合，包括无候选、环境不兼容和计划失败的题；paired outcome 只能由原始分数自动生成。
+22. schema v1 只允许审计/迁移，不能直接参与运行决策；经验卡经人工复核后另存 schema v2。
 
 ## 已确认主线
 
@@ -54,6 +63,7 @@
 - `DIRECT`：当前原查询，不用历史变换。
 - `REUSE`：把一条历史查询变换应用到当前问题。
 - `FRESH`：只为当前问题现场生成新变换。
+- Query variant：同一信息需求的另一种实际检索查询，可由改写、扩展、分解或消歧产生。
 - 历史可信度（reliability/trust）：过去独立复用时的收益与伤害记录。
 - 当前适用性（applicability/fit）：在当前题执行前，对“这条经验是否匹配”的预测。
 - 成对伤害（harm）：`DIRECT` 达标而 `REUSE` 不达标。
@@ -61,6 +71,7 @@
 - 成对收益（benefit）：`DIRECT` 不达标而 `REUSE` 达标。
 - Gold：数据集提供的参考答案、相关文档、supporting facts、qrels 或 nuggets；不是模型自评分。
 - Oracle：离线看过所有候选真实结果后的上界，不是可部署路由器。
+- Priority：热记忆调用顺序；不是可靠度或正确率。
 
 ## 更新规则
 

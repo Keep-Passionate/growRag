@@ -10,8 +10,16 @@ from growrag.experience.ledger import (
     SourceEvidence,
     TransferObservation,
 )
+from growrag.experience.portfolio import (
+    ExperienceActivity,
+    PortfolioPolicy,
+    PortfolioScore,
+    PortfolioSelection,
+    select_hot_portfolio,
+)
 from growrag.experience.snapshot import (
     SCHEMA_VERSION,
+    SUPPORTED_SCHEMA_VERSIONS,
     ExperienceSnapshot,
     SnapshotValidationError,
     dumps_snapshot,
@@ -19,6 +27,7 @@ from growrag.experience.snapshot import (
     loads_snapshot,
     save_snapshot,
 )
+from growrag.models import SUPPORTED_GAP_CATEGORIES
 
 __all__ = [
     "EvidenceRole",
@@ -29,7 +38,14 @@ __all__ = [
     "ReliabilitySummary",
     "SourceEvidence",
     "TransferObservation",
+    "ExperienceActivity",
+    "PortfolioPolicy",
+    "PortfolioScore",
+    "PortfolioSelection",
+    "select_hot_portfolio",
     "SCHEMA_VERSION",
+    "SUPPORTED_SCHEMA_VERSIONS",
+    "SUPPORTED_GAP_CATEGORIES",
     "ExperienceSnapshot",
     "SnapshotValidationError",
     "dumps_snapshot",

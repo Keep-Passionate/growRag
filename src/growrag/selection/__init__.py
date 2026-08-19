@@ -13,6 +13,12 @@ from growrag.selection.candidates import (
     rank_experiences,
     token_jaccard,
 )
+from growrag.selection.environment import (
+    EnvironmentCompatibilityMode,
+    EnvironmentCompatibilityPolicy,
+    EnvironmentMatchReport,
+    match_environments,
+)
 from growrag.selection.gate import (
     CandidateGateTrace,
     DecisionReason,
@@ -32,6 +38,9 @@ __all__ = [
     "CandidateGateTrace",
     "DecisionReason",
     "DeploymentAction",
+    "EnvironmentCompatibilityMode",
+    "EnvironmentCompatibilityPolicy",
+    "EnvironmentMatchReport",
     "GateCandidate",
     "GateDecision",
     "GatePolicy",
@@ -40,6 +49,7 @@ __all__ = [
     "RankedExperience",
     "SignatureApplicabilityScorer",
     "TrustedReuseGate",
+    "match_environments",
     "rank_experiences",
     "token_jaccard",
 ]

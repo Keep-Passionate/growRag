@@ -46,6 +46,9 @@ def add_candidate(ledger: ExperienceLedger, experience_id: str) -> None:
         source_dataset_id="toy",
         source_split="train",
         source_group_id=f"source-group-{experience_id}",
+        diagnosed_failure="missing bridge from work to author",
+        gap_categories=("bridge_entity", "relation"),
+        contraindication_signature=("answer already explicit", "temporal question"),
     )
     source = SourceEvidence(
         direct_score=0,
@@ -105,7 +108,7 @@ def test_roundtrip_preserves_complete_record_policy_and_identity() -> None:
 
     loaded = loads_snapshot(encoded)
 
-    assert loaded.schema_version == 1
+    assert loaded.schema_version == 2
     assert loaded.memory_snapshot_id == "memory-7"
     assert loaded.ledger.policy == original.policy
     assert loaded.ledger.records == original.records
@@ -162,7 +165,7 @@ def test_unknown_fields_fail_closed(where: str) -> None:
 
 def test_unknown_schema_version_fails_closed() -> None:
     raw = parsed_snapshot()
-    raw["schema_version"] = 2
+    raw["schema_version"] = 3
 
     with pytest.raises(SnapshotValidationError, match="unsupported schema_version"):
         loads_snapshot(json.dumps(raw))
@@ -224,6 +227,12 @@ def test_snapshot_contains_all_environment_and_evidence_fields() -> None:
     }
     assert "passes_paired_write_gate" in record["source_evidence"]
     assert "outcome" in record["transfer_observations"][0]
+    assert record["transformation"]["diagnosed_failure"] == ("missing bridge from work to author")
+    assert record["transformation"]["gap_categories"] == ["bridge_entity", "relation"]
+    assert record["transformation"]["contraindication_signature"] == [
+        "answer already explicit",
+        "temporal question",
+    ]
     assert set(raw["lifecycle_policy"]) == {
         "promotion_min_observations",
         "promotion_min_direct_good_observations",
@@ -232,3 +241,44 @@ def test_snapshot_contains_all_environment_and_evidence_fields() -> None:
         "promotion_max_wilson_breakage_upper_bound",
         "quarantine_at_harm_count",
     }
+
+
+def test_v1_snapshot_loads_with_empty_gap_metadata_and_upgrades_on_write() -> None:
+    raw = parsed_snapshot()
+    raw["schema_version"] = 1
+    transformation = raw["records"][0]["transformation"]
+    transformation.pop("diagnosed_failure")
+    transformation.pop("gap_categories")
+    transformation.pop("contraindication_signature")
+
+    loaded = loads_snapshot(json.dumps(raw))
+
+    card = loaded.ledger.get("exp-1").transformation
+    assert loaded.schema_version == 1
+    assert card.diagnosed_failure == ""
+    assert card.gap_categories == ()
+    assert card.contraindication_signature == ()
+    with pytest.raises(SnapshotValidationError, match="audit/migration-only"):
+        loaded.require_runtime_ready()
+
+    upgraded = json.loads(
+        dumps_snapshot(loaded.ledger, memory_snapshot_id=loaded.memory_snapshot_id)
+    )
+    assert upgraded["schema_version"] == 2
+    assert upgraded["records"][0]["transformation"]["gap_categories"] == []
+
+
+def test_each_snapshot_version_keeps_an_exact_transformation_schema() -> None:
+    v2 = parsed_snapshot()
+    del v2["records"][0]["transformation"]["diagnosed_failure"]
+    with pytest.raises(SnapshotValidationError, match="fields differ"):
+        loads_snapshot(json.dumps(v2))
+
+    v1 = parsed_snapshot()
+    v1["schema_version"] = 1
+    transformation = v1["records"][0]["transformation"]
+    transformation.pop("gap_categories")
+    transformation.pop("contraindication_signature")
+    # Leaving one v2-only field in a v1 object must fail closed.
+    with pytest.raises(SnapshotValidationError, match="fields differ"):
+        loads_snapshot(json.dumps(v1))

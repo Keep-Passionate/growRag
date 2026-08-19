@@ -27,7 +27,8 @@ from growrag.experience.ledger import (
 )
 from growrag.models import EnvironmentFingerprint, QueryTransformation
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+SUPPORTED_SCHEMA_VERSIONS = frozenset({1, SCHEMA_VERSION})
 
 
 class SnapshotValidationError(ValueError):
@@ -41,6 +42,22 @@ class ExperienceSnapshot:
     schema_version: int
     memory_snapshot_id: str
     ledger: ExperienceLedger
+
+    def require_runtime_ready(self) -> ExperienceSnapshot:
+        """Reject audit-readable legacy cards before deployable selection.
+
+        Schema v1 did not represent contraindications. Treating its missing
+        field as an audited empty set would be fail-open, so v1 is available
+        only for explicit migration and review.
+        """
+
+        if self.schema_version != SCHEMA_VERSION:
+            raise SnapshotValidationError(
+                f"memory schema v{self.schema_version} is audit/migration-only; "
+                f"review the cards and save a new schema v{SCHEMA_VERSION} snapshot "
+                "before runtime decisions"
+            )
+        return self
 
 
 def dumps_snapshot(ledger: ExperienceLedger, *, memory_snapshot_id: str) -> str:
@@ -93,9 +110,10 @@ def loads_snapshot(data: str) -> ExperienceSnapshot:
         "snapshot",
     )
     schema_version = _expect_int(root["schema_version"], "schema_version")
-    if schema_version != SCHEMA_VERSION:
+    if schema_version not in SUPPORTED_SCHEMA_VERSIONS:
         raise SnapshotValidationError(
-            f"unsupported schema_version {schema_version}; expected {SCHEMA_VERSION}"
+            f"unsupported schema_version {schema_version}; "
+            f"supported={sorted(SUPPORTED_SCHEMA_VERSIONS)}"
         )
     snapshot_id = _expect_string(root["memory_snapshot_id"], "memory_snapshot_id")
     _require_non_empty_string(snapshot_id, "memory_snapshot_id")
@@ -103,7 +121,11 @@ def loads_snapshot(data: str) -> ExperienceSnapshot:
 
     raw_records = _expect_list(root["records"], "records")
     records = tuple(
-        _record_from_dict(value, path=f"records[{index}]")
+        _record_from_dict(
+            value,
+            path=f"records[{index}]",
+            schema_version=schema_version,
+        )
         for index, value in enumerate(raw_records)
     )
     _validate_unique_experience_ids(records)
@@ -179,9 +201,12 @@ def _record_to_dict(record: ExperienceRecord) -> dict[str, Any]:
             "applicability_signature": list(transformation.applicability_signature),
             "application_note": transformation.application_note,
             "atomic_units": list(transformation.atomic_units),
+            "contraindication_signature": list(transformation.contraindication_signature),
+            "diagnosed_failure": transformation.diagnosed_failure,
             "environment": _environment_to_dict(transformation.environment),
             "experience_id": transformation.experience_id,
             "provenance": transformation.provenance,
+            "gap_categories": list(transformation.gap_categories),
             "source_dataset_id": transformation.source_dataset_id,
             "source_group_id": transformation.source_group_id,
             "source_query": transformation.source_query,
@@ -193,14 +218,23 @@ def _record_to_dict(record: ExperienceRecord) -> dict[str, Any]:
     }
 
 
-def _record_from_dict(value: object, *, path: str) -> ExperienceRecord:
+def _record_from_dict(
+    value: object,
+    *,
+    path: str,
+    schema_version: int,
+) -> ExperienceRecord:
     raw = _expect_object(value, path)
     _require_exact_keys(
         raw,
         {"transformation", "state", "source_evidence", "transfer_observations"},
         path,
     )
-    transformation = _transformation_from_dict(raw["transformation"], f"{path}.transformation")
+    transformation = _transformation_from_dict(
+        raw["transformation"],
+        f"{path}.transformation",
+        schema_version=schema_version,
+    )
     try:
         state = ExperienceState(_expect_string(raw["state"], f"{path}.state"))
     except ValueError as exc:
@@ -222,9 +256,14 @@ def _record_from_dict(value: object, *, path: str) -> ExperienceRecord:
     )
 
 
-def _transformation_from_dict(value: object, path: str) -> QueryTransformation:
+def _transformation_from_dict(
+    value: object,
+    path: str,
+    *,
+    schema_version: int,
+) -> QueryTransformation:
     raw = _expect_object(value, path)
-    fields = {
+    v1_fields = {
         "experience_id",
         "source_query_id",
         "source_query",
@@ -239,33 +278,75 @@ def _transformation_from_dict(value: object, path: str) -> QueryTransformation:
         "source_split",
         "source_group_id",
     }
+    v2_fields = v1_fields | {
+        "diagnosed_failure",
+        "gap_categories",
+        "contraindication_signature",
+    }
+    fields = v1_fields if schema_version == 1 else v2_fields
     _require_exact_keys(raw, fields, path)
     atomic_units = _string_tuple(raw["atomic_units"], f"{path}.atomic_units")
     signature = _string_tuple(
         raw["applicability_signature"],
         f"{path}.applicability_signature",
     )
-    return QueryTransformation(
-        experience_id=_expect_string(raw["experience_id"], f"{path}.experience_id"),
-        source_query_id=_expect_string(raw["source_query_id"], f"{path}.source_query_id"),
-        source_query=_expect_string(raw["source_query"], f"{path}.source_query"),
-        transformed_query=_expect_string(raw["transformed_query"], f"{path}.transformed_query"),
-        atomic_units=atomic_units,
-        environment=_environment_from_dict(raw["environment"], f"{path}.environment"),
-        provenance=_expect_string(raw["provenance"], f"{path}.provenance"),
-        transformation_type=_expect_string(
-            raw["transformation_type"],
-            f"{path}.transformation_type",
-        ),
-        application_note=_expect_string(raw["application_note"], f"{path}.application_note"),
-        applicability_signature=signature,
-        source_dataset_id=_expect_string(
-            raw["source_dataset_id"],
-            f"{path}.source_dataset_id",
-        ),
-        source_split=_expect_string(raw["source_split"], f"{path}.source_split"),
-        source_group_id=_expect_string(raw["source_group_id"], f"{path}.source_group_id"),
-    )
+    diagnosed_failure = ""
+    gap_categories: tuple[str, ...] = ()
+    contraindications: tuple[str, ...] = ()
+    if schema_version == 2:
+        diagnosed_failure = _expect_string(
+            raw["diagnosed_failure"],
+            f"{path}.diagnosed_failure",
+        )
+        gap_categories = _string_tuple(
+            raw["gap_categories"],
+            f"{path}.gap_categories",
+        )
+        contraindications = _string_tuple(
+            raw["contraindication_signature"],
+            f"{path}.contraindication_signature",
+        )
+    try:
+        return QueryTransformation(
+            experience_id=_expect_string(raw["experience_id"], f"{path}.experience_id"),
+            source_query_id=_expect_string(
+                raw["source_query_id"],
+                f"{path}.source_query_id",
+            ),
+            source_query=_expect_string(raw["source_query"], f"{path}.source_query"),
+            transformed_query=_expect_string(
+                raw["transformed_query"],
+                f"{path}.transformed_query",
+            ),
+            atomic_units=atomic_units,
+            environment=_environment_from_dict(raw["environment"], f"{path}.environment"),
+            provenance=_expect_string(raw["provenance"], f"{path}.provenance"),
+            transformation_type=_expect_string(
+                raw["transformation_type"],
+                f"{path}.transformation_type",
+            ),
+            application_note=_expect_string(
+                raw["application_note"],
+                f"{path}.application_note",
+            ),
+            applicability_signature=signature,
+            source_dataset_id=_expect_string(
+                raw["source_dataset_id"],
+                f"{path}.source_dataset_id",
+            ),
+            source_split=_expect_string(raw["source_split"], f"{path}.source_split"),
+            source_group_id=_expect_string(
+                raw["source_group_id"],
+                f"{path}.source_group_id",
+            ),
+            diagnosed_failure=diagnosed_failure,
+            gap_categories=gap_categories,
+            contraindication_signature=contraindications,
+        )
+    except SnapshotValidationError:
+        raise
+    except (TypeError, ValueError) as exc:
+        raise SnapshotValidationError(f"invalid {path}: {exc}") from exc
 
 
 def _environment_to_dict(environment: EnvironmentFingerprint) -> dict[str, str]:

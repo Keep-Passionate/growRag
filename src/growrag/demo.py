@@ -67,6 +67,11 @@ def build_demo_experience() -> QueryTransformation:
         source_dataset_id="toy",
         source_split="development",
         source_group_id="source-family",
+        diagnosed_failure=(
+            "The comparison query did not expose each entity's birth-date attribute."
+        ),
+        gap_categories=("attribute", "relation"),
+        contraindication_signature=("single_entity",),
     )
 
 

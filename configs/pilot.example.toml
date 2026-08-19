@@ -24,6 +24,11 @@ analyzer_version = "UNSET"
 rewriter_id = "UNSET"
 rewriter_version = "UNSET"
 
+[environment_compatibility]
+mode = "strict"
+minimum_score = 1.0
+soft_mismatch_penalty = 0.10
+
 [write_gate]
 minimum_source_gain = 0.05
 
@@ -40,7 +45,7 @@ scorer = "source-query-jaccard-v1"
 maximum_candidates = 5
 
 [applicability]
-scorer = "signature-coverage-v1"
+scorer = "signature-coverage-v2"
 minimum_score = 0.50
 
 [application]

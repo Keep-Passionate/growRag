@@ -11,6 +11,8 @@ GrowRAG 已确认第一版研究方向，并完成可安装、可配置、可重
 - [项目当前记忆](knowledge/CURRENT_PROJECT_MEMORY.md)
 - [路线 A 已确认决策](knowledge/decisions/2026-08-19_路线A查询侧可信复用层_已确认.md)
 - [查询侧可信复用层 v1](knowledge/method/2026-08-19_查询侧可信复用层_v1.md)
+- [查询变体、经验卡、生命周期与双路线](knowledge/method/2026-08-19_查询变体_经验卡_生命周期与双路线.md)
+- [v1.1 代码审阅清单](knowledge/method/2026-08-19_代码审阅清单.md)
 - [Gate 1 代码实验计划](knowledge/experiments/2026-08-19_Gate1_代码实验计划.md)
 - [查询侧可信复用层实施路线](knowledge/experiments/2026-08-19_查询侧可信复用层_实施路线.md)
 - [方向候选与待选择事项](knowledge/decisions/2026-08-19_ERM继承路线与待选择.md)
@@ -33,6 +35,9 @@ GrowRAG 已确认第一版研究方向，并完成可安装、可配置、可重
 - candidate / active / quarantine / retired 经验账本；
 - 严格、可重启的经验快照和运行配置；
 - 历史候选召回、当前适用性、可信 gate 和完整 facade；
+- S2G 启发的来源缺口经验卡、正向/禁用适用条件；
+- 非破坏性的衰减热记忆 Top-K 与 strict/tiered 环境兼容；
+- 可扫描阈值的 risk–coverage 离线分析；
 - 文件化批量决策 CLI 与离线 oracle；
 - 可复现研究所需的防泄漏与风险测试。
 

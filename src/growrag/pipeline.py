@@ -9,7 +9,14 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from growrag.experience import ExperienceLedger, ExperienceRecord, ExperienceState
+from growrag.experience import (
+    ExperienceActivity,
+    ExperienceLedger,
+    ExperienceRecord,
+    ExperienceState,
+    PortfolioPolicy,
+    select_hot_portfolio,
+)
 from growrag.models import EnvironmentFingerprint
 from growrag.rewrite import ApplicationError, QueryPlanApplier
 from growrag.selection import (
@@ -33,6 +40,11 @@ class TrustedReuseResult:
     max_candidates: int
     eligible_experience_ids: tuple[str, ...]
     candidate_experience_ids: tuple[str, ...]
+    portfolio_enabled: bool
+    hot_experience_ids: tuple[str, ...]
+    cold_experience_ids: tuple[str, ...]
+    expired_experience_ids: tuple[str, ...]
+    environment_rejected_experience_ids: tuple[str, ...]
 
 
 class TrustedReuseLayer:
@@ -46,6 +58,7 @@ class TrustedReuseLayer:
         applicability_scorer: ApplicabilityScorer | None = None,
         gate: TrustedReuseGate | None = None,
         max_candidates: int = 5,
+        portfolio_policy: PortfolioPolicy | None = None,
     ) -> None:
         if max_candidates < 1:
             raise ValueError("max_candidates must be at least 1")
@@ -54,6 +67,7 @@ class TrustedReuseLayer:
         self.applicability_scorer = applicability_scorer or SignatureApplicabilityScorer()
         self.gate = gate or TrustedReuseGate()
         self.max_candidates = max_candidates
+        self.portfolio_policy = portfolio_policy
 
     def decide(
         self,
@@ -63,20 +77,65 @@ class TrustedReuseLayer:
         target_query: str,
         current_environment: EnvironmentFingerprint,
         current_signatures: frozenset[str],
+        activities: Iterable[ExperienceActivity] = (),
+        current_step: int | None = None,
     ) -> TrustedReuseResult:
         """Return the query-side action without observing downstream outcomes."""
 
         materialized = _materialize_records(records)
         _validate_unique_experience_ids(materialized)
+        if self.portfolio_policy is None:
+            portfolio_enabled = False
+            hot_ids = tuple(
+                sorted(
+                    record.experience_id
+                    for record in materialized
+                    if record.state is ExperienceState.ACTIVE
+                )
+            )
+            cold_ids: tuple[str, ...] = ()
+            expired_ids: tuple[str, ...] = ()
+        else:
+            if current_step is None:
+                raise ValueError(
+                    "current_step is required when the hot-memory portfolio is enabled"
+                )
+            portfolio_enabled = True
+            portfolio = select_hot_portfolio(
+                materialized,
+                activities,
+                current_step=current_step,
+                policy=self.portfolio_policy,
+            )
+            hot_ids = portfolio.hot
+            cold_ids = portfolio.cold
+            expired_ids = portfolio.expired
+        allowed_ids = frozenset(hot_ids)
+        active_allowed = tuple(
+            record
+            for record in materialized
+            if record.state is ExperienceState.ACTIVE and record.experience_id in allowed_ids
+        )
+        environment_reports = {
+            record.experience_id: self.gate.match_environment(
+                record.transformation.environment,
+                current_environment,
+            )
+            for record in active_allowed
+        }
+        environment_rejected_ids = tuple(
+            sorted(
+                record.experience_id
+                for record in active_allowed
+                if not environment_reports[record.experience_id].compatible
+            )
+        )
         eligible = tuple(
             sorted(
                 (
                     record
-                    for record in materialized
-                    if record.state is ExperienceState.ACTIVE
-                    and record.transformation.environment.retrieval_compatible_with(
-                        current_environment
-                    )
+                    for record in active_allowed
+                    if environment_reports[record.experience_id].compatible
                 ),
                 key=lambda record: record.experience_id,
             )
@@ -128,6 +187,11 @@ class TrustedReuseLayer:
             candidate_experience_ids=tuple(
                 recalled.experience.experience_id for recalled in ranked
             ),
+            portfolio_enabled=portfolio_enabled,
+            hot_experience_ids=hot_ids,
+            cold_experience_ids=cold_ids,
+            expired_experience_ids=expired_ids,
+            environment_rejected_experience_ids=environment_rejected_ids,
         )
 
 

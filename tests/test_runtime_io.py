@@ -19,6 +19,14 @@ def write_json(path, value: object) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
 
 
+def signature_protocol() -> dict[str, str]:
+    return {
+        "signature_extractor_id": "query-only-rules",
+        "signature_extractor_version": "1",
+        "signature_input_scope": "query_only",
+    }
+
+
 def valid_plan_bundle() -> dict[str, object]:
     return {
         "schema_version": 1,
@@ -68,6 +76,7 @@ def test_load_requests_from_strict_jsonl(tmp_path) -> None:
                         "target_query_id": "q-1",
                         "target_query": "Who wrote Hamlet?",
                         "signatures": ["authorship", "play"],
+                        **signature_protocol(),
                     }
                 ),
                 json.dumps(
@@ -75,6 +84,7 @@ def test_load_requests_from_strict_jsonl(tmp_path) -> None:
                         "target_query_id": "q-2",
                         "target_query": "Where was Austen born?",
                         "signatures": [],
+                        **signature_protocol(),
                     }
                 ),
             )
@@ -99,6 +109,10 @@ def test_load_requests_from_strict_jsonl(tmp_path) -> None:
         (lambda value: value.update({"signatures": "authorship"}), "signatures must be an array"),
         (lambda value: value.update({"signatures": [1]}), r"signatures\[0\] must be a string"),
         (lambda value: value.update({"signatures": [" "]}), r"signatures\[0\] must not be empty"),
+        (
+            lambda value: value.update({"signature_input_scope": "retrieval_results"}),
+            "must be 'query_only'",
+        ),
     ],
 )
 def test_request_schema_fails_closed(tmp_path, mutation, message: str) -> None:
@@ -106,6 +120,7 @@ def test_request_schema_fails_closed(tmp_path, mutation, message: str) -> None:
         "target_query_id": "q-1",
         "target_query": "Who wrote Hamlet?",
         "signatures": ["authorship"],
+        **signature_protocol(),
     }
     mutation(request)
     path = tmp_path / "bad.jsonl"
@@ -120,6 +135,7 @@ def test_duplicate_request_id_and_blank_line_are_rejected(tmp_path) -> None:
         "target_query_id": "same",
         "target_query": "question",
         "signatures": [],
+        **signature_protocol(),
     }
     duplicate_path = tmp_path / "duplicate.jsonl"
     duplicate_path.write_text(
@@ -143,6 +159,33 @@ def test_duplicate_json_object_key_is_rejected_in_request(tmp_path) -> None:
     )
 
     with pytest.raises(RuntimeIOError, match="duplicate JSON key"):
+        load_requests(path)
+
+
+def test_request_batch_requires_one_frozen_signature_protocol(tmp_path) -> None:
+    base = {
+        "target_query": "question",
+        "signatures": [],
+        **signature_protocol(),
+    }
+    path = tmp_path / "mixed-protocol.jsonl"
+    path.write_text(
+        "\n".join(
+            (
+                json.dumps({**base, "target_query_id": "q1"}),
+                json.dumps(
+                    {
+                        **base,
+                        "target_query_id": "q2",
+                        "signature_extractor_version": "2",
+                    }
+                ),
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RuntimeIOError, match="one frozen signature protocol"):
         load_requests(path)
 
 
