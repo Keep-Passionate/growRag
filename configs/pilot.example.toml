@@ -1,0 +1,21 @@
+[experiment]
+name = "gate1_oracle_feasibility"
+seed = 42
+
+[actions]
+direct = true
+reuse = true
+fresh = true
+
+[evaluation]
+good_threshold = 1.0
+max_history_candidates = 5
+paired_harm_is_primary = true
+
+[environment]
+corpus_id = "UNSET"
+corpus_version = "UNSET"
+retriever_id = "bm25"
+retriever_version = "UNSET"
+rewriter_id = "UNSET"
+

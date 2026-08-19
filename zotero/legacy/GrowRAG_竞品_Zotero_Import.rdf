@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:vcard="http://nwalsh.com/rdf/vCard#"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:link="http://purl.org/rss/1.0/modules/link/"
+  xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/">
+
+<!-- ============================================================
+     GrowRAG 竞品分析合集 — 2026-08-05
+     用途：识别竞争关系，支撑 GrowRAG 论文的 Related Work 定位
+     导入方法：File > Import… > 选择本文件
+     ============================================================ -->
+
+  <z:Collection rdf:about="#col_GrowRAG_竞品">
+    <dc:title>GrowRAG 竞品分析 2026</dc:title>
+    <dcterms:hasPart rdf:resource="#item_ReflectiveRAG"/>
+    <dcterms:hasPart rdf:resource="#item_ERM"/>
+    <dcterms:hasPart rdf:resource="#item_GAM_RAG"/>
+    <dcterms:hasPart rdf:resource="#item_ExpWeaver"/>
+    <dcterms:hasPart rdf:resource="#item_MemCon"/>
+    <dcterms:hasPart rdf:resource="#item_Memory_R1"/>
+    <dcterms:hasPart rdf:resource="#item_Amber"/>
+  </z:Collection>
+
+<!-- ============================================================
+     1. ReflectiveRAG — 单题修复基线 BR
+     ============================================================ -->
+  <bib:Article rdf:about="#item_ReflectiveRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReflectiveRAG: Rethinking Adaptivity in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.eacl-industry.27/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.eacl-industry.27</dc:identifier>
+    <z:extra>[GrowRAG-竞品] 【单题修复基线 BR】1.5B SLM做自反思检索(SRR)+噪声去除(NR)，无需策略训练，+2.7ppEM(HotpotQA)，打败7B RL模型。我们的改进方向：让其修复结果在后续相似查询中被安全摊销。Zotero存储：DUGV4YEY</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Verma</foaf:surname><foaf:givenName>Akshay</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Gupta</foaf:surname><foaf:givenName>Swapnil</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Pillai</foaf:surname><foaf:givenName>Siddharth</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Sircar</foaf:surname><foaf:givenName>Prateek</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Gupta</foaf:surname><foaf:givenName>Deepak</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf>
+      <bib:Proceedings><dc:title>Proceedings of the 2026 Conference of the European Chapter of the ACL: Industry Track (EACL 2026)</dc:title></bib:Proceedings>
+    </dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-竞品</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG-memory</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>基线BR</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+<!-- ============================================================
+     2. ERM — 最直接竞品，改文档索引我们不改
+     ============================================================ -->
+  <bib:Article rdf:about="#item_ERM">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>RAG without Forgetting: Continual Query-Infused Key Memory</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2602.05152</z:url>
+    <dc:identifier>arXiv:2602.05152</dc:identifier>
+    <z:extra>[GrowRAG-竞品] 【最直接竞品】把成功的query expansion持久化为document key更新(index-side)，training-free，零推理开销，BEIR+BRIGHT 13域+46%BM25/+15%密集。【差异化】ERM改文档key嵌入；我们维护独立经验账本、不碰索引、有abstention。Zotero存储：8H3G28TQ</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Hu</foaf:surname><foaf:givenName>Yuntong</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Li</foaf:surname><foaf:givenName>Sha</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Ramakrishnan</foaf:surname><foaf:givenName>Naren</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Zhao</foaf:surname><foaf:givenName>Liang</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2602.05152</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-竞品</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG-memory</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>最直接竞品</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+<!-- ============================================================
+     3. GAM-RAG — 积累检索经验+Kalman增益，raw+EMA被覆盖降为消融
+     ============================================================ -->
+  <bib:Article rdf:about="#item_GAM_RAG">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>GAM-RAG: Gain-Adaptive Memory for Evolving Retrieval in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2603.01783</z:url>
+    <dc:identifier>arXiv:2603.01783</dc:identifier>
+    <z:extra>[GrowRAG-竞品] 【原方案raw+EMA被覆盖，降为消融】复旦。三层图(entity→sentence→passage)+Kalman gain在线更新句子记忆向量。+3.95%(0-turn)/+8.19%(5-turn)，推理成本-61%。【差异化】GAM-RAG需图结构；我们不需图，更plug-and-play，且有NO_MEMORY一等动作。Zotero存储：3HGLTY4D</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Wang</foaf:surname><foaf:givenName>Yifan</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Jiang</foaf:surname><foaf:givenName>Mingxuan</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Sun</foaf:surname><foaf:givenName>Zhihao</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Cao</foaf:surname><foaf:givenName>Yixin</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Liu</foaf:surname><foaf:givenName>Yicun</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Chen</foaf:surname><foaf:givenName>Keyang</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Ye</foaf:surname><foaf:givenName>Guangnan</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Chai</foaf:surname><foaf:givenName>Hongfeng</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2603.01783</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-竞品</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG-memory</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+<!-- ============================================================
+     4. ExpWeaver — 经验调用时机研究，门控器想法已被覆盖
+     ============================================================ -->
+  <bib:Article rdf:about="#item_ExpWeaver">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Rethinking Experience Utilization in Self-Evolving Language Model Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2605.07164</z:url>
+    <dc:identifier>arXiv:2605.07164</dc:identifier>
+    <z:extra>[GrowRAG-竞品] 【何时调用经验已被覆盖】发现always-on差于init-only；ExpWeaver让agent选择性调用经验。4框架×7LLM×3环境。RL可放大选择性调用。【启示】三路决策(NO_MEMORY/REUSE/RE_REFLECT)有依据，但我们不把"调用时机"当主创新。Zotero存储：3SZRD3XK</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Zhao</foaf:surname><foaf:givenName>Weixiang</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Wang</foaf:surname><foaf:givenName>Yingshuo</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Zhang</foaf:surname><foaf:givenName>Yichen</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Zhao</foaf:surname><foaf:givenName>Yanyan</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Zhang</foaf:surname><foaf:givenName>Yu</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Wu</foaf:surname><foaf:givenName>Yang</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Qin</foaf:surname><foaf:givenName>Bing</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Liu</foaf:surname><foaf:givenName>Ting</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2605.07164</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-竞品</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>agent-experience</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+<!-- ============================================================
+     5. MemCon — 在线学习记忆策略(bandit)，本地PDF已下载
+     ============================================================ -->
+  <bib:Article rdf:about="#item_MemCon">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Memory as a Controlled Process: Learned Adaptive Memory Management for LLM Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2607.13591</z:url>
+    <dc:identifier>arXiv:2607.13591</dc:identifier>
+    <z:extra>[GrowRAG-竞品] 【在线bandit学习记忆控制，已被覆盖】UCLA。MDP建模记忆操作，tabular contextual bandit+UCB学习retrieve/inject/consolidate/forget/noop策略。6基准×3框架×3LLM，+15.2pp，token-5-20%。【差异化】MemCon研究通用agent任务；我们研究RAG-QA检索修复，完全不同场景。PDF已下载至docs/literature_notes/</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Jiang</foaf:surname><foaf:givenName>Eric Hanchen</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Zhang</foaf:surname><foaf:givenName>Zhi</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Wu</foaf:surname><foaf:givenName>Yuchen</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Chang</foaf:surname><foaf:givenName>Kai-Wei</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Wu</foaf:surname><foaf:givenName>Ying Nian</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2607.13591</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-竞品</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG-memory</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>PDF已下载</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+<!-- ============================================================
+     6. Memory-R1 — RL学习ADD/UPDATE/DELETE/NOOP，训练成本高
+     ============================================================ -->
+  <bib:Article rdf:about="#item_Memory_R1">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Memory-R1: Enhancing Large Language Model Agents to Manage and Utilize Memories via Reinforcement Learning</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.583/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.583</dc:identifier>
+    <z:extra>[GrowRAG-竞品] 【端到端RL记忆Agent，正面竞争且训练成本高】双agent(Memory Manager+Answer Agent)，RL(PPO/GRPO)训练，仅152 QA对收敛。操作:ADD/UPDATE/DELETE/NOOP。LoCoMo/MSC/LongMemEval。【差异化】研究对话历史记忆；我们研究RAG检索修复经验摊销，场景不同。Zotero存储：V2QBRVGI</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Yan</foaf:surname><foaf:givenName>Sikuan</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Yang</foaf:surname><foaf:givenName>Xiufeng</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Huang</foaf:surname><foaf:givenName>Zuchao</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Nie</foaf:surname><foaf:givenName>Ercong</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Pan</foaf:surname><foaf:givenName>Jeff Z.</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Ma</foaf:surname><foaf:givenName>Yunpu</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf>
+      <bib:Proceedings><dc:title>Proceedings of the 63rd Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings>
+    </dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-竞品</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG-memory</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+<!-- ============================================================
+     7. Amber — 多Agent迭代记忆RAG，路线太重不适合第一篇
+     ============================================================ -->
+  <bib:Article rdf:about="#item_Amber">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Towards Adaptive Memory-Based Optimization for Enhanced Retrieval-Augmented Generation</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.findings-acl.418/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.findings-acl.418</dc:identifier>
+    <z:extra>[GrowRAG-竞品] 【多Agent强耦合RAG路线，太重不适合第一篇】三模块：Agent-based Memory Updater/Adaptive Information Collector/Multi-granular Content Filter。覆盖"多Agent+迭代记忆+查询改写+停止判断"。【结论】GrowRAG走轻量单Agent旁路路线，与此明确区分。Zotero存储：U48W2HX3</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Qin</foaf:surname><foaf:givenName>Qitao</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Luo</foaf:surname><foaf:givenName>Yucong</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Lu</foaf:surname><foaf:givenName>Yihang</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Chu</foaf:surname><foaf:givenName>Zhibo</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Liu</foaf:surname><foaf:givenName>Xiaoman</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Meng</foaf:surname><foaf:givenName>Xianwei</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf>
+      <bib:Proceedings><dc:title>Findings of the ACL: ACL 2025</dc:title></bib:Proceedings>
+    </dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-竞品</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG-memory</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+</rdf:RDF>

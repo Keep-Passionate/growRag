@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <!--
+    GrowRAG 已覆盖方向与研究缺口审计包（2026-08-19）
+    共 21 条、6 个集合。20 条与 08-14 / 08-19 包可能重复；潜空间 ExpWeaver 为新增条目。
+    导入后请按 DOI 或 arXiv ID 合并，切勿按“ExpWeaver”方法名合并两篇不同论文。
+  -->
+
+  <z:Collection rdf:about="#c_query_learning">
+    <dc:title>GrowRAG 研究缺口｜01 查询生成与学习｜可能与已有包重复</dc:title>
+    <dcterms:hasPart rdf:resource="#queryrewrite"/>
+    <dcterms:hasPart rdf:resource="#rafe"/>
+    <dcterms:hasPart rdf:resource="#rqrag"/>
+    <dcterms:hasPart rdf:resource="#reformer"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#c_preselect">
+    <dc:title>GrowRAG 研究缺口｜02 检索前选择与止损｜可能与已有包重复</dc:title>
+    <dcterms:hasPart rdf:resource="#qppvariant"/>
+    <dcterms:hasPart rdf:resource="#notallrewrite"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#c_retrieval_memory">
+    <dc:title>GrowRAG 研究缺口｜03 持续检索记忆｜可能与已有包重复</dc:title>
+    <dcterms:hasPart rdf:resource="#erm"/>
+    <dcterms:hasPart rdf:resource="#gamrag"/>
+    <dcterms:hasPart rdf:resource="#rrm"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#c_agent_memory">
+    <dc:title>GrowRAG 研究缺口｜04 Agent经验控制与压缩｜可能与已有包重复</dc:title>
+    <dcterms:hasPart rdf:resource="#expweaver_optional"/>
+    <dcterms:hasPart rdf:resource="#expweaver_latent"/>
+    <dcterms:hasPart rdf:resource="#memcon"/>
+    <dcterms:hasPart rdf:resource="#usefulmemories"/>
+    <dcterms:hasPart rdf:resource="#coevomem"/>
+    <dcterms:hasPart rdf:resource="#merit"/>
+    <dcterms:hasPart rdf:resource="#qcr"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#c_postrepair">
+    <dc:title>GrowRAG 研究缺口｜05 检索后自省修复｜可能与已有包重复</dc:title>
+    <dcterms:hasPart rdf:resource="#selfrag"/>
+    <dcterms:hasPart rdf:resource="#reflectiverag_verma"/>
+    <dcterms:hasPart rdf:resource="#s2grag"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#c_trust">
+    <dc:title>GrowRAG 研究缺口｜06 可信拒绝与反事实伤害｜可能与已有包重复</dc:title>
+    <dcterms:hasPart rdf:resource="#selectivenet"/>
+    <dcterms:hasPart rdf:resource="#counterfactualharm"/>
+  </z:Collection>
+
+  <bib:Article rdf:about="#queryrewrite">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Query Rewriting in Retrieval-Augmented Large Language Models</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://aclanthology.org/2023.emnlp-main.322/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2023.emnlp-main.322</dc:identifier>
+    <z:extra>状态：EMNLP 2023 Main，正式同行评审。 已做：提出 Rewrite-Retrieve-Read；用冻结阅读器的反馈通过强化学习训练小型查询改写器。 没做：没有跨问题历史经验库、运行时拒绝复用、经验生命周期，也没有显式度量 DIRECT 正确而改写后错误的伤害。 GrowRAG 启示：可作“如何生成 fresh rewrite”的基础基线；GrowRAG 的贡献应放在历史变换是否值得复用，而非再次声称首次学习查询改写。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Xinbei</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yeyun</foaf:givenName><foaf:surname>Gong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Pengcheng</foaf:givenName><foaf:surname>He</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hai</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Nan</foaf:givenName><foaf:surname>Duan</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of EMNLP 2023</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>查询生成与学习</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#rafe">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RaFe: Ranking Feedback Improves Query Rewriting for RAG</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://aclanthology.org/2024.findings-emnlp.49/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2024.findings-emnlp.49</dc:identifier>
+    <z:extra>状态：Findings of EMNLP 2024，正式同行评审（不是 EMNLP Main）。 已做：用检索排序反馈构造无人工改写标注的训练信号，优化 RAG 查询改写。 没做：没有持久历史记忆、复用时适用性判断或生命周期；排序改善也不等于最终答案改善，更未控制有害复用。 GrowRAG 启示：可借其 ranking feedback 作为检索层收益信号，但必须另测答案层收益与 DIRECT→REUSE 的非对称伤害。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Shengyu</foaf:givenName><foaf:surname>Mao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yong</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Boli</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiao</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Peng</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xinyu</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Pengjun</foaf:givenName><foaf:surname>Xie</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Fei</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Huajun</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ningyu</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: EMNLP 2024</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>查询生成与学习</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#rqrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RQ-RAG: Learning to Refine Queries for Retrieval Augmented Generation</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://openreview.net/forum?id=tzE7VqsaJ4</z:url>
+    <dc:identifier>arXiv:2404.00610</dc:identifier>
+    <z:extra>状态：COLM 2024，正式同行评审。 已做：训练模型在 rewrite、decompose、disambiguate 等查询操作之间生成并选择轨迹。 没做：没有跨题经验可信度、历史复用生命周期或无需训练的轻量拒绝层。 GrowRAG 启示：可作训练型强参照；第一版应强调对冻结 RAG 的历史经验增量与安全选择，而不是扩大动作空间。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Chi-Min</foaf:givenName><foaf:surname>Chan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chunpu</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ruibin</foaf:givenName><foaf:surname>Yuan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hongyin</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wei</foaf:givenName><foaf:surname>Xue</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yike</foaf:givenName><foaf:surname>Guo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jie</foaf:givenName><foaf:surname>Fu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Conference on Language Modeling (COLM 2024)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>查询生成与学习</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#reformer">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReFormeR: Learning and Applying Explicit Query Reformulation Patterns</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://doi.org/10.1007/978-3-032-21300-6_30</z:url>
+    <dc:identifier>DOI: 10.1007/978-3-032-21300-6_30</dc:identifier>
+    <z:extra>状态：ECIR 2026 正式短论文；官方会议报告标注 Best Short Paper。 已做：从成功查询对归纳显式改写模式，并结合原查询与首次检索上下文选择和应用模式。 没做：没有在线经验生命周期、显式 DIRECT/REUSE 拒绝动作、反事实伤害约束或回滚；选择还依赖首次检索上下文，并非纯 query-only 前置层。 GrowRAG 启示：这是最接近 typed delta 的方法基线；剩余切口是把静态模式改成可审计的可选历史，并分离历史可信度与当前适用性。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Amin</foaf:givenName><foaf:surname>Bigdeli</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mert</foaf:givenName><foaf:surname>Incesu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Charles L. A.</foaf:givenName><foaf:surname>Clarke</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ebrahim</foaf:givenName><foaf:surname>Bagheri</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>48th European Conference on Information Retrieval (ECIR 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>查询生成与学习</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#qppvariant">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Can QPP Choose the Right Query Variant? Evaluating Query Variant Selection for RAG Pipelines</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://doi.org/10.1145/3805712.3808571</z:url>
+    <dc:identifier>DOI: 10.1145/3805712.3808571</dc:identifier>
+    <z:extra>状态：SIGIR 2026 Reproducibility Track，正式同行评审。 已做：比较检索前与检索后 QPP，在多个 query variant 中预测并选择一个；揭示检索指标与答案效用存在 utility gap。 没做：没有历史经验库、经验写入与衰减、复用伤害预算或 DIRECT/REUSE 回滚。 GrowRAG 启示：它说明适用性可以事前估计但不能保证；可作轻量 selector 基线，并用 oracle 上限先判断该方向是否值得做。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Andrew</foaf:givenName><foaf:surname>Drozdov</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Michael</foaf:givenName><foaf:surname>Bendersky</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Matei</foaf:givenName><foaf:surname>Zaharia</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>检索前选择与止损</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#notallrewrite">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Not All Queries Need Rewriting: When Prompt-Only LLM Refinement Helps and Hurts Dense Retrieval</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://openreview.net/forum?id=tmpVrh40jX</z:url>
+    <dc:identifier>arXiv:2603.13301</dc:identifier>
+    <z:extra>状态：ICLR 2026 CAO Workshop 论文；经 workshop 审稿，但不是 ICLR 主会。 已做：系统展示 prompt-only 查询改写会因领域和检索器而增益或退化，并测试简单 gate 与 oracle。 没做：没有跨题历史经验、RAG 答案生成评估、稳定的安全门或经验更新机制。 GrowRAG 启示：它是止损反证：先测 never-rewrite、always-rewrite、gate 与 oracle；若历史复用的 oracle 空间很小，就不应继续堆复杂控制器。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Varun</foaf:givenName><foaf:surname>Kotte</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>CAO Workshop at ICLR 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>检索前选择与止损</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Workshop-非主会</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#erm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RAG without Forgetting: Continual Query-Infused Key Memory</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2602.05152</z:url>
+    <dc:identifier>arXiv:2602.05152</dc:identifier>
+    <z:extra>状态：ICML 2026，正式同行评审；方法名为 ERM（Evolving Retrieval Memory）。 已做：在写入时用正确性验证器筛选查询扩展，并把成功扩展归因后持续更新文档键；支持 gold、人评或 LLM judge。 没做：写入门不等于未来复用门；未来查询直接使用演化索引，没有每题 DIRECT/ERM 选择、不可变基础索引、显式 abstain/rollback，也未以 DIRECT 正确而 ERM 错误定义伤害；论文还承认正反馈可能放大早期偏差。 GrowRAG 启示：最有力增量是不可变基础索引＋可选 ERM overlay，再分别估计历史可信度与当前适用性，并以 DIRECT/OVERLAY/REWRITE 三动作控制有害复用。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yuntong</foaf:givenName><foaf:surname>Hu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sha</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Naren</foaf:givenName><foaf:surname>Ramakrishnan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Liang</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>持续检索记忆</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#gamrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>GAM-RAG: Gain-Adaptive Memory for Evolving Retrieval in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2603.01783</z:url>
+    <dc:identifier>arXiv:2603.01783</dc:identifier>
+    <z:extra>状态：ICML 2026，正式同行评审。 已做：以无关系层级图和句子记忆积累跨题检索经验，依据困惑度不确定性用 Kalman-inspired gain 自适应更新，且无需训练。 没做：其增益更新不是标准 EMA；没有复用 abstain、反事实伤害、历史可信度/当前适用性分解或回滚。 GrowRAG 启示：可借其收益与不确定性共同更新经验强度，但 GrowRAG 应把“是否调用”与“调用后怎样更新”拆开。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yifan</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mingxuan</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhihao</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yixin</foaf:givenName><foaf:surname>Cao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yicun</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Keyang</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Guangnan</foaf:givenName><foaf:surname>Ye</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hongfeng</foaf:givenName><foaf:surname>Chai</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>持续检索记忆</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#rrm">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>RRM: Experience-Driven Reflective Retrieval Memory for Long-Horizon Multimodal Reasoning</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2607.28156</z:url>
+    <dc:identifier>arXiv:2607.28156</dc:identifier>
+    <z:extra>状态：仅 arXiv 预印本（arXiv:2607.28156）；截至 2026-08-19 未核实正式接收。 已做：从长程多模态轨迹提炼程序性检索知识，向新问题提供 query-level guidance，同时保留 fresh evidence，并用复用反馈、频率和时间衰减管理生命周期。 没做：没有面向文本 RAG 查询变换的 DIRECT/REUSE 风险校准、正式拒绝保证或不可变基线回放协议。 GrowRAG 启示：历史经验、query-only 使用和生命周期已被覆盖；可做的新问题是“可靠经验在当前题是否适用”及错误复用的可测风险。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Jingxiang</foaf:givenName><foaf:surname>Fan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Junbao</foaf:givenName><foaf:surname>Zhuo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bochao</foaf:givenName><foaf:surname>Zou</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>持续检索记忆</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-未核实接收</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#expweaver_optional">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Rethinking Experience Utilization in Self-Evolving Language Model Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2605.07164</z:url>
+    <dc:identifier>arXiv:2605.07164</dc:identifier>
+    <z:extra>状态：仅 arXiv 预印本（arXiv:2605.07164）；截至 2026-08-19 未核实正式接收。注意：其方法也叫 ExpWeaver。 已做：保持经验构建不变，把经验作为推理中的可选资源，让 Agent 在需要时选择调用；也报告强化学习可增强该行为。 没做：没有显式拆分历史可信度与当前适用性，没有查询改写专用的反事实伤害、不可变 DIRECT 基线或风险覆盖保证。 GrowRAG 启示：“经验是可选资源”不能再作为单独创新；GrowRAG 应把选择对象收窄到历史查询变换，并给出可审计的拒绝与伤害定义。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Weixiang</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yingshuo</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yichen</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yanyan</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yu</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yang</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dandan</foaf:givenName><foaf:surname>Tu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bing</foaf:givenName><foaf:surname>Qin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ting</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Agent经验控制与压缩</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-未核实接收</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>同名方法-勿误合并</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#expweaver_latent">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ExpWeaver: LLM Agents Learn from Experience via Latent RAG</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://openreview.net/forum?id=4ARH5kZrgz</z:url>
+    <dc:identifier>arXiv:2606.01041</dc:identifier>
+    <z:extra>状态：ICML 2026 regular paper，正式同行评审；arXiv:2606.01041。与 Zhao 等同名 ExpWeaver 是不同论文。 已做：把经验编码到 LLM 隐状态，在每个解码步做潜空间检索，以交叉注意力和门控残差融合，并用强化学习端到端优化。 没做：不是黑盒冻结 RAG 的轻量插件；经验不易人工审计，也没有显式 DIRECT/REUSE 伤害、历史可信度/当前适用性分解或无训练拒绝门。 GrowRAG 启示：潜空间经验融合已被正式论文覆盖；GrowRAG 第一版更适合保持文本化、可解释、可旁路的经验层。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Tao</foaf:givenName><foaf:surname>Feng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tianyang</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jingjun</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhigang</foaf:givenName><foaf:surname>Hua</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yan</foaf:givenName><foaf:surname>Xie</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Shuang</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ge</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiaxuan</foaf:givenName><foaf:surname>You</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Agent经验控制与压缩</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>同名方法-勿误合并</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#memcon">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Memory as a Controlled Process: Learned Adaptive Memory Management for LLM Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2607.13591</z:url>
+    <dc:identifier>arXiv:2607.13591</dc:identifier>
+    <z:extra>状态：仅 arXiv 预印本（arXiv:2607.13591）；截至 2026-08-19 未核实正式接收。 已做：将记忆操作建模为 MDP，并用带 UCB 的表格 contextual bandit 在 retrieve、plan inject、re-retrieve、consolidate、forget 与 NoOp 之间在线选择。 没做：没有查询变换专用的可信复用定义；UCB 探索可能产生在线伤害，且二元反馈不能直接给出 DIRECT 反事实。 GrowRAG 启示：可作为后期 Agent 控制器参考，不宜成为第一版核心；先做离线 paired replay 与保守拒绝，再考虑在线 bandit。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Eric Hanchen</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhi</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yuchen</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Levina</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dong</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiao</foaf:givenName><foaf:surname>Liang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rui</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yubei</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Edward</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Haozheng</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhaolu</foaf:givenName><foaf:surname>Kang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Aylin</foaf:givenName><foaf:surname>Caliskan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kai-Wei</foaf:givenName><foaf:surname>Chang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ying Nian</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Agent经验控制与压缩</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-未核实接收</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#usefulmemories">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Useful Memories Become Faulty When Continuously Updated by LLMs</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2605.12978</z:url>
+    <dc:identifier>arXiv:2605.12978</dc:identifier>
+    <z:extra>状态：仅 arXiv 预印本（arXiv:2605.12978）；截至 2026-08-19 未核实正式接收。 已做：实证指出 LLM 连续 consolidation 会把有用记忆改坏，原始 episodic traces 可有竞争力，并支持显式 consolidation gate。 没做：没有针对新查询的适用性预测、DIRECT/REUSE 风险预算或查询改写记忆结构。 GrowRAG 启示：第一版保留原始 query pair 与版本，不反复覆盖；摘要/CoT 笔记作为可删除派生视图，并让 EMA 只调权重而不改原记录。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Dylan</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yanshan</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhengkun</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yihang</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bingxuan</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dianqi</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hao</foaf:givenName><foaf:surname>Peng</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Agent经验控制与压缩</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-未核实接收</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#coevomem">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>CoEvo-Mem: Co-Evolving Retrieval Policy and Memory Bank for LLM Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.01739</z:url>
+    <dc:identifier>arXiv:2608.01739</dc:identifier>
+    <z:extra>状态：仅 arXiv 预印本（arXiv:2608.01739）；截至 2026-08-19 未核实正式接收。 已做：让冻结 LLM 生成 route-specific query rewrites 与路由先验，再由轻量残差路由器和记忆库根据结果共同演化。 没做：没有显式 DIRECT/REUSE 伤害、风险预算、历史可信度/当前适用性分解或可审计回滚。 GrowRAG 启示：“路由＋查询改写＋记忆共演化”已高度拥挤；应避免泛化成同类框架，收窄到文本 RAG 的检索前有害复用控制。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Bowen</foaf:givenName><foaf:surname>Ye</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yongchao</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhijian</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiang</foaf:givenName><foaf:surname>Yin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Junkai</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wenzhao</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Agent经验控制与压缩</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-未核实接收</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#merit">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Causal Episodic Memory for Feedback-Driven Agent Repair</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.05906</z:url>
+    <dc:identifier>arXiv:2608.05906</dc:identifier>
+    <z:extra>状态：仅 arXiv 预印本（arXiv:2608.05906）；截至 2026-08-19 未核实正式接收。 已做：在 Text-to-SQL 中保存 oracle 验证的正负修复经验，以故障类型条件化混合检索，并迁移到后续问题。 没做：依赖强 oracle，不是通用文本 RAG；typed retrieval 未稳定优于 untyped dynamic retrieval，BIRD 增益也较弱；没有正式安全保证。 GrowRAG 启示：typed delta 与正负经验都不是空白；可借它设计消融，但核心应是弱监督条件下的可信复用和当前适用性。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Khang Nhat Hoang</foaf:givenName><foaf:surname>Vo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tam Minh</foaf:givenName><foaf:surname>Chu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Anh Trac Duc</foaf:givenName><foaf:surname>Dinh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Thuyen Vinh Ha</foaf:givenName><foaf:surname>Bui</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tho</foaf:givenName><foaf:surname>Quan</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Agent经验控制与压缩</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-未核实接收</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#qcr">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Beyond Retrieval: Query-Conditioned Reuse of Long-Horizon Agent Trajectories</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.12847</z:url>
+    <dc:identifier>arXiv:2608.12847</dc:identifier>
+    <z:extra>状态：仅 arXiv 预印本（arXiv:2608.12847）；截至 2026-08-19 未核实正式接收。 已做：把长程 Agent 轨迹压缩为面向当前目标的支持笔记，显式保留流程、变量绑定、适用条件和验证要求。 没做：不优化文本 RAG 的检索前查询变换、经验写入生命周期或 DIRECT/REUSE 风险门。 GrowRAG 启示：CoT/轨迹压缩成笔记已有近邻；若保留备选，应聚焦检索 CoT 中的查询变换依据与可验证条件，而不是笼统宣称首次压缩轨迹。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yifei</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Heng</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Lingling</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Muye</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xinyu</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiashuai</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hang</foaf:givenName><foaf:surname>Yan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rongman</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Agent经验控制与压缩</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-未核实接收</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#selfrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://openreview.net/forum?id=hSyW5go0v8</z:url>
+    <dc:identifier>arXiv:2310.11511</dc:identifier>
+    <z:extra>状态：ICLR 2024 Oral（官方标注 top 1%），正式同行评审。 已做：训练模型产生 reflection tokens，自适应决定检索并批评相关性、支持性与回答质量。 没做：没有跨问题持久经验、历史查询变换复用或 DIRECT/REUSE 反事实伤害控制。 GrowRAG 启示：可作训练型检索控制参照；与 GrowRAG 的差异应明确为跨题历史经验的检索前可选复用。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Akari</foaf:givenName><foaf:surname>Asai</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zeqiu</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yizhong</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Avirup</foaf:givenName><foaf:surname>Sil</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hannaneh</foaf:givenName><foaf:surname>Hajishirzi</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>International Conference on Learning Representations (ICLR 2024)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>检索后自省修复</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#reflectiverag_verma">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReflectiveRAG: Rethinking Adaptivity in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.eacl-industry.27/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.eacl-industry.27</dc:identifier>
+    <z:extra>状态：EACL 2026 Industry Track，正式同行评审。 已做：先默认检索，再判断证据充分性；不足时迭代 reformulate，并清除噪声证据，属于本题内 fresh repair。 没做：没有跨题持久历史、经验可信度/当前适用性分解或检索前轻量旁路层。 GrowRAG 启示：它是路线 B 的直接强基线；路线 A 应突出首次检索前的低成本选择，路线 B 则需证明历史复用比每题 fresh repair 更省且不增伤害。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Akshay</foaf:givenName><foaf:surname>Verma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Swapnil</foaf:givenName><foaf:surname>Gupta</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Siddharth</foaf:givenName><foaf:surname>Pillai</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Prateek</foaf:givenName><foaf:surname>Sircar</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Deepak</foaf:givenName><foaf:surname>Gupta</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of EACL 2026 (Volume 5: Industry Track)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>检索后自省修复</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#s2grag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>S2G-RAG: Structured Sufficiency and Gap Judging for Iterative Retrieval-Augmented QA</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.1185/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.1185</dc:identifier>
+    <z:extra>状态：ACL 2026 Long Paper，正式同行评审。 已做：把证据充分性与信息缺口结构化，用 gap 驱动迭代检索，并组织句级证据上下文。 没做：没有跨题经验记忆、复用生命周期、历史适用性预测或反事实风险控制。 GrowRAG 启示：可借其结构化 sufficiency/gap 作为路线 B 触发器或事后标签，但检索前路线不能把它当作零成本判据。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Minghan</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Junjie</foaf:givenName><foaf:surname>Zou</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xinxuan</foaf:givenName><foaf:surname>Lv</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chao</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Guodong</foaf:givenName><foaf:surname>Zhou</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of ACL 2026 (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>检索后自省修复</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#selectivenet">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>SelectiveNet: A Deep Neural Network with an Integrated Reject Option</dc:title>
+    <dc:date>2019</dc:date>
+    <z:url>https://proceedings.mlr.press/v97/geifman19a.html</z:url>
+    <dc:identifier>PMLR: v97/geifman19a</dc:identifier>
+    <z:extra>状态：ICML 2019，正式同行评审。 已做：把预测与 reject option 联合训练，以 selective risk–coverage 衡量覆盖更多样本与只在可靠样本行动的权衡。 没做：不是 RAG 或记忆论文；依赖监督训练，不定义因果反事实伤害，也不解决经验生命周期。 GrowRAG 启示：优先继承评价协议而非网络结构：画经验调用覆盖率—错误复用风险曲线，并保留 NO_MEMORY/DIRECT 动作。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yonatan</foaf:givenName><foaf:surname>Geifman</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ran</foaf:givenName><foaf:surname>El-Yaniv</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 36th International Conference on Machine Learning</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>可信拒绝与反事实伤害</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#counterfactualharm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Counterfactual Harm</dc:title>
+    <dc:date>2022</dc:date>
+    <z:url>https://proceedings.neurips.cc/paper_files/paper/2022/hash/ebcf1bff7b2fe6dcc3fbe666faaa50f1-Abstract-Conference.html</z:url>
+    <dc:identifier>DOI: 10.52202/068431-2634</dc:identifier>
+    <z:extra>状态：NeurIPS 2022 Main，正式同行评审。 已做：在结构因果模型中定义相对默认动作的个体反事实伤害，区分平均收益与“本可正确却被干预改错”。 没做：不是 RAG 论文；个体反事实通常不可同时观测，需要因果假设、离线 paired replay 或可识别上界；论文不提供历史经验选择器。 GrowRAG 启示：将默认动作设为 DIRECT，把 DIRECT 正确且 REUSE 错误定义为 harmful reuse；离线 Gold 数据上可双跑直接观测，在线无 Gold 时只能用校准代理而非宣称真值。 重复导入提醒：本条可能已存在于 08-14 或 08-19 包；请按 DOI/arXiv ID 合并。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Jonathan G.</foaf:givenName><foaf:surname>Richens</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rory</foaf:givenName><foaf:surname>Beard</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Daniel H.</foaf:givenName><foaf:surname>Thompson</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Advances in Neural Information Processing Systems 35 (NeurIPS 2022)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>可能重复导入</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>可信拒绝与反事实伤害</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>正式同行评审</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+</rdf:RDF>
+

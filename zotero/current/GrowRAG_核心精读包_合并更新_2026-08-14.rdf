@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <!--
+    GrowRAG 核心精读包（合并更新版，2026-08-14）
+    集合 A：经同行评审的基础与正式基线
+    集合 B：与 GrowRAG 最接近、但尚未发现正式接收版本的前沿预印本
+    集合 C：若继续做 Agent 控制器，需要补读的 contextual-bandit 论文
+    集合 D：查询变换与检索后修复闭环
+    集合 E：轨迹压缩与经验笔记
+    集合 F：可信复用、拒绝执行与反事实伤害
+    集合 G：首轮实验所需的数据集原论文
+
+    引用快照只用于安排阅读顺序，不用于学术评价：
+    S2 = Semantic Scholar，OA = OpenAlex；查询日期 2026-08-13。
+    不同数据库的合并规则不同，不应横向混比 S2 与 OA 数字。
+  -->
+
+  <z:Collection rdf:about="#collection_reviewed">
+    <dc:title>GrowRAG 01｜同行评审优先精读</dc:title>
+    <dcterms:hasPart rdf:resource="#rag2020"/>
+    <dcterms:hasPart rdf:resource="#selfrag"/>
+    <dcterms:hasPart rdf:resource="#queryrewrite"/>
+    <dcterms:hasPart rdf:resource="#adaptiverag"/>
+    <dcterms:hasPart rdf:resource="#rafe"/>
+    <dcterms:hasPart rdf:resource="#reflectiverag_verma"/>
+    <dcterms:hasPart rdf:resource="#s2grag"/>
+    <dcterms:hasPart rdf:resource="#memoryr1"/>
+    <dcterms:hasPart rdf:resource="#amber"/>
+    <dcterms:hasPart rdf:resource="#reflectiverag_wu"/>
+    <dcterms:hasPart rdf:resource="#erm"/>
+    <dcterms:hasPart rdf:resource="#gamrag"/>
+    <dcterms:hasPart rdf:resource="#reformer"/>
+    <dcterms:hasPart rdf:resource="#matchesheaven"/>
+    <dcterms:hasPart rdf:resource="#ircot"/>
+    <dcterms:hasPart rdf:resource="#ragcritic"/>
+    <dcterms:hasPart rdf:resource="#reflexion"/>
+    <dcterms:hasPart rdf:resource="#expel"/>
+    <dcterms:hasPart rdf:resource="#awm"/>
+    <dcterms:hasPart rdf:resource="#dynamiccheatsheet"/>
+    <dcterms:hasPart rdf:resource="#reasoningbank"/>
+    <dcterms:hasPart rdf:resource="#retrievalthought"/>
+    <dcterms:hasPart rdf:resource="#procedural"/>
+    <dcterms:hasPart rdf:resource="#selectivenet"/>
+    <dcterms:hasPart rdf:resource="#counterfactualharm"/>
+    <dcterms:hasPart rdf:resource="#hotpotqa"/>
+    <dcterms:hasPart rdf:resource="#twowiki"/>
+    <dcterms:hasPart rdf:resource="#musique"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#collection_frontier">
+    <dc:title>GrowRAG 02｜危险近邻与反证（预印本）</dc:title>
+    <dcterms:hasPart rdf:resource="#rrm"/>
+    <dcterms:hasPart rdf:resource="#usefulmemories"/>
+    <dcterms:hasPart rdf:resource="#crag"/>
+    <dcterms:hasPart rdf:resource="#expweaver"/>
+    <dcterms:hasPart rdf:resource="#memcon"/>
+    <dcterms:hasPart rdf:resource="#merit"/>
+    <dcterms:hasPart rdf:resource="#rollbackrepair"/>
+    <dcterms:hasPart rdf:resource="#ragtraces"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#collection_bandit">
+    <dc:title>GrowRAG 03｜Agent 控制器与 Contextual Bandit</dc:title>
+    <dcterms:hasPart rdf:resource="#linucb"/>
+    <dcterms:hasPart rdf:resource="#doublyrobust"/>
+    <dcterms:hasPart rdf:resource="#memcon"/>
+    <dcterms:hasPart rdf:resource="#memoryr1"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#collection_repair">
+    <dc:title>GrowRAG 04｜查询变换与修复闭环</dc:title>
+    <dcterms:hasPart rdf:resource="#reformer"/>
+    <dcterms:hasPart rdf:resource="#matchesheaven"/>
+    <dcterms:hasPart rdf:resource="#queryrewrite"/>
+    <dcterms:hasPart rdf:resource="#ircot"/>
+    <dcterms:hasPart rdf:resource="#reflectiverag_verma"/>
+    <dcterms:hasPart rdf:resource="#s2grag"/>
+    <dcterms:hasPart rdf:resource="#ragcritic"/>
+    <dcterms:hasPart rdf:resource="#merit"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#collection_notes">
+    <dc:title>GrowRAG 05｜轨迹压缩与经验笔记</dc:title>
+    <dcterms:hasPart rdf:resource="#reflexion"/>
+    <dcterms:hasPart rdf:resource="#expel"/>
+    <dcterms:hasPart rdf:resource="#awm"/>
+    <dcterms:hasPart rdf:resource="#dynamiccheatsheet"/>
+    <dcterms:hasPart rdf:resource="#reasoningbank"/>
+    <dcterms:hasPart rdf:resource="#retrievalthought"/>
+    <dcterms:hasPart rdf:resource="#procedural"/>
+    <dcterms:hasPart rdf:resource="#ragtraces"/>
+    <dcterms:hasPart rdf:resource="#rrm"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#collection_trust">
+    <dc:title>GrowRAG 06｜可信复用与反事实伤害</dc:title>
+    <dcterms:hasPart rdf:resource="#selectivenet"/>
+    <dcterms:hasPart rdf:resource="#counterfactualharm"/>
+    <dcterms:hasPart rdf:resource="#merit"/>
+    <dcterms:hasPart rdf:resource="#rollbackrepair"/>
+    <dcterms:hasPart rdf:resource="#usefulmemories"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#collection_datasets">
+    <dc:title>GrowRAG 07｜首轮实验数据集原论文</dc:title>
+    <dcterms:hasPart rdf:resource="#hotpotqa"/>
+    <dcterms:hasPart rdf:resource="#twowiki"/>
+    <dcterms:hasPart rdf:resource="#musique"/>
+  </z:Collection>
+
+  <!-- ==================== 同行评审优先 ==================== -->
+
+  <bib:Article rdf:about="#rag2020">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</dc:title>
+    <dc:date>2020</dc:date>
+    <z:url>https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html</z:url>
+    <z:extra>发表状态：已同行评审，NeurIPS 2020 正式论文。阅读优先级：P0-基础。引用快照：Semantic Scholar 16,983，重要引用 1,544（2026-08-13）。为什么读：理解 RAG 的参数记忆、非参数记忆、检索器和生成器最初如何分工；避免把“外部记忆”与“跨题经验记忆”混为一谈。精读问题：它保存什么、检索什么、训练哪些参数、评价的到底是检索还是生成？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Patrick</foaf:givenName><foaf:surname>Lewis</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ethan</foaf:givenName><foaf:surname>Perez</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Aleksandra</foaf:givenName><foaf:surname>Piktus</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Fabio</foaf:givenName><foaf:surname>Petroni</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Vladimir</foaf:givenName><foaf:surname>Karpukhin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Naman</foaf:givenName><foaf:surname>Goyal</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Heinrich</foaf:givenName><foaf:surname>Küttler</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mike</foaf:givenName><foaf:surname>Lewis</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wen-tau</foaf:givenName><foaf:surname>Yih</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tim</foaf:givenName><foaf:surname>Rocktäschel</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sebastian</foaf:givenName><foaf:surname>Riedel</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Douwe</foaf:givenName><foaf:surname>Kiela</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Advances in Neural Information Processing Systems 33 (NeurIPS 2020)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-基础</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-顶会</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#selfrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://openreview.net/forum?id=hSyW5go0v8</z:url>
+    <dc:identifier>arXiv:2310.11511</dc:identifier>
+    <z:extra>发表状态：已同行评审，ICLR 2024；官方项目标注 Oral、top 1%。阅读优先级：P0-控制基础。引用快照：Semantic Scholar 2,363，重要引用 223（2026-08-13）。为什么读：理解“模型何时检索、何时批评证据”的训练型路线，也能看清它和我们的跨题经验复用不是同一对象。精读问题：reflection token 的监督从哪里来？控制是单题内还是跨题？训练成本和推理成本如何计算？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Akari</foaf:givenName><foaf:surname>Asai</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zeqiu</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yizhong</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Avirup</foaf:givenName><foaf:surname>Sil</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hannaneh</foaf:givenName><foaf:surname>Hajishirzi</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>International Conference on Learning Representations (ICLR 2024)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-控制基础</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-顶会-Oral</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#queryrewrite">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Query Rewriting in Retrieval-Augmented Large Language Models</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://aclanthology.org/2023.emnlp-main.322/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2023.emnlp-main.322</dc:identifier>
+    <z:extra>发表状态：已同行评审，EMNLP 2023 Main。阅读优先级：P0-方法基础。引用快照：Semantic Scholar 159；OpenAlex 235（2026-08-13；不同库勿混比）。为什么读：这是理解“prompt 只是产生改写的机制，真正进入检索器的是新 query”的直接基础。精读问题：改写目标由什么训练或反馈？怎样隔离检索增益与生成器增益？查询预算是否公平？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Xinbei</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yeyun</foaf:givenName><foaf:surname>Gong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Pengcheng</foaf:givenName><foaf:surname>He</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hai</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Nan</foaf:givenName><foaf:surname>Duan</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of EMNLP 2023</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-查询改写</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-顶会主会</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#adaptiverag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://aclanthology.org/2024.naacl-long.389/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2024.naacl-long.389</dc:identifier>
+    <z:extra>发表状态：已同行评审，NAACL 2024 Long。阅读优先级：P0-路由基础。引用快照：Semantic Scholar 602；OpenAlex 189（2026-08-13；不同库勿混比）。为什么读：它把问题复杂度映射到不同检索策略，是理解可部署 router 与 oracle 上界差异的重要起点。精读问题：router 看到了哪些特征？标签怎样构造？为什么其动作空间不是历史经验复用？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Soyeong</foaf:givenName><foaf:surname>Jeong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jinheon</foaf:givenName><foaf:surname>Baek</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sukmin</foaf:givenName><foaf:surname>Cho</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sung Ju</foaf:givenName><foaf:surname>Hwang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jong C.</foaf:givenName><foaf:surname>Park</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of NAACL 2024 (Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-路由</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-顶会主会</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#rafe">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RaFe: Ranking Feedback Improves Query Rewriting for RAG</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://aclanthology.org/2024.findings-emnlp.49/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2024.findings-emnlp.49</dc:identifier>
+    <z:extra>发表状态：已同行评审，Findings of EMNLP 2024；不是 EMNLP Main。阅读优先级：P0-反馈基础。引用快照：Semantic Scholar 84；OpenAlex 16（2026-08-13；不同库勿混比）。为什么读：理解怎样用 ranking feedback 评价/优化 query rewrite，直接对应我们“何为成功改写”的检索层标准。精读问题：反馈是 pointwise、pairwise 还是 listwise？是否改善最终答案？与 gold supporting facts 的关系是什么？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Shengyu</foaf:givenName><foaf:surname>Mao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yong</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Boli</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiao</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Peng</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xinyu</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Pengjun</foaf:givenName><foaf:surname>Xie</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Fei</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Huajun</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ningyu</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: EMNLP 2024</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-改写反馈</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Findings</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#reflectiverag_verma">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReflectiveRAG: Rethinking Adaptivity in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.eacl-industry.27/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.eacl-industry.27</dc:identifier>
+    <z:extra>发表状态：已同行评审，EACL 2026 Industry Track；不是主会 Long。阅读优先级：P0-强基线。引用快照：Semantic Scholar 2；OpenAlex 1（2026-08-13，论文很新）。为什么读：它是 fresh per-query repair 的最直接正式基线：先判断证据充分性，再迭代 query reformulation，且不训练策略。精读问题：何时判定不足？fresh repair 的真实调用、token、延迟是多少？我们的 REUSE 若仍调用同等规模 LLM，是否真的节约成本？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Akshay</foaf:givenName><foaf:surname>Verma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Swapnil</foaf:givenName><foaf:surname>Gupta</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Siddharth</foaf:givenName><foaf:surname>Pillai</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Prateek</foaf:givenName><foaf:surname>Sircar</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Deepak</foaf:givenName><foaf:surname>Gupta</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of EACL 2026 (Volume 5: Industry Track)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-Fresh-Repair基线</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Industry</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#s2grag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>S2G-RAG: Structured Sufficiency and Gap Judging for Iterative Retrieval-Augmented QA</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.1185/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.1185</dc:identifier>
+    <z:extra>发表状态：已同行评审，ACL 2026 Long。阅读优先级：P0-强基线。引用快照：OpenAlex 0（2026-08-13，论文很新）。为什么读：它把证据充分性和缺口判断结构化，可帮助定义 reactive repair 的触发器。精读问题：sufficiency 与 gap 如何标注/推断？它解决的是本题内检索循环，还是跨题经验？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Minghan</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Junjie</foaf:givenName><foaf:surname>Zou</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xinxuan</foaf:givenName><foaf:surname>Lv</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chao</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Guodong</foaf:givenName><foaf:surname>Zhou</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of ACL 2026 (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-充分性判断</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-顶会主会</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#memoryr1">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Memory-R1: Enhancing Large Language Model Agents to Manage and Utilize Memories via Reinforcement Learning</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.583/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.583</dc:identifier>
+    <z:extra>发表状态：已同行评审，ACL 2026 Long。阅读优先级：P1-Agent/训练边界。引用快照：OpenAlex 2（2026-08-13，论文很新）。为什么读：理解 ADD/UPDATE/DELETE/NOOP 与 RL 训练的记忆管理路线，从而知道为何第一篇不宜直接做重型端到端 Agent。精读问题：动作、状态、奖励、训练样本和部署反馈分别是什么？它管理的是对话事实还是检索变换？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Sikuan</foaf:givenName><foaf:surname>Yan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiufeng</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zuchao</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ercong</foaf:givenName><foaf:surname>Nie</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zifeng</foaf:givenName><foaf:surname>Ding</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zonggen</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiaowen</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jinhe</foaf:givenName><foaf:surname>Bi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kristian</foaf:givenName><foaf:surname>Kersting</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jeff Z.</foaf:givenName><foaf:surname>Pan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hinrich</foaf:givenName><foaf:surname>Schuetze</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Volker</foaf:givenName><foaf:surname>Tresp</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yunpu</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of ACL 2026 (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-Agent记忆</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-顶会主会</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#amber">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Towards Adaptive Memory-Based Optimization for Enhanced Retrieval-Augmented Generation</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.findings-acl.418/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.findings-acl.418</dc:identifier>
+    <z:extra>发表状态：已同行评审，Findings of ACL 2025；不是 ACL Main。阅读优先级：P1-系统边界。引用快照：OpenAlex 1（2026-08-13）。为什么读：多 Agent、迭代记忆、信息收集与过滤的重型路线，能帮助我们有意识地保持第一篇机制简单。精读问题：性能来自哪一模块？需要多少次模型调用与微调？是否真的隔离了记忆贡献？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Qitao</foaf:givenName><foaf:surname>Qin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yucong</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yihang</foaf:givenName><foaf:surname>Lu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhibo</foaf:givenName><foaf:surname>Chu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiaoman</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xianwei</foaf:givenName><foaf:surname>Meng</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: ACL 2025</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-多Agent</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Findings</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#reflectiverag_wu">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Reflective RAG: Self-Evaluation Driven Strategy Optimization in Agentic Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.findings-acl.648/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.findings-acl.648</dc:identifier>
+    <z:extra>发表状态：已同行评审，Findings of ACL 2026；不是 ACL Main。阅读优先级：P1-训练型反思。引用快照：Semantic Scholar/OpenAlex 0（2026-08-13，论文很新）。注意：不要与 Verma 等人的 EACL Industry ReflectiveRAG 混淆；本篇是训练型策略优化路线。精读问题：self-evaluation 如何成为监督/奖励？SFT 与 RL 各贡献多少？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Haiyan</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chenchen</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chaoqun</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chengxiong</foaf:givenName><foaf:surname>Lu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yan-Hong</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhiqiang</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiaoqing</foaf:givenName><foaf:surname>Feng</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-训练型控制</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Findings</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <!-- ==================== 危险近邻与反证 ==================== -->
+
+  <bib:Article rdf:about="#erm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RAG without Forgetting: Continual Query-Infused Key Memory</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2602.05152</z:url>
+    <dc:identifier>arXiv:2602.05152</dc:identifier>
+    <z:extra>发表状态更新（2026-08-19）：已列入 ICML 2026 官方论文海报列表，正式同行评审论文；08-13 时“仅预印本”的旧判断已失效。阅读优先级：P0-危险近邻。为什么读：correctness-gated 地把成功 query expansion 持久化到 document keys；直接挑战“保存并复用有效检索变化”的新颖性。精读问题：成功信号是什么？怎样选择性归因？修改索引带来了什么优势与代价？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yuntong</foaf:givenName><foaf:surname>Hu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sha</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Naren</foaf:givenName><foaf:surname>Ramakrishnan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Liang</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-危险近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ICML</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#gamrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>GAM-RAG: Gain-Adaptive Memory for Evolving Retrieval in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2603.01783</z:url>
+    <dc:identifier>arXiv:2603.01783</dc:identifier>
+    <z:extra>发表状态更新（2026-08-19）：已列入 ICML 2026 官方论文海报列表，正式同行评审论文；08-13 时“仅预印本”的旧判断已失效。阅读优先级：P0-危险近邻。为什么读：它已经做 training-free 的跨题检索经验积累、反馈与降成本。注意：其更新不是标准 EMA，而是带不确定性的 Kalman-inspired gain。精读问题：成功 episode 如何定义？memory state 与 uncertainty 如何更新？图/层次索引是否为必要条件？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yifan</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mingxuan</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhihao</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yixin</foaf:givenName><foaf:surname>Cao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yicun</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Keyang</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Guangnan</foaf:givenName><foaf:surname>Ye</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hongfeng</foaf:givenName><foaf:surname>Chai</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-危险近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ICML</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#rrm">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>RRM: Experience-Driven Reflective Retrieval Memory for Long-Horizon Multimodal Reasoning</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2607.28156</z:url>
+    <dc:identifier>arXiv:2607.28156</dc:identifier>
+    <z:extra>发表状态：arXiv 预印本；截至 2026-08-13 未发现公开正式接收版本，是否在审未知。阅读优先级：P0-最大新颖性威胁。引用快照：Semantic Scholar/OpenAlex 0（2026-08-13，提交仅约两周，引用无判断力）。为什么读：RRM 已从历史轨迹提炼可迁移程序性检索知识，转成 query-level guidance，并用当前新鲜证据回答；还有复用反馈、频率、时间衰减和生命周期管理。精读问题：经验抽象粒度、applicability、异常触发、query-only 使用、无泄漏协议分别怎样实现？GrowRAG 还能提出什么没有被它覆盖的可证伪问题？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Jingxiang</foaf:givenName><foaf:surname>Fan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Junbao</foaf:givenName><foaf:surname>Zhuo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bochao</foaf:givenName><foaf:surname>Zou</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2607.28156</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-最大新颖性威胁</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-未发现正式接收</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#usefulmemories">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Useful Memories Become Faulty When Continuously Updated by LLMs</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2605.12978</z:url>
+    <dc:identifier>arXiv:2605.12978</dc:identifier>
+    <z:extra>发表状态：arXiv 预印本；截至 2026-08-13 未发现公开正式接收版本，是否在审未知。阅读优先级：P0-关键反证。引用快照：OpenAlex 0（2026-08-13，论文很新）。为什么读：连续 LLM consolidation 可能让有效记忆退化到低于 no-memory；支持保留 raw episodes、显式 gate consolidation。精读问题：退化来自经验本身还是更新过程？什么实验能把 raw、abstract、update schedule 分开？对我们而言为何“具体 query pair + typed delta”可能比反复抽象更可审计？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Dylan</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yanshan</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhengkun</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yihang</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bingxuan</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dianqi</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hao</foaf:givenName><foaf:surname>Peng</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2605.12978</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-反证</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-未发现正式接收</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#crag">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Corrective Retrieval Augmented Generation</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://arxiv.org/abs/2401.15884</z:url>
+    <dc:identifier>arXiv:2401.15884</dc:identifier>
+    <z:extra>发表状态：arXiv/CoRR 预印本；截至 2026-08-13 未发现公开正式接收版本，不应标为顶会。阅读优先级：P1-经典修复参照。引用快照：Semantic Scholar 260，重要引用 20（2026-08-13）。为什么读：检索评价器触发 corrective actions，是 reactive correction 的直观代表。精读问题：它改 query、改 corpus、还是改 passages？收益是否来自额外 web search 预算？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Shi-Qi</foaf:givenName><foaf:surname>Yan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jia-Chen</foaf:givenName><foaf:surname>Gu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yun</foaf:givenName><foaf:surname>Zhu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhen-Hua</foaf:givenName><foaf:surname>Ling</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2401.15884</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-Corrective-RAG</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-非顶会正式版</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#expweaver">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Rethinking Experience Utilization in Self-Evolving Language Model Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2605.07164</z:url>
+    <dc:identifier>arXiv:2605.07164</dc:identifier>
+    <z:extra>发表状态：arXiv 预印本；截至 2026-08-13 未发现公开正式接收版本，是否在审未知。阅读优先级：P1-选择性经验。引用快照：OpenAlex 0（2026-08-13）。为什么读：历史经验被设计成可选资源，说明 always-on memory 不是合理默认；其提示版也覆盖文本 QA。精读问题：选择性调用的可观测信号是什么？不调用、调用、重新推理如何比较？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Weixiang</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yingshuo</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yichen</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yanyan</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yu</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yang</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dandan</foaf:givenName><foaf:surname>Tu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bing</foaf:givenName><foaf:surname>Qin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ting</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2605.07164</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-选择性经验</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-未发现正式接收</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#memcon">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Memory as a Controlled Process: Learned Adaptive Memory Management for LLM Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2607.13591</z:url>
+    <dc:identifier>arXiv:2607.13591</dc:identifier>
+    <z:extra>发表状态：arXiv 预印本；截至 2026-08-13 未发现公开正式接收版本，是否在审未知。阅读优先级：P1-Agent 控制器。引用快照：Semantic Scholar 1（2026-08-13，论文很新）。为什么读：它用 tabular contextual bandit + UCB 选择 retrieve、plan inject、re-retrieve、consolidate、forget、NoOp，直接限制“记忆控制器”路线的新颖空间。精读问题：context、arms、reward、exploration 和 convergence 分别如何定义？在线学习是否产生不可接受的探索伤害？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Eric Hanchen</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhi</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yuchen</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Levina</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dong</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiao</foaf:givenName><foaf:surname>Liang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rui</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yubei</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Edward</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Haozheng</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhaolu</foaf:givenName><foaf:surname>Kang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Aylin</foaf:givenName><foaf:surname>Caliskan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kai-Wei</foaf:givenName><foaf:surname>Chang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ying Nian</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2607.13591</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-Contextual-Bandit</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-未发现正式接收</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <!-- ==================== 查询修复基线与数据集 ==================== -->
+
+  <bib:Article rdf:about="#reformer">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReFormeR: Learning and Applying Explicit Query Reformulation Patterns</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://doi.org/10.1007/978-3-032-21300-6_30</z:url>
+    <dc:identifier>DOI: 10.1007/978-3-032-21300-6_30</dc:identifier>
+    <z:extra>发表状态：已同行评审，ECIR 2026 正式短论文。阅读优先级：P0-最危险查询变换近邻。为什么读：它从原查询与经验上更优的改写查询对中归纳显式可迁移模式，再结合首次检索上下文为新查询选择模式，几乎直接覆盖本项目早期所谓 typed delta。精读问题：模式库怎样抽取、聚类和去重？选择器究竟看查询还是查询加首轮文档？模式迁移增益与生成器增益如何隔离？静态离线模式、在线可信度和拒绝复用之间还留下什么空间？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Amin</foaf:givenName><foaf:surname>Bigdeli</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mert</foaf:givenName><foaf:surname>Incesu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Charles L. A.</foaf:givenName><foaf:surname>Clarke</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ebrahim</foaf:givenName><foaf:surname>Bagheri</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>48th European Conference on Information Retrieval (ECIR 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>400–408</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-危险近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ECIR</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#matchesheaven">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Matches Made in Heaven: Toolkit and Large-Scale Datasets for Supervised Query Reformulation</dc:title>
+    <dc:date>2021</dc:date>
+    <z:url>https://doi.org/10.1145/3459637.3482009</z:url>
+    <dc:identifier>DOI: 10.1145/3459637.3482009</dc:identifier>
+    <z:extra>发表状态：已同行评审，CIKM 2021 Resource Track 正式论文。阅读优先级：P0-查询经验数据基础。为什么读：它构造 Diamond、Platinum、Gold 等大规模原查询到更优查询的数据，是直接保存 q→q* 查询经验及 ReFormeR 模式学习的重要上游。精读问题：更优改写依据哪些检索指标与阈值产生？查询对是否包含近重复或答案泄漏？训练、验证和测试如何去重？这些查询对能否支持跨模板而非只支持近邻复制？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Amin</foaf:givenName><foaf:surname>Bigdeli</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Shirin</foaf:givenName><foaf:surname>Seyedsalehi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Morteza</foaf:givenName><foaf:surname>Zihayat</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ebrahim</foaf:givenName><foaf:surname>Bagheri</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 30th ACM International Conference on Information and Knowledge Management (CIKM 2021)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>4417–4425</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-查询改写数据</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-CIKM</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#ircot">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Interleaving Retrieval with Chain-of-Thought Reasoning for Knowledge-Intensive Multi-Step Questions</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://aclanthology.org/2023.acl-long.557/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2023.acl-long.557</dc:identifier>
+    <z:extra>发表状态：已同行评审，ACL 2023 Main Long 正式论文。阅读优先级：P0-多跳检索基线。为什么读：IRCoT 将检索和逐步推理交错执行，直接说明子查询必须随已得到的桥接证据变化，是比较检索前一次改写与检索后闭环修复的关键基线。精读问题：每轮检索查询怎样从推理状态生成？停止规则是什么？累计错误证据如何影响后续跳？在 HotpotQA、2Wiki、MuSiQue 上如何分别评价检索与答案？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Harsh</foaf:givenName><foaf:surname>Trivedi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Niranjan</foaf:givenName><foaf:surname>Balasubramanian</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tushar</foaf:givenName><foaf:surname>Khot</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ashish</foaf:givenName><foaf:surname>Sabharwal</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>10014–10037</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-多跳检索</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ACL-Main</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#ragcritic">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RAG-Critic: Leveraging Automated Critic-Guided Agentic Workflow for Retrieval Augmented Generation</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.acl-long.179/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.acl-long.179</dc:identifier>
+    <z:extra>发表状态：已同行评审，ACL 2025 Main Long 正式论文。阅读优先级：P0-检索后诊断与修复。为什么读：它先建立分层 RAG 错误体系并训练 critic，再根据错误反馈选择执行流程，是可靠修复闭环和失败类型表示的强基线。精读问题：critic 的标签与训练数据怎样构造？错误定位是否依赖答案标签？不同错误类型映射到哪些修复动作？若用轻量规则或无训练判断器替换 critic，收益还剩多少？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Guanting</foaf:givenName><foaf:surname>Dong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiajie</foaf:givenName><foaf:surname>Jin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiaoxi</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yutao</foaf:givenName><foaf:surname>Zhu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhicheng</foaf:givenName><foaf:surname>Dou</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ji-Rong</foaf:givenName><foaf:surname>Wen</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>3551–3578</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-检索后修复</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ACL-Main</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#hotpotqa">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering</dc:title>
+    <dc:date>2018</dc:date>
+    <z:url>https://aclanthology.org/D18-1259/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/D18-1259</dc:identifier>
+    <z:extra>发表状态：已同行评审，EMNLP 2018 Main 正式论文。阅读优先级：P0-首轮主数据集。为什么读：它同时提供答案和 supporting facts，适合把检索成功、证据充分和最终答案正确拆开评价，并检验桥接型与比较型问题上的经验迁移。精读问题：distractor 与 fullwiki 设置有何差异？supporting-fact 标注位于句子还是文档层？桥接题和比较题如何分布？官方 EM、F1 与 supporting-fact 指标怎样计算？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Zhilin</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Peng</foaf:givenName><foaf:surname>Qi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Saizheng</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yoshua</foaf:givenName><foaf:surname>Bengio</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>William W.</foaf:givenName><foaf:surname>Cohen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ruslan</foaf:givenName><foaf:surname>Salakhutdinov</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Christopher D.</foaf:givenName><foaf:surname>Manning</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>2369–2380</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-数据集</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-HotpotQA</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-EMNLP</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#twowiki">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Constructing A Multi-hop QA Dataset for Comprehensive Evaluation of Reasoning Steps</dc:title>
+    <dc:date>2020</dc:date>
+    <z:url>https://aclanthology.org/2020.coling-main.580/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2020.coling-main.580</dc:identifier>
+    <z:extra>发表状态：已同行评审，COLING 2020 Main 正式论文；数据集通称 2WikiMultiHopQA。阅读优先级：P0-首轮主数据集。为什么读：它提供推理路径和支持证据，覆盖比较、推断、组合与桥接等多跳结构，可检验经验是否迁移到相同关系结构而非相同实体。精读问题：问题模板与 Wikidata 关系怎样生成？训练测试间实体和关系是否重叠？证据与推理链的 gold 标注如何用于 oracle 和检索指标？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Xanh</foaf:givenName><foaf:surname>Ho</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Anh-Khoa Duong</foaf:givenName><foaf:surname>Nguyen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Saku</foaf:givenName><foaf:surname>Sugawara</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Akiko</foaf:givenName><foaf:surname>Aizawa</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 28th International Conference on Computational Linguistics (COLING 2020)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>6345–6355</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-数据集</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-2WikiMultiHopQA</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-COLING</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#musique">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>MuSiQue: Multihop Questions via Single-hop Question Composition</dc:title>
+    <dc:date>2022</dc:date>
+    <z:url>https://doi.org/10.1162/tacl_a_00475</z:url>
+    <dc:identifier>DOI: 10.1162/tacl_a_00475</dc:identifier>
+    <z:extra>发表状态：已同行评审，Transactions of the Association for Computational Linguistics 2022 正式论文。阅读优先级：P0-困难多跳压力测试。为什么读：MuSiQue 用可控单跳组合减少捷径，使系统必须完成真正的多步分解，适合测试子查询计划和经验笔记是否在困难问题上仍有效。精读问题：组合过程如何保证每一跳必要？不可回答样本怎样构造？二跳、三跳、四跳应否分层报告？整题 embedding 与子问题 embedding 的差异怎样做消融？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Harsh</foaf:givenName><foaf:surname>Trivedi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Niranjan</foaf:givenName><foaf:surname>Balasubramanian</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tushar</foaf:givenName><foaf:surname>Khot</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ashish</foaf:givenName><foaf:surname>Sabharwal</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>Transactions of the Association for Computational Linguistics</dc:title></bib:Journal></dcterms:isPartOf>
+    <bib:volume>10</bib:volume>
+    <bib:pages>539–554</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-数据集</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-MuSiQue</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-TACL</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <!-- ==================== 轨迹压缩与经验笔记 ==================== -->
+
+  <bib:Article rdf:about="#reflexion">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Reflexion: Language Agents with Verbal Reinforcement Learning</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://proceedings.neurips.cc/paper_files/paper/2023/hash/1b44b878bb782e6954cd888628510e90-Abstract-Conference.html</z:url>
+    <dc:identifier>DOI: 10.52202/075280-0377</dc:identifier>
+    <z:extra>发表状态：已同行评审，NeurIPS 2023 Main 正式论文。阅读优先级：P0-语言经验记忆起点。为什么读：它把环境反馈转成自然语言反思并保存在 episodic memory 中供后续重试，是失败到教训再到复用的经典原型。精读问题：反思主要服务同一任务重试还是跨任务迁移？反馈来自规则、模型还是外部环境？记忆窗口多长？怎样区分反思本身有效与额外采样预算有效？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Noah</foaf:givenName><foaf:surname>Shinn</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Federico</foaf:givenName><foaf:surname>Cassano</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ashwin</foaf:givenName><foaf:surname>Gopinath</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Karthik</foaf:givenName><foaf:surname>Narasimhan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Shunyu</foaf:givenName><foaf:surname>Yao</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Advances in Neural Information Processing Systems 36 (NeurIPS 2023)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-反思记忆</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-NeurIPS</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#expel">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ExpeL: LLM Agents Are Experiential Learners</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/29936</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v38i17.29936</dc:identifier>
+    <z:extra>发表状态：已同行评审，AAAI 2024 正式论文。阅读优先级：P0-经验抽取基线。为什么读：ExpeL 同时保存成功轨迹，并通过成功与失败对比抽取可跨任务复用的自然语言 insight；HotpotQA 实验使其与本项目直接相关。精读问题：ADD、UPVOTE、DOWNVOTE、EDIT 怎样维护 insight？轨迹示例和抽象 insight 分别贡献多少？训练任务与测试任务如何隔离？错误 insight 是否有撤销机制？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Andrew</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Daniel</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Quentin</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Matthieu</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yong-Jin</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Gao</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the AAAI Conference on Artificial Intelligence, Volume 38, Issue 17</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>19632–19642</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-经验学习</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-AAAI</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#awm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Agent Workflow Memory</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://proceedings.mlr.press/v267/wang25bx.html</z:url>
+    <dc:identifier>PMLR: v267/wang25bx</dc:identifier>
+    <z:extra>发表状态：已同行评审，ICML 2025 正式论文。阅读优先级：P0-程序性经验表示。为什么读：它从任务与动作轨迹诱导可复用 workflow，并在离线和在线条件下选择性注入，是子查询计划、变量占位和可执行程序记忆的直接原型。精读问题：工作流怎样从具体实体抽象为占位符？何时检索和注入工作流？跨任务、跨网站、跨领域泛化如何定义？工作流错误会怎样级联？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Zora Zhiruo</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiayuan</foaf:givenName><foaf:surname>Mao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Daniel</foaf:givenName><foaf:surname>Fried</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Graham</foaf:givenName><foaf:surname>Neubig</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 42nd International Conference on Machine Learning</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>63897–63911</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-工作流记忆</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ICML</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#dynamiccheatsheet">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Dynamic Cheatsheet: Test-Time Learning with Adaptive Memory</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.eacl-long.333/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.eacl-long.333</dc:identifier>
+    <z:extra>发表状态：已同行评审，EACL 2026 Main Long 正式论文。阅读优先级：P0-经验笔记最近邻。为什么读：它让黑盒模型在测试时持续维护简洁策略、解题草图和代码片段，而非保存整段对话，直接反驳“压缩轨迹为可复用笔记无人研究”。精读问题：累计版与检索版怎样更新、删除和压缩？无需标签时凭什么判断经验有效？记忆增长、上下文成本和负迁移如何报告？哪些任务依赖代码片段而非一般策略？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Mirac</foaf:givenName><foaf:surname>Suzgun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mert</foaf:givenName><foaf:surname>Yuksekgonul</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Federico</foaf:givenName><foaf:surname>Bianchi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dan</foaf:givenName><foaf:surname>Jurafsky</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>James</foaf:givenName><foaf:surname>Zou</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 19th Conference of the European Chapter of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>7080–7106</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-经验笔记</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-EACL-Main</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#reasoningbank">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://iclr.cc/virtual/2026/poster/10007887</z:url>
+    <dc:identifier>arXiv:2509.25140</dc:identifier>
+    <z:extra>发表状态：已同行评审并接收为 ICLR 2026 Poster。阅读优先级：P0-结构化推理经验最强近邻。为什么读：它从成功和失败轨迹中自我整理可泛化推理策略，并以 Title、Description、Content 形式持续检索、提炼和合并；本项目不能再把“压缩 CoT 为经验”称为首创。精读问题：成功与失败怎样自判？一条记忆的作用域和证据从哪里来？合并会不会丢失反例？MaTTS 增益中有多少来自额外采样而非记忆？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Siru</foaf:givenName><foaf:surname>Ouyang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jun</foaf:givenName><foaf:surname>Yan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>I-Hung</foaf:givenName><foaf:surname>Hsu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yanfei</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ke</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zifeng</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rujun</foaf:givenName><foaf:surname>Han</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Long</foaf:givenName><foaf:surname>Le</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Samira</foaf:givenName><foaf:surname>Daruki</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiangru</foaf:givenName><foaf:surname>Tang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Vishy</foaf:givenName><foaf:surname>Tirumalashetty</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>George</foaf:givenName><foaf:surname>Lee</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mahsan</foaf:givenName><foaf:surname>Rofouei</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hangfei</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiawei</foaf:givenName><foaf:surname>Han</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chen-Yu</foaf:givenName><foaf:surname>Lee</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tomas</foaf:givenName><foaf:surname>Pfister</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>International Conference on Learning Representations (ICLR 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-危险近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ICLR</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#retrievalthought">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Retrieval-of-Thought: Efficient Reasoning via Reusing Thoughts</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://iclr.cc/virtual/2026/poster/10009010</z:url>
+    <dc:identifier>arXiv:2509.21743</dc:identifier>
+    <z:extra>发表状态：已同行评审并接收为 ICLR 2026 Poster。阅读优先级：P0-CoT 片段复用危险近邻。为什么读：它将历史推理拆成图中的可组合 thought steps，并通过语义边、顺序边和奖励引导遍历为新问题组装模板，直接覆盖“复用历史 CoT 某一部分”的宽泛想法。精读问题：thought step 怎样切分和去事实化？图检索与整轨迹检索相比贡献多少？奖励是否可用于无标签 RAG？减少 token 时准确率和内存开销如何权衡？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Ammar</foaf:givenName><foaf:surname>Ahmed</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Azal Ahmad</foaf:givenName><foaf:surname>Khan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ayaan</foaf:givenName><foaf:surname>Ahmad</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sheng</foaf:givenName><foaf:surname>Di</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zirui</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ali</foaf:givenName><foaf:surname>Anwar</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>International Conference on Learning Representations (ICLR 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-CoT复用</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ICLR</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#procedural">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Procedural Knowledge at Scale Improves Reasoning</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2604.01348</z:url>
+    <dc:identifier>arXiv:2604.01348</dc:identifier>
+    <z:extra>发表状态：已列入 COLM 2026 接收论文；截至 2026-08-14 以 arXiv camera-ready 元数据为主。阅读优先级：P0-程序性记忆表示。为什么读：Reasoning Memory 将完整逐步轨迹分解成 3200 万个自包含的子问题与子程序对，并优于文档、完整轨迹和小型模板库检索，是“保存哪部分推理”的强直接基线。精读问题：子问题与子程序怎样自动分解？如何排除答案事实泄漏？大规模覆盖与表示粒度各贡献多少？它的 in-thought query 能否转成 RAG 检索控制笔记？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Di</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Devendra Singh</foaf:givenName><foaf:surname>Sachan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wen-tau</foaf:givenName><foaf:surname>Yih</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mingda</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Conference on Language Modeling (COLM 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-程序性记忆</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>已接收-COLM</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#ragtraces">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>RAG over Thinking Traces Can Improve Reasoning Tasks</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2605.03344</z:url>
+    <dc:identifier>arXiv:2605.03344</dc:identifier>
+    <z:extra>发表状态：arXiv 预印本；截至 2026-08-14 未核实到正式同行评审接收版本。阅读优先级：P0-最危险表示消融近邻。为什么读：它在同一批 thinking traces 上受控比较完整轨迹、切块轨迹以及结构化步骤、核心语义、错误反思三种 T3 变换，已经直接研究“CoT 哪部分值得保存”。精读问题：不同表示是否严格来自同一源轨迹？token 与候选数量是否匹配？为何最优表示随模型和任务改变？如何把其数学代码结论迁移到知识型 RAG，而不把结果过度泛化？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wenjie</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sewon</foaf:givenName><foaf:surname>Min</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Matei</foaf:givenName><foaf:surname>Zaharia</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2605.03344</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-危险近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-未核实正式接收</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <!-- ==================== 可信复用与事后恢复 ==================== -->
+
+  <bib:Article rdf:about="#selectivenet">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>SelectiveNet: A Deep Neural Network with an Integrated Reject Option</dc:title>
+    <dc:date>2019</dc:date>
+    <z:url>https://proceedings.mlr.press/v97/geifman19a.html</z:url>
+    <dc:identifier>PMLR: v97/geifman19a</dc:identifier>
+    <z:extra>发表状态：已同行评审，ICML 2019 正式论文。阅读优先级：P0-拒绝使用理论基础。为什么读：SelectiveNet 将预测与拒绝联合优化，并用 risk-coverage 曲线评价“覆盖更多样本”与“只在可靠样本上行动”的权衡，可直接转译为经验调用或 NO_MEMORY。精读问题：coverage 约束如何实现？selective risk 与普通准确率有何不同？校准阈值是否需要训练数据？本项目无训练时应继承评价协议还是模型结构？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yonatan</foaf:givenName><foaf:surname>Geifman</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ran</foaf:givenName><foaf:surname>El-Yaniv</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 36th International Conference on Machine Learning</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>2151–2159</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-选择性预测</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ICML</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#counterfactualharm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Counterfactual Harm</dc:title>
+    <dc:date>2022</dc:date>
+    <z:url>https://proceedings.neurips.cc/paper_files/paper/2022/hash/ebcf1bff7b2fe6dcc3fbe666faaa50f1-Abstract-Conference.html</z:url>
+    <dc:identifier>DOI: 10.52202/068431-2634</dc:identifier>
+    <z:extra>发表状态：已同行评审，NeurIPS 2022 Main 正式论文。阅读优先级：P1-反事实伤害概念基础。为什么读：它用因果模型定义相对某个默认动作的伤害，帮助把“使用记忆后答错”精确定义为相对 DIRECT 基线本可答对却因经验介入而失败，而不是简单统计总错误。精读问题：默认动作如何选择？个体反事实为何通常不可观测？哪些假设支持估计或上界？在 GrowRAG 中 paired replay、oracle 和在线部署分别能观测什么？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Jonathan G.</foaf:givenName><foaf:surname>Richens</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rory</foaf:givenName><foaf:surname>Beard</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Daniel H.</foaf:givenName><foaf:surname>Thompson</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Advances in Neural Information Processing Systems 35 (NeurIPS 2022)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-反事实伤害</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-NeurIPS</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#merit">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Causal Episodic Memory for Feedback-Driven Agent Repair</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.05906</z:url>
+    <dc:identifier>arXiv:2608.05906</dc:identifier>
+    <z:extra>发表状态：arXiv 预印本，2026-08-06 首次公开；截至 2026-08-14 未发现正式同行评审接收版本。阅读优先级：P0-刚出现的直接撞车预警。为什么读：MERIT 在 Text-to-SQL 修复中保存 oracle 验证的成功纠正和失败方向，用粗粒度故障类型条件化混合检索，再把历史修复迁移到后续查询；这与 typed repair、双极性经验和跨题修复高度接近。精读问题：oracle 反馈提供了多少额外监督？为什么 typed retrieval 未稳定优于 untyped dynamic retrieval？schema-local 经验为何最可靠？Spider 与 BIRD 结果差异说明哪些迁移边界？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Khang Nhat Hoang</foaf:givenName><foaf:surname>Vo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tam Minh</foaf:givenName><foaf:surname>Chu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Anh Trac Duc</foaf:givenName><foaf:surname>Dinh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Thuyen Vinh Ha</foaf:givenName><foaf:surname>Bui</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tho</foaf:givenName><foaf:surname>Quan</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2608.05906</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-危险近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-未核实正式接收</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#rollbackrepair">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>From Faulty Memories to Corrected Actions: Dependency-Guided Rollback Repair for Memory-Augmented Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.10502</z:url>
+    <dc:identifier>arXiv:2608.10502</dc:identifier>
+    <z:extra>发表状态：arXiv 预印本，2026-08-11 首次公开；截至 2026-08-14 未发现正式同行评审接收版本。阅读优先级：P0-可信闭环与回滚最新近邻。为什么读：它研究记忆错误已经传播到后续行动和派生记忆后的恢复，构造 typed memory-to-action dependency graph，只失活缺乏独立可信支持的状态并选择性重放受影响计算；这比简单降级或删除经验更完整。精读问题：依赖边怎样从运行时 provenance 得到？错误根因由谁诊断？如何证明保留了无害记忆？回滚、重放和当前回答修复的成本分别是多少？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Caili</foaf:givenName><foaf:surname>Yu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yiqi</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiaqi</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yiqun</foaf:givenName><foaf:surname>Duan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mingkai</foaf:givenName><foaf:surname>Zheng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhangkai</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kaize</foaf:givenName><foaf:surname>Shi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Taotao</foaf:givenName><foaf:surname>Cai</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2608.10502</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-回滚修复</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本-未核实正式接收</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <!-- ==================== Contextual Bandit 基础 ==================== -->
+
+  <bib:Article rdf:about="#linucb">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>A Contextual-Bandit Approach to Personalized News Article Recommendation</dc:title>
+    <dc:date>2010</dc:date>
+    <z:url>https://doi.org/10.1145/1772690.1772758</z:url>
+    <dc:identifier>DOI: 10.1145/1772690.1772758</dc:identifier>
+    <z:extra>发表状态：已同行评审，WWW 2010 正式论文。阅读优先级：P0-Bandit 入门。引用快照：Semantic Scholar 3,460，重要引用 461（2026-08-13）。为什么读：LinUCB 的经典来源，用最清楚的形式解释“看到 context 后选择一个 arm，只观察该 arm 的 reward，并以不确定性探索”。映射到本项目：context=问题与经验特征；arms=DIRECT/REUSE/FRESH；reward=质量减成本。精读问题：UCB 如何平衡探索利用？离线 replay 的假设是什么？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Lihong</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wei</foaf:givenName><foaf:surname>Chu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>John</foaf:givenName><foaf:surname>Langford</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Robert E.</foaf:givenName><foaf:surname>Schapire</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 19th International Conference on World Wide Web (WWW 2010)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P0-Bandit基础</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-经典高引</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#doublyrobust">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Doubly Robust Policy Evaluation and Learning</dc:title>
+    <dc:date>2011</dc:date>
+    <z:url>https://icml.cc/2011/papers/554_icmlpaper.pdf</z:url>
+    <dc:identifier>arXiv:1103.4601</dc:identifier>
+    <z:extra>发表状态：已同行评审，ICML 2011 正式论文。阅读优先级：P1-离线 Bandit 评估。引用数：本包未写入未经稳定核验的动态数字；该文是离线策略评价的经典方法论文。为什么读：线上只看到被选动作的 reward，不能直接知道“如果选 REUSE/FRESH 会怎样”；Doubly Robust 结合 reward model 与 propensity 修正来评估新策略。精读问题：DM、IPS、DR 各依赖什么假设？日志必须记录哪些 propensity？</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Miroslav</foaf:givenName><foaf:surname>Dudík</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>John</foaf:givenName><foaf:surname>Langford</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Lihong</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 28th International Conference on Machine Learning (ICML 2011)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>GrowRAG-核心精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>P1-Off-Policy-Evaluation</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-经典</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+</rdf:RDF>

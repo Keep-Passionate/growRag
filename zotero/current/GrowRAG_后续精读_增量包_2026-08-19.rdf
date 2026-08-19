@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <!--
+    GrowRAG 后续精读增量包（2026-08-19）
+    只收录 2026-08-14 合并包中缺失的条目，避免 Zotero 重复导入。
+    ReFormeR、Self-RAG、Adaptive-RAG、SelectiveNet、MERIT 等仍从 08-14 包阅读。
+  -->
+
+  <z:Collection rdf:about="#must_read">
+    <dc:title>GrowRAG 08-19｜01 定方向前必读</dc:title>
+    <dcterms:hasPart rdf:resource="#qppvariant"/>
+    <dcterms:hasPart rdf:resource="#reformrepro"/>
+    <dcterms:hasPart rdf:resource="#notallrewrite"/>
+    <dcterms:hasPart rdf:resource="#rqrag"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#targeted_reading">
+    <dc:title>GrowRAG 08-19｜02 方向确定后定向读</dc:title>
+    <dcterms:hasPart rdf:resource="#qppconv"/>
+    <dcterms:hasPart rdf:resource="#qprm"/>
+    <dcterms:hasPart rdf:resource="#masking"/>
+    <dcterms:hasPart rdf:resource="#counterfactualcontrol"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#implementation">
+    <dc:title>GrowRAG 08-19｜03 实验工具</dc:title>
+    <dcterms:hasPart rdf:resource="#querygym"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#frontier_watch">
+    <dc:title>GrowRAG 08-19｜04 最新近邻跟踪</dc:title>
+    <dcterms:hasPart rdf:resource="#qcr"/>
+    <dcterms:hasPart rdf:resource="#coevomem"/>
+  </z:Collection>
+
+  <bib:Article rdf:about="#qppvariant">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Can QPP Choose the Right Query Variant? Evaluating Query Variant Selection for RAG Pipelines</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://doi.org/10.1145/3805712.3808571</z:url>
+    <dc:identifier>DOI: 10.1145/3805712.3808571</dc:identifier>
+    <z:extra>发表状态：SIGIR 2026 Reproducibility Track，正式同行评审论文。阅读优先级：P0，第 1 篇。WHY：它直接回答“难道必须把所有改写执行完才能判断哪个好？”HOW：为同一信息需求生成多个 query variant，用检索前或检索后 QPP 预测器选一个，再只执行被选路径。WHAT：轻量检索前预测器经常能选到优于原查询的变体；但 nDCG 最优和最终答案最优存在 utility gap。GrowRAG 必学：历史可信度与当前适用性要分开；适用性可以事前预测但不能保证。精读重点：候选如何生成、pre-retrieval 特征、oracle 定义、决策指标与相关性指标为何不同、TREC-RAG 的标签如何使用。代码与预计算结果：https://github.com/Narabzad/QPP-4-RAG</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Andrew</foaf:givenName><foaf:surname>Drozdov</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Michael</foaf:givenName><foaf:surname>Bendersky</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Matei</foaf:givenName><foaf:surname>Zaharia</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>2813–2823</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-必须精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-SIGIR</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>检索前选择</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#reformrepro">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>A Reproducibility Study of LLM-Based Query Reformulation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://doi.org/10.1145/3805712.3808560</z:url>
+    <dc:identifier>DOI: 10.1145/3805712.3808560</dc:identifier>
+    <z:extra>发表状态：SIGIR 2026 Reproducibility Track，正式同行评审论文。阅读优先级：P0，第 3 篇。WHY：不同 query rewriting 论文的模型、检索器和数据集不同，表面增益不可直接比较。HOW：统一复现 10 种方法、2 个模型族与两种规模、BM25/SPLADE/稠密检索、9 个数据集。WHAT：收益强依赖 retriever；BM25 上的改进不稳定迁移到 neural retriever，大模型也不总更好。GrowRAG 必学：一条经验的可信度必须绑定 corpus、retriever、prompt/model 和版本；本论文的矩阵可直接作为公平实验协议。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Amin</foaf:givenName><foaf:surname>Bigdeli</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Radin</foaf:givenName><foaf:surname>Hamidi Rad</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hai Son</foaf:givenName><foaf:surname>Le</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mert</foaf:givenName><foaf:surname>Incesu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Charles L. A.</foaf:givenName><foaf:surname>Clarke</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ebrahim</foaf:givenName><foaf:surname>Bagheri</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>2824–2834</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-必须精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-SIGIR</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>复现实验</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#notallrewrite">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Not All Queries Need Rewriting: When Prompt-Only LLM Refinement Helps and Hurts Dense Retrieval</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://openreview.net/forum?id=tmpVrh40jX</z:url>
+    <dc:identifier>arXiv: 2603.13301</dc:identifier>
+    <z:extra>发表状态：ICLR 2026 CAO Workshop 论文；经过 workshop 审稿，但不等同于 ICLR 主会，证据权重低于 SIGIR/ACL 主论文。阅读优先级：P0，第 4 篇，作为止损反证。WHY：纯 query-only 改写可能把已经很好的查询改坏。HOW：在三个 BEIR 数据集、两种稠密检索器和多个设置下比较不改写与 prompt-only rewrite，并分析词汇对齐和语料术语迁移。WHAT：效果高度依赖领域；简单 gate 只能避免部分最坏退化，未可靠超过 never-rewrite，oracle 上限也可能很小。GrowRAG 必学：先测可获益空间，再设计可信层；如果历史复用的 oracle 空间也很小，应及时停止路线 A。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Varun</foaf:givenName><foaf:surname>Kotte</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>CAO Workshop at ICLR 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-止损反证</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Workshop</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>有害改写</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#rqrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RQ-RAG: Learning to Refine Queries for Retrieval Augmented Generation</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://openreview.net/forum?id=tzE7VqsaJ4</z:url>
+    <dc:identifier>arXiv: 2404.00610</dc:identifier>
+    <z:extra>发表状态：COLM 2024 正式同行评审论文。阅读优先级：P0，第 5 篇。WHY：一个问题未必只需要普通改写，也可能需要分解或消歧。HOW：训练模型用控制 token 产生 rewrite、decompose、disambiguate、answer 等轨迹，并用困惑度、置信度或集成策略选择。WHAT：在单跳和多跳 QA 上提升。GrowRAG 必学：动作空间、置信度选轨迹和训练型 query refinement 已经有人做；第一版若强调免参数训练和历史经验兼容性，可把它作为强能力参照，不能声称首次自适应选择查询操作。代码：https://github.com/chanchimin/RQ-RAG</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Chi-Min</foaf:givenName><foaf:surname>Chan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chunpu</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ruibin</foaf:givenName><foaf:surname>Yuan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hongyin</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wei</foaf:givenName><foaf:surname>Xue</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yike</foaf:givenName><foaf:surname>Guo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jie</foaf:givenName><foaf:surname>Fu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Conference on Language Modeling (COLM 2024)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-必须精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-COLM</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>训练型强基线</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#qppconv">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Query Performance Prediction: From Ad-hoc to Conversational Search</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://doi.org/10.1145/3539618.3591919</z:url>
+    <dc:identifier>DOI: 10.1145/3539618.3591919</dc:identifier>
+    <z:extra>发表状态：SIGIR 2023 Reproducibility Track，正式同行评审论文。阅读优先级：P1，在 QPP Variant Selection 之后读。WHY：QPP 的目标是在没有 relevance judgment 的运行阶段估计某个查询的检索表现。HOW：复现检索前/检索后、监督/无监督 QPP，并研究不同 query rewrite 和对话稠密检索。WHAT：监督方法需要足够训练数据；部分基于检索分数的无监督方法也有竞争力。GrowRAG 必学：无 Gold 不等于没有可用信号，但 QPP 预测的是质量而不是真值；需要在有标签开发集验证它与真实收益的关系。代码：https://github.com/ChuanMeng/QPP4CS</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Chuan</foaf:givenName><foaf:surname>Meng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mohammad</foaf:givenName><foaf:surname>Aliannejadi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Maarten</foaf:givenName><foaf:surname>de Rijke</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 46th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>2583–2593</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P1-定向精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-SIGIR</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>QPP基础</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#qprm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Q-PRM: Adaptive Query Rewriting for Retrieval-Augmented Generation via Step-level Process Supervision</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.findings-emnlp.817/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.findings-emnlp.817</dc:identifier>
+    <z:extra>发表状态：Findings of EMNLP 2025，正式同行评审，但不是 EMNLP Main。阅读优先级：P1；只有考虑训练型改写时精读。WHY：统一结果监督容易导致过度或不足改写。HOW：把改写建模为由原子步骤组成的 MDP，用 MCTS 构造过程监督，再进行强化式自训练和 PRM 引导解码。WHAT：不同复杂度开放域 QA 上优于基线。GrowRAG 必学：逐步改写、过程奖励和复杂度适配均不是空白；第一版不需要复制这条重训练路线。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Xiaopeng</foaf:givenName><foaf:surname>Ye</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chen</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chaoliang</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhaocheng</foaf:givenName><foaf:surname>Du</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jun</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Gang</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhenhua</foaf:givenName><foaf:surname>Dong</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: EMNLP 2025</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>15113–15128</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P1-训练路线</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Findings</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>过程监督</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#masking">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Masking or Mitigating? Deconstructing the Impact of Query Rewriting on Retriever Biases in RAG</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.findings-acl.414/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.findings-acl.414</dc:identifier>
+    <z:extra>发表状态：Findings of ACL 2026，正式同行评审，但不是 ACL Main。阅读优先级：P1/P2，开始比较多种稠密检索器时读。WHY：查询改写可能降低某些表面偏差，也可能在组合偏差和不同 retriever 下失效。HOW：五种 query enhancement、六种稠密检索器、受控文档对和四类偏差。WHAT：简单 LLM rewrite 平均降低偏差最多，但没有方法对所有检索器和偏差都稳定。GrowRAG 必学：经验可信度不能脱离 retriever；跨检索器泛化必须成为压力测试，而不是默认成立。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Agam</foaf:givenName><foaf:surname>Goyal</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Koyel</foaf:givenName><foaf:surname>Mukherjee</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Apoorv</foaf:givenName><foaf:surname>Saxena</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Anirudh</foaf:givenName><foaf:surname>Phukan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Eshwar</foaf:givenName><foaf:surname>Chandrasekharan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hari</foaf:givenName><foaf:surname>Sundaram</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>8517–8530</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P2-泛化压力测试</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Findings</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Retriever依赖</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#counterfactualcontrol">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Controlling Counterfactual Harm in Decision Support Systems Based on Prediction Sets</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://proceedings.neurips.cc/paper_files/paper/2024/hash/e9e3e5bdb017bbc887271c6f6de5353f-Abstract-Conference.html</z:url>
+    <dc:identifier>DOI: 10.52202/079017-4113</dc:identifier>
+    <z:extra>发表状态：NeurIPS 2024 Main Conference Track，正式同行评审。阅读优先级：P1；若主打 trusted/safe reuse 则升为 P0。它不是 RAG 论文。WHY：一个辅助系统平均提高准确率，仍可能把原本会做对的样本改错。HOW：用结构因果模型定义 counterfactual harm，并在假设下用 conformal risk control 限制伤害频率。WHAT：准确率和反事实伤害存在权衡。GrowRAG 借鉴：把“DIRECT 原本正确、REUSE 后错误”定义为有害复用，并画风险—覆盖率曲线；不要直接照搬其保证，因为其人类决策和单调性假设未必适用于 RAG。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Eleni</foaf:givenName><foaf:surname>Straitouri</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Suhas</foaf:givenName><foaf:surname>Thejaswi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Manuel</foaf:givenName><foaf:surname>Gomez Rodriguez</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Advances in Neural Information Processing Systems 37 (NeurIPS 2024)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P1-可信复用</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-NeurIPS</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>反事实伤害</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#querygym">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>QueryGym: A Toolkit for Reproducible LLM-Based Query Reformulation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://doi.org/10.1145/3774905.3793135</z:url>
+    <dc:identifier>DOI: 10.1145/3774905.3793135</dc:identifier>
+    <z:extra>发表状态：The Web Conference 2026 Companion/Demo Track，正式收录；它是工具论文，不应按主会研究论文权重解读。阅读优先级：实现前快速读，重点看代码而非方法主张。用途：统一实现多种 LLM query reformulation，提供版本化 prompt bank、BEIR/MS MARCO 数据接口、Pyserini/PyTerrier 连接与稳定输出格式。GrowRAG 决策：用它作为干净实验底座，避免从零复写十种改写方法；历史经验库和可信选择器仍由我们独立实现。代码：https://github.com/ls3-lab/QueryGym；文档：https://querygym.com/</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Amin</foaf:givenName><foaf:surname>Bigdeli</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Radin</foaf:givenName><foaf:surname>Hamidi Rad</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mert</foaf:givenName><foaf:surname>Incesu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Negar</foaf:givenName><foaf:surname>Arabzadeh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Charles L. A.</foaf:givenName><foaf:surname>Clarke</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ebrahim</foaf:givenName><foaf:surname>Bagheri</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Companion Proceedings of the ACM Web Conference 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>196–199</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>实现工具</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Demo</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>公开代码</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#qcr">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>Beyond Retrieval: Query-Conditioned Reuse of Long-Horizon Agent Trajectories</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.12847</z:url>
+    <dc:identifier>arXiv: 2608.12847</dc:identifier>
+    <z:extra>发表状态：仅 arXiv 预印本（2026-08-13 提交）；截至本包制作日未核实正式接收，不能按顶会论文引用其结论。阅读优先级：前沿近邻跟踪。WHY：找到历史轨迹不等于知道怎样安全地用于新的目标。HOW：把长轨迹转成面向当前目标的简短支持笔记，记录可复用流程、待恢复绑定、适用条件和验证要求。WHAT：在三个网页/应用 Agent 基准上报告较完整轨迹更好的成功率与更低 token。GrowRAG 风险：CoT/轨迹压缩成带适用条件的笔记已经有非常近的工作；若以后做检索经验笔记，差异必须落在文本 RAG、查询变换和前瞻性伤害控制，而不能声称首次压缩轨迹复用。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yifei</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Heng</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Lingling</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Muye</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xinyu</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiashuai</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hang</foaf:givenName><foaf:surname>Yan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rongman</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2608.12847</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>前沿近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>经验笔记</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#coevomem">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>CoEvo-Mem: Co-Evolving Retrieval Policy and Memory Bank for LLM Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.01739</z:url>
+    <dc:identifier>arXiv: 2608.01739</dc:identifier>
+    <z:extra>发表状态：仅 arXiv 预印本（2026-08-03 提交）；截至本包制作日未核实正式接收。阅读优先级：最新危险近邻，查重必读但证据权重低于正式论文。WHY：它把 query-specific retrieval policy 和 memory bank 放进同一个反馈闭环。HOW：冻结 LLM 生成 route-specific query rewrites 与 routing prior，轻量 residual router 在线修正；任务结果同时给路由决策归因并更新记忆值与图关系。GrowRAG 风险：如果我们把主张扩成“在线路由＋查询改写＋记忆共同演化”，会与它高度重合。仍可能的边界是文本 RAG 中具体历史查询变换的检索前伤害校准与拒绝，而不是一般共演化框架。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Bowen</foaf:givenName><foaf:surname>Ye</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yongchao</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhijian</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiang</foaf:givenName><foaf:surname>Yin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Junkai</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wenzhao</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv preprint arXiv:2608.01739</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>前沿近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>预印本</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>路由记忆共演化</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+</rdf:RDF>

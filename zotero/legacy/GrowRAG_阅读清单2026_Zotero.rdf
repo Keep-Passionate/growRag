@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:vcard="http://nwalsh.com/rdf/vCard#"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:link="http://purl.org/rss/1.0/modules/link/"
+  xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/">
+
+<!-- ============================================================
+     RAG 2026 顶会顶刊阅读清单  |  生成日期：2026-08-06
+     来源：ACL 2026 / AAAI 2026 / Nature / arXiv
+     导入：Zotero → File → Import → 选择本文件
+     ============================================================ -->
+
+  <z:Collection rdf:about="#col_RAG2026">
+    <dc:title>RAG 2026 顶会顶刊阅读清单</dc:title>
+    <dcterms:hasPart rdf:resource="#item_OpenScholar"/>
+    <dcterms:hasPart rdf:resource="#item_DynamicGraphNav"/>
+    <dcterms:hasPart rdf:resource="#item_StructureGuidedRAG"/>
+    <dcterms:hasPart rdf:resource="#item_R3AG"/>
+    <dcterms:hasPart rdf:resource="#item_RetrievalAsGen"/>
+    <dcterms:hasPart rdf:resource="#item_SPARKLE"/>
+    <dcterms:hasPart rdf:resource="#item_ARAG"/>
+    <dcterms:hasPart rdf:resource="#item_StableRAG"/>
+    <dcterms:hasPart rdf:resource="#item_S2GRAG"/>
+    <dcterms:hasPart rdf:resource="#item_MegaRAG"/>
+    <dcterms:hasPart rdf:resource="#item_PathRAG"/>
+    <dcterms:hasPart rdf:resource="#item_SegMemRAG"/>
+    <dcterms:hasPart rdf:resource="#item_InferenceScaling"/>
+    <dcterms:hasPart rdf:resource="#item_SafeRAG"/>
+  </z:Collection>
+
+<!-- ============================================================
+     A. Scientific RAG  |  B. Structure-aware RAG  ★★★★★
+     ============================================================ -->
+  <bib:Article rdf:about="#item_OpenScholar">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>Synthesizing scientific literature with retrieval-augmented language models</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://doi.org/10.1038/s41586-025-10072-4</z:url>
+    <dc:identifier>DOI: 10.1038/s41586-025-10072-4</dc:identifier>
+    <z:extra>★★★★★ [Scientific-RAG] OpenScholar: 45M论文检索+多文档综合+自动引用验证。8B开源模型超越GPT-4o+PaperQA2。Scientific RAG代表作，ScholarQABench基准。本地PDF：docs/literature_notes/Nature_s41586-025-10072-4.pdf</z:extra>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li><foaf:Person><foaf:surname>Asai</foaf:surname><foaf:givenName>Akari</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>He</foaf:surname><foaf:givenName>Jacqueline</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Shao</foaf:surname><foaf:givenName>Rulin</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Shi</foaf:surname><foaf:givenName>Weijia</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Singh</foaf:surname><foaf:givenName>Amanpreet</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Soldaini</foaf:surname><foaf:givenName>Luca</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Zettlemoyer</foaf:surname><foaf:givenName>Luke</foaf:givenName></foaf:Person></rdf:li>
+        <rdf:li><foaf:Person><foaf:surname>Hajishirzi</foaf:surname><foaf:givenName>Hannaneh</foaf:givenName></foaf:Person></rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>Nature</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Scientific-RAG</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>★★★★★</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+<!-- B. Structure-aware RAG ★★★★★ -->
+  <bib:Article rdf:about="#item_DynamicGraphNav">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Dynamic Graph Navigation via Triplet Chains for Structure-Aware Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date><z:url>https://aclanthology.org/2026.findings-acl.1360/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.findings-acl.1360</dc:identifier>
+    <z:extra>★★★★★ [Structure-aware-RAG] 用triplet chain (entity,rel,entity) 建模文档关系，解决embedding检索无法理解"A提出B→B改进C"的问题。适合论文知识图谱。PDF: 2026_阅读清单/ACL26_DynamicGraphNav_findings-acl.1360.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Zhao</foaf:surname><foaf:givenName>Feng</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Wu</foaf:surname><foaf:givenName>Yufei</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Liu</foaf:surname><foaf:givenName>Xianggan</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Zhao</foaf:surname><foaf:givenName>Ruilin</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the ACL: ACL 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Structure-aware-RAG</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>★★★★★</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_StructureGuidedRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Structure Guided Retrieval-Augmented Generation for Factual Queries</dc:title>
+    <dc:date>2026</dc:date><z:url>https://aclanthology.org/2026.acl-long.1873/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.1873</dc:identifier>
+    <z:extra>★★★★★ [Structure-aware-RAG] 解决embedding只能找"语义相似"文本、无法处理结构条件(时间/作者数/引用数)的问题。数据库型RAG、论文检索RAG重要基础。PDF: 2026_阅读清单/ACL26_StructureGuidedRAG_acl-long.1873.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Xie</foaf:surname><foaf:givenName>Miao</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>Structure-aware-RAG</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+
+  <bib:Article rdf:about="#item_R3AG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>R³AG: Retriever Routing for Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.939/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.939</dc:identifier>
+    <z:extra>★★★★★ [Retriever-Routing] 动态路由选择最优Retriever(BM25/Dense/ColBERT/Graph)，同时考虑retrieval relevance+generation utility。PDF: 2026_阅读清单/ACL26_R3AG_acl-long.939.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Zhao</foaf:surname><foaf:givenName>Tong</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Zhu</foaf:surname><foaf:givenName>Yutao</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Tian</foaf:surname><foaf:givenName>Yucheng</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Dou</foaf:surname><foaf:givenName>Zhicheng</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Retriever-Routing</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>★★★★★</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_RetrievalAsGen">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Retrieval as Generation: A Unified Framework with Self-Triggered Information Planning</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.196/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.196</dc:identifier>
+    <z:extra>★★★★★ [Agentic-RAG] 模型主动决定何时检索(generate→retrieve?→search→continue)，而非传统 retrieve→generate。PDF: 2026_阅读清单/ACL26_RetrievalAsGen_acl-long.196.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Li</foaf:surname><foaf:givenName>Bo</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Wang</foaf:surname><foaf:givenName>Mingda</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Fang</foaf:surname><foaf:givenName>Gexiang</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Zhang</foaf:surname><foaf:givenName>Shikun</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Ye</foaf:surname><foaf:givenName>Wei</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Agentic-RAG</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>★★★★★</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_SPARKLE">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>SPARKLE: A Structured and Plug-and-play Agentic Retrieval Policy for Adaptive RAG Models</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.1793/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.1793</dc:identifier>
+    <z:extra>★★★★☆ [Agentic-RAG] 学习何时搜索/再检索/停止的检索策略，结构化且可插拔的Agent RAG pipeline。PDF: 2026_阅读清单/ACL26_SPARKLE_acl-long.1793.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Fang</foaf:surname><foaf:givenName>Jinyuan</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Meng</foaf:surname><foaf:givenName>Zaiqiao</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Macdonald</foaf:surname><foaf:givenName>Craig</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Agentic-RAG</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_ARAG">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>A-RAG: Scaling Agentic Retrieval-Augmented Generation via Hierarchical Retrieval Interfaces</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2602.03442</z:url>
+    <dc:identifier>arXiv: 2602.03442</dc:identifier>
+    <z:extra>★★★★☆ [Agentic-RAG] 给Agent提供多个检索接口(keyword/semantic/chunk read)，研究LLM如何自主控制retrieval。PDF: 2026_阅读清单/arXiv_A-RAG_2602.03442.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Du</foaf:surname><foaf:givenName>Mingxuan</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>arXiv preprint 2602.03442</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Agentic-RAG</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_StableRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Stable-RAG: Mitigating Retrieval-Permutation-Induced Hallucinations in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.1188/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.1188</dc:identifier>
+    <z:extra>★★★★☆ [RAG-Reliability] 发现检索文档排序变化会导致答案变化，用hidden state clustering稳定答案。PDF: 2026_阅读清单/ACL26_StableRAG_acl-long.1188.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Zhang</foaf:surname><foaf:givenName>Qianchi</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Zhang</foaf:surname><foaf:givenName>Hainan</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Pang</foaf:surname><foaf:givenName>Liang</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Zheng</foaf:surname><foaf:givenName>Zhiming</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>RAG-Reliability</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_S2GRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>S2G-RAG: Structured Sufficiency and Gap Judging for Iterative Retrieval-Augmented QA</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.1185/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.1185</dc:identifier>
+    <z:extra>★★★★☆ [Agentic-RAG] 判断证据是否充分(Yes→answer / No→retrieve again)，Corrective RAG路线。PDF: 2026_阅读清单/ACL26_S2G-RAG_acl-long.1185.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Li</foaf:surname><foaf:givenName>Minghan</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Agentic-RAG</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>RAG-Reliability</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_MegaRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>MegaRAG: Multimodal Knowledge Graph-Based Retrieval Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.2218/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.2218</dc:identifier>
+    <z:extra>★★★★☆ [Graph-RAG][Multimodal-RAG] 构建text+image+spatial multimodal KG用于RAG。PDF: 2026_阅读清单/ACL26_MegaRAG_acl-long.2218.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Hsiao</foaf:surname><foaf:givenName>Chi-Hsiang</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Wang</foaf:surname><foaf:givenName>Yi-Cheng</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Lin</foaf:surname><foaf:givenName>Tzung-Sheng</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Yeh</foaf:surname><foaf:givenName>Yi-Ren</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Chen</foaf:surname><foaf:givenName>Chu-song</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the ACL: Long Papers (ACL 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Graph-RAG</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Multimodal-RAG</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_PathRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>PathRAG: Pruning Graph-based Retrieval Augmented Generation with Relational Paths</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/40268</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v40i36.40268</dc:identifier>
+    <z:extra>★★★★☆ [Graph-RAG] 关系路径检索A→B→C，减少Graph RAG冗余信息，GraphRAG优化方向。PDF: 2026_阅读清单/AAAI26_PathRAG_40268.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Chen</foaf:surname><foaf:givenName>Boyu</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Guo</foaf:surname><foaf:givenName>Zirui</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Yang</foaf:surname><foaf:givenName>Zidan</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Chen</foaf:surname><foaf:givenName>Yuluo</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Yang</foaf:surname><foaf:givenName>Cheng</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 40th AAAI Conference on Artificial Intelligence (AAAI 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Graph-RAG</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_SegMemRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>SegMem-RAG: Adaptive Memory for Retrieval-Augmented Generation in Open-Ended Knowledge Environments</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/40320</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v40i36.40320</dc:identifier>
+    <z:extra>★★★★☆ [Memory-RAG] 利用长期memory动态学习不同知识库如何访问，Multi-corpus RAG。PDF: 2026_阅读清单/AAAI26_SegMemRAG_40320.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Fan</foaf:surname><foaf:givenName>Xuanbo</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Zhao</foaf:surname><foaf:givenName>Tianqi</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Cheng</foaf:surname><foaf:givenName>Yi</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Zhang</foaf:surname><foaf:givenName>Yan</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 40th AAAI Conference on Artificial Intelligence (AAAI 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Memory-RAG</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_InferenceScaling">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Inference Scaling Law for Retrieval Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/38692</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v40i19.38692</dc:identifier>
+    <z:extra>★★★☆☆ [RAG-Theory] 研究RAG性能随Retriever规模/Generator规模/context长度/retrieved docs数量变化规律。PDF: 2026_阅读清单/AAAI26_InferenceScaling_38692.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Zhou</foaf:surname><foaf:givenName>Shu</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Ao</foaf:surname><foaf:givenName>Yuxuan</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Wang</foaf:surname><foaf:givenName>Xin</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Wang</foaf:surname><foaf:givenName>Hao</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 40th AAAI Conference on Artificial Intelligence (AAAI 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>RAG-Theory</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#item_SafeRAG">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Safe RAG by RAG: Untying the Bell That RAG Rang with the RAG Hand</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/40462</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v40i38.40462</dc:identifier>
+    <z:extra>★★★☆☆ [Secure-RAG] 解决恶意文档污染retrieval，RAG security expert方法。企业RAG安全。PDF: 2026_阅读清单/AAAI26_SafeRAG_40462.pdf</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:surname>Liang</foaf:surname><foaf:givenName>Xun</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Wang</foaf:surname><foaf:givenName>Mengwei</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Ma</foaf:surname><foaf:givenName>Yuefeng</foaf:givenName></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:surname>Niu</foaf:surname><foaf:givenName>Simin</foaf:givenName></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 40th AAAI Conference on Artificial Intelligence (AAAI 2026)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>RAG2026</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Secure-RAG</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+</rdf:RDF>

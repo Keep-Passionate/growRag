@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Editors and local configuration
+.idea/
+.vscode/
+.claude/
+.env
+.env.*
+!.env.example
+
+# Data, models, runs and upstream repositories
+data/**
+!data/
+!data/README.md
+runs/**
+!runs/
+!runs/README.md
+external/**
+!external/
+!external/README.md
+models/
+checkpoints/
+
+# Large research assets
+*.pdf
+*.zip
+*.7z
+*.tar
+*.gz
+
+# Legacy archive: keep only the human-readable manifest
+archive/**
+!archive/
+!archive/legacy_2026-08-19/
+!archive/legacy_2026-08-19/MANIFEST.md
+
+# Experiment artifacts
+*.jsonl
+*.parquet
+*.arrow
+*.npy
+*.npz
+wandb/
+mlruns/
+
+# OS
+.DS_Store
+Thumbs.db
+
