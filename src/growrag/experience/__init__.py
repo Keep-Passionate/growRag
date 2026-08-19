@@ -10,6 +10,15 @@ from growrag.experience.ledger import (
     SourceEvidence,
     TransferObservation,
 )
+from growrag.experience.snapshot import (
+    SCHEMA_VERSION,
+    ExperienceSnapshot,
+    SnapshotValidationError,
+    dumps_snapshot,
+    load_snapshot,
+    loads_snapshot,
+    save_snapshot,
+)
 
 __all__ = [
     "EvidenceRole",
@@ -20,4 +29,11 @@ __all__ = [
     "ReliabilitySummary",
     "SourceEvidence",
     "TransferObservation",
+    "SCHEMA_VERSION",
+    "ExperienceSnapshot",
+    "SnapshotValidationError",
+    "dumps_snapshot",
+    "loads_snapshot",
+    "save_snapshot",
+    "load_snapshot",
 ]

@@ -1,31 +1,31 @@
 [experiment]
-name = "gate1_oracle_feasibility"
+name = "trusted_reuse_file_demo"
 seed = 42
 
 [actions]
 direct = true
 reuse = true
-fresh = true
+fresh = false
 
 [evaluation]
-good_threshold = 1.0
+good_threshold = 0.5
 max_history_candidates = 5
 paired_harm_is_primary = true
 
 [environment]
-corpus_id = "UNSET"
-corpus_version = "UNSET"
+corpus_id = "toy-wiki"
+corpus_version = "2026-08"
 retriever_id = "bm25"
-retriever_version = "UNSET"
-index_id = "UNSET"
-index_version = "UNSET"
-analyzer_id = "UNSET"
-analyzer_version = "UNSET"
-rewriter_id = "UNSET"
-rewriter_version = "UNSET"
+retriever_version = "1"
+index_id = "toy-index"
+index_version = "sha256:demo"
+analyzer_id = "unicode-words"
+analyzer_version = "1"
+rewriter_id = "precomputed-plan"
+rewriter_version = "v1"
 
 [write_gate]
-minimum_source_gain = 0.05
+minimum_source_gain = 0.0
 
 [reliability]
 minimum_transfer_observations = 3
@@ -44,8 +44,8 @@ scorer = "signature-coverage-v1"
 minimum_score = 0.50
 
 [application]
-applier_id = "UNSET"
-application_version = "UNSET"
+applier_id = "precomputed-plan"
+application_version = "v1"
 
 [budget]
 maximum_retrieval_queries = 1

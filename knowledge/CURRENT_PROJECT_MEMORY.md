@@ -1,7 +1,7 @@
 # GrowRAG 当前项目记忆
 
 更新日期：2026-08-19
-状态：路线 A 已确认；v1 核心骨架已实现，下一步接入 Gate 1 真实数据
+状态：路线 A 已确认；可运行 v1 MVP 已实现，下一步接入 Gate 1 真实数据
 权威性：当前入口；后续经双方确认后更新
 
 ## 已确认
@@ -25,6 +25,7 @@
 10. v1 默认保存具体 `q → q'`、原子变化和 provenance；在线动作固定为 `DIRECT/REUSE`，`FRESH` 仅作离线强基线。
 11. v1 先使用经验阈值、条件破坏率的 Wilson 上界和 risk–coverage；EMA、conformal、bandit/RL 均后置。
 12. v1 已实现经验账本、候选召回、适用性接口、可信 gate、target query plan 接口和离线 candidate-set oracle；真实检索器与数据尚未接入。
+13. v1 已提供严格 TOML 配置、可重启 JSON 经验快照、请求/计划文件协议、完整 TrustedReuseLayer、统一 `growrag` CLI 和文件化 DIRECT/REUSE 示例。
 
 ## 已确认主线
 

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "applier_id": "precomputed-plan",
+  "application_version": "v1",
+  "plans": [
+    {
+      "target_query_id": "target-reuse",
+      "experience_id": "comparison-decomposition-1",
+      "transformed_query": "Carol birth date; David birth date"
+    },
+    {
+      "target_query_id": "target-not-applicable",
+      "experience_id": "comparison-decomposition-1",
+      "transformed_query": "Carol birth date"
+    }
+  ]
+}
