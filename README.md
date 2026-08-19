@@ -1,6 +1,6 @@
 # GrowRAG
 
-GrowRAG 目前处于研究问题收敛与可行性验证阶段。当前最值得验证的候选方向是：
+GrowRAG 已确认第一版研究方向，当前进入核心实现与可行性验证：
 
 > 在第一次正式检索前，只有当一条历史查询变换本身可靠、且对当前问题的适用性风险足够低时才复用；否则保持原查询不动。
 
@@ -9,6 +9,10 @@ GrowRAG 目前处于研究问题收敛与可行性验证阶段。当前最值得
 ## 当前入口
 
 - [项目当前记忆](knowledge/CURRENT_PROJECT_MEMORY.md)
+- [路线 A 已确认决策](knowledge/decisions/2026-08-19_路线A查询侧可信复用层_已确认.md)
+- [查询侧可信复用层 v1](knowledge/method/2026-08-19_查询侧可信复用层_v1.md)
+- [Gate 1 代码实验计划](knowledge/experiments/2026-08-19_Gate1_代码实验计划.md)
+- [查询侧可信复用层实施路线](knowledge/experiments/2026-08-19_查询侧可信复用层_实施路线.md)
 - [方向候选与待选择事项](knowledge/decisions/2026-08-19_ERM继承路线与待选择.md)
 - [ERM 继承与安全复用方案](knowledge/method/2026-08-19_ERM继承与安全复用.md)
 - [经验记忆与 EMA 备忘](knowledge/method/2026-08-19_经验记忆与EMA.md)
@@ -21,14 +25,16 @@ GrowRAG 目前处于研究问题收敛与可行性验证阶段。当前最值得
 
 `src/growrag` 是 2026-08-19 新建的最小研究脚手架。旧版“账本—验证门—经验注入”代码已经退出活动工程，保存在 `archive/legacy_2026-08-19`，不得再作为新方法的默认依据。
 
-当前代码只定义：
+当前第一批实现包括：
 
 - `DIRECT / REUSE / FRESH` 三种实验动作；
-- 查询变换与环境版本的中立数据结构；
+- 来源查询变换、目标题 query plan 与环境版本的数据结构；
 - 成对比较 `DIRECT` 与 `REUSE` 的 benefit / harm 标签；
-- 可复现研究所需的最小测试。
+- candidate / active / quarantine / retired 经验账本；
+- 历史候选召回、当前适用性接口和离线 oracle；
+- 可复现研究所需的防泄漏与风险测试。
 
-它还没有实现最终选择器、ERM 索引更新、EMA、LLM 调用或数据下载。
+它仍未接入真实检索器、LLM 和公开数据下载；ERM 索引更新、EMA、RL/bandit 也不属于当前 v1。
 
 ## 本地启动
 
@@ -37,6 +43,18 @@ GrowRAG 目前处于研究问题收敛与可行性验证阶段。当前最值得
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python -m pytest
+```
+
+运行无需模型的完整可信门示例：
+
+```powershell
+python scripts/run_trusted_gate_demo.py
+```
+
+运行 Gate 1 离线 oracle 示例：
+
+```powershell
+python scripts/run_oracle_pilot.py --input examples/oracle_pilot.csv --output runs/oracle_pilot.json
 ```
 
 如需重新创建，可以使用本机已有的 Python 3.11：

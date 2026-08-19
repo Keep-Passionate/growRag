@@ -17,5 +17,35 @@ corpus_id = "UNSET"
 corpus_version = "UNSET"
 retriever_id = "bm25"
 retriever_version = "UNSET"
+index_id = "UNSET"
+index_version = "UNSET"
+analyzer_id = "UNSET"
+analyzer_version = "UNSET"
 rewriter_id = "UNSET"
 
+[write_gate]
+minimum_source_gain = 0.05
+
+[reliability]
+minimum_transfer_observations = 3
+minimum_direct_good_observations = 2
+minimum_benefits = 1
+minimum_mean_gain = 0.0
+maximum_conditional_breakage_upper_bound = 0.70
+
+[candidate_recall]
+scorer = "source-query-jaccard-v1"
+maximum_candidates = 5
+
+[applicability]
+scorer = "signature-coverage-v1"
+minimum_score = 0.50
+
+[application]
+applier_id = "UNSET"
+application_version = "UNSET"
+
+[budget]
+maximum_retrieval_queries = 1
+top_k = 5
+context_tokens = 4096

@@ -1,7 +1,7 @@
 # GrowRAG 当前项目记忆
 
-更新日期：2026-08-19  
-状态：方向讨论与 Gate 0 / Gate 1 准备中  
+更新日期：2026-08-19
+状态：路线 A 已确认；v1 核心骨架已实现，下一步接入 Gate 1 真实数据
 权威性：当前入口；后续经双方确认后更新
 
 ## 已确认
@@ -21,10 +21,14 @@
    - HotpotQA fullwiki + 2WikiMultiHopQA 做核心跨题迁移和 harmful reuse；
    - MuSiQue 做困难、充分性与拒绝压力测试；
    - BRIGHT/BEIR/TREC DL 负责 ERM 复现与跨检索器外部有效性。
+9. 2026-08-19 用户正式选择 **查询侧可信复用层**，不再把可回滚 ERM 索引作为首篇主线。
+10. v1 默认保存具体 `q → q'`、原子变化和 provenance；在线动作固定为 `DIRECT/REUSE`，`FRESH` 仅作离线强基线。
+11. v1 先使用经验阈值、条件破坏率的 Wilson 上界和 risk–coverage；EMA、conformal、bandit/RL 均后置。
+12. v1 已实现经验账本、候选召回、适用性接口、可信 gate、target query plan 接口和离线 candidate-set oracle；真实检索器与数据尚未接入。
 
-## 当前候选主线
+## 已确认主线
 
-暂称 **Safe-ERM + Do-No-Harm Query Reuse**：
+暂称 **查询侧可信复用层**：
 
 1. 继承 ERM 的“正确性门、原子归因、稳定积累”思想；
 2. 将 ERM 的绝对正确门升级为相对 `DIRECT` 的成对改进门；
@@ -34,15 +38,15 @@
 6. 两者都满足阈值才 `REUSE`，否则 `DIRECT`；
 7. 主评价显式报告 benefit、harm、coverage、成本和 risk–coverage 曲线。
 
-这仍是候选路线，不是已经证明的新颖贡献。
+方向已经确认，但新颖性和有效性仍需 Gate 1 实验验证。
 
-## 尚未决定
+## 已冻结的第一版取舍
 
-- 主论文是“安全查询经验复用”还是“可回滚条件化 ERM 索引”。
-- 第一版经验表示是具体 query pair、原子 expansion units，还是 ReFormeR 风格 pattern。
-- 只做 `DIRECT/REUSE`，还是把 `FRESH` 也纳入在线控制器。
-- 风险控制先用经验阈值/校准器，还是进一步追求 conformal 风险保证。
-- 阶段 0 是先复现 ERM 还是先跑 TREC-RAG/Hotpot 风险矩阵；两者都保留，默认优先风险矩阵、并行做轻量 ERM 复现。
+- 主论文对象：查询侧安全复用，不修改基础索引。
+- 经验表示：具体 query pair + 原子变化；pattern/CoT 笔记后续消融。
+- 在线动作：`DIRECT/REUSE`；`FRESH` 只作为离线基线。
+- 风险控制：先经验校准，不先承诺 conformal 保证。
+- 实验顺序：优先风险矩阵与 oracle；ERM 只在需要比较索引侧写入时作为支线基线复现。
 
 ## 术语约定
 
@@ -52,6 +56,7 @@
 - 历史可信度（reliability/trust）：过去独立复用时的收益与伤害记录。
 - 当前适用性（applicability/fit）：在当前题执行前，对“这条经验是否匹配”的预测。
 - 成对伤害（harm）：`DIRECT` 达标而 `REUSE` 不达标。
+- 条件破坏率：在 `DIRECT` 原本达标的题中，被 `REUSE` 改到不达标的比例。
 - 成对收益（benefit）：`DIRECT` 不达标而 `REUSE` 达标。
 - Gold：数据集提供的参考答案、相关文档、supporting facts、qrels 或 nuggets；不是模型自评分。
 - Oracle：离线看过所有候选真实结果后的上界，不是可部署路由器。

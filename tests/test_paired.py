@@ -16,4 +16,3 @@ def test_labels_benefit_when_reuse_repairs_a_bad_direct_result() -> None:
 def test_threshold_is_explicit() -> None:
     result = evaluate_pair(0.8, 0.7, good_threshold=0.5)
     assert result.outcome is PairedOutcome.BOTH_GOOD
-

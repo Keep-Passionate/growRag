@@ -49,4 +49,3 @@ def evaluate_pair(
         difference=reuse_score - direct_score,
         outcome=outcome,
     )
-

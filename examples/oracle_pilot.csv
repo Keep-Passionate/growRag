@@ -1,0 +1,7 @@
+target_query_id,experience_id,memory_snapshot_id,candidate_rank,retrieval_query_count,requested_top_k,context_token_budget,direct_score,reuse_score,fresh_score
+q1,e1,memory-demo-v1,1,1,2,2048,0.40,0.70,0.60
+q1,e2,memory-demo-v1,2,1,2,2048,0.40,0.30,0.60
+q2,e1,memory-demo-v1,1,1,2,2048,0.80,0.60,0.90
+q2,e3,memory-demo-v1,2,1,2,2048,0.80,0.80,0.90
+q3,e2,memory-demo-v1,1,1,2,2048,0.60,0.60,0.60
+q3,e3,memory-demo-v1,2,1,2,2048,0.60,0.20,0.60
