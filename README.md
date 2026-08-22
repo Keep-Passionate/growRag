@@ -115,4 +115,4 @@ python -m ruff format --check src tests scripts
 
 - `data/`、`runs/` 和 `external/` 的大文件不提交 Git。
 - `archive/` 只跟踪说明文件，不提交旧代码、PDF 或历史运行产物。
-- GitHub 远端仓库已创建且本地 `origin` 已配置；当前命令行网络无法连接 GitHub，连接器仍待授权，因此尚未完成首次推送。见 [GITHUB_SETUP.md](GITHUB_SETUP.md)。
+- GitHub 远端仓库已创建并完成首次推送，本地 `main` 正在跟踪 `origin/main`。见 [GITHUB_SETUP.md](GITHUB_SETUP.md)。

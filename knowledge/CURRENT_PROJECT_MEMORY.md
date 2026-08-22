@@ -148,7 +148,7 @@ v1 冻结三个 prompt：`state_judge`、`fresh_repair`、`experience_apply`。
 - 现有 `src/growrag` 是路线 A 的可信复用核心，可作为方案 B 的 REUSE 子模块，不再代表完整系统。
 - QueryEpisode、结构化 state、配对 VerificationEvent、ExperienceCard 和可信 Registry 的 v0 数据合同已实现；下一阶段接入 base-adapter/state judge/controller，不需要推倒已测试的 reliability/harm gate。
 - 本地 `origin` 已指向 `https://github.com/Keep-Passionate/growRag.git`；远端仓库已核实公开且为空。
-- 当前命令行到 GitHub 443 连接失败；GitHub 连接器安装请求仍待用户授权确认，因此尚未推送。
+- 2026-08-22 已通过现有 Git 凭据把本地 `main` 首次推送到 `origin/main`；GitHub 连接器安装请求未获界面确认，但不再阻塞同步。
 
 ## 更新规则
 

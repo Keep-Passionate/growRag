@@ -4,7 +4,7 @@
 
 `https://github.com/Keep-Passionate/growRag.git`
 
-本地 `origin` 已指向该地址。当前机器的命令行到 `github.com:443` 连接超时；GitHub 连接器安装建议已经发出，但仍等待用户在界面中确认授权，所以尚未完成首次推送。
+本地 `origin` 已指向该地址。2026-08-22 已通过现有 Git 凭据完成首次推送，远端 `main` 正在跟踪本地 `main`。GitHub 连接器安装请求未获界面确认，但不再阻塞当前仓库同步。
 
 仓库内已经提供 `.github/workflows/ci.yml`；连接并推送远端后会自动在 Python 3.11/3.12 上运行测试、代码检查和 CLI 冒烟测试。
 
@@ -17,7 +17,7 @@
 
 ## 当前连接
 
-本地 `origin` 已配置；网络/授权恢复后只需执行：
+后续同步使用：
 
 ```powershell
 git push -u origin main
@@ -30,7 +30,7 @@ gh auth login
 git push -u origin main
 ```
 
-不要 force push。远端当前虽为空，首次推送前仍应再次 fetch/核对，以防用户期间从网页添加 README 或 License。
+不要 force push。后续推送前先正常 fetch/pull，避免覆盖用户从网页或其他机器提交的内容。
 
 ## 当前准备跟踪的上游
 
@@ -50,4 +50,4 @@ git clone --depth 1 https://github.com/aminbigdeli/ReFormeR.git external/reforme
 git clone --depth 1 https://github.com/ls3-lab/QueryGym.git external/querygym
 ```
 
-2026-08-19 已核对这三个官方地址。2026-08-22 再次确认命令行到 `github.com:443` 仍连接超时，因此目录尚未下载；网络或 GitHub 连接器授权恢复后重试即可。
+2026-08-19 已核对这三个官方地址。当前未下载，是因为 M0 数据合同不依赖这些上游；进入 M1 复现 query operator/基线时再按需浅克隆。
