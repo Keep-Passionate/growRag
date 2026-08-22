@@ -1,15 +1,20 @@
 # GrowRAG
 
-GrowRAG 已确认第一版研究方向，并完成可安装、可配置、可重启的 v1 MVP；下一步进入真实数据可行性验证：
+GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在不修改基础 RAG 的前提下，建立一个可绕过、可追溯、可拒绝历史经验的轻量修复闭环：
 
-> 在第一次正式检索前，只有当一条历史查询变换本身可靠、且对当前问题的适用性风险足够低时才复用；否则保持原查询不动。
+> 原查询先运行一次基础 RAG；若证据不足，则显式说明缺口，在可信历史修复与本题现场修复之间选择；没有进展或预算耗尽时停止并承认证据不足。
 
-这不是“新 RAG 范式”的既定结论。第一阶段先测量历史查询变换是否真的存在跨题迁移空间，以及能否控制 `DIRECT 原本正确、REUSE 反而错误` 的非对称伤害。
+它可以发展成轻量级单控制器 Agentic RAG，但“Agentic、adaptive、插件式或 query rewriting”都不是项目的既定创新。第一阶段要测量单 Query repair episode 是否真的能跨题迁移，以及能否控制 `BASE 原本正确、REUSE 反而错误` 的非对称伤害。
 
 ## 当前入口
 
 - [项目当前记忆](knowledge/CURRENT_PROJECT_MEMORY.md)
-- [路线 A 已确认决策](knowledge/decisions/2026-08-19_路线A查询侧可信复用层_已确认.md)
+- [方案 B 已确认决策](knowledge/decisions/2026-08-22_方案B可信自适应查询修复_已确认.md)
+- [单 Query Episode 与长期经验卡 Schema v0](knowledge/method/2026-08-22_单Query_Episode与长期经验卡_Schema_v0.md)
+- [Adaptive / Agentic 路由与新颖性边界](knowledge/literature/2026-08-22_方案B自适应路由与新颖性边界.md)
+- [方案 B 实施路线](knowledge/experiments/2026-08-22_方案B实施路线.md)
+- [双层记忆与结构化修复讨论稿](knowledge/method/2026-08-21_双层记忆与结构化修复_讨论稿.md)
+- [历史路线 A 决策](knowledge/decisions/2026-08-19_路线A查询侧可信复用层_已确认.md)
 - [查询侧可信复用层 v1](knowledge/method/2026-08-19_查询侧可信复用层_v1.md)
 - [查询变体、经验卡、生命周期与双路线](knowledge/method/2026-08-19_查询变体_经验卡_生命周期与双路线.md)
 - [v1.1 代码审阅清单](knowledge/method/2026-08-19_代码审阅清单.md)
@@ -25,7 +30,7 @@ GrowRAG 已确认第一版研究方向，并完成可安装、可配置、可重
 
 ## 代码状态
 
-`src/growrag` 是 2026-08-19 新建的最小研究脚手架。旧版“账本—验证门—经验注入”代码已经退出活动工程，保存在 `archive/legacy_2026-08-19`，不得再作为新方法的默认依据。
+`src/growrag` 是 2026-08-19 新建的最小研究脚手架。旧版 GrowRAG 已退出活动工程并归档。当前代码保留可靠历史复用子模块，并新增方案 B 的不可变 QueryEpisode、配对验证和长期 ExperienceCard 数据合同；尚未接入真实检索器和 LLM，因此还不是可运行的完整 Agentic 修复闭环。
 
 当前第一批实现包括：
 
@@ -40,8 +45,14 @@ GrowRAG 已确认第一版研究方向，并完成可安装、可配置、可重
 - 可扫描阈值的 risk–coverage 离线分析；
 - 文件化批量决策 CLI 与离线 oracle；
 - 可复现研究所需的防泄漏与风险测试。
+- 强制 BASE-first 的单 Query episode 状态机；
+- 每个 turn 单查询、结构化 gap、证据指针、成本与停止原因；
+- 同题、同环境、同预算的 BASE/REUSE/FRESH 配对验证；
+- typed episode/turn provenance、版本父链与不可覆盖卡片；
+- 可重算 benefit/neutral/correct-to-wrong harm 的经验卡注册边界；
+- 可配置但显式记录的 ACTIVE 门槛，默认拒绝 proxy-only 和单次成功。
 
-v1 的输出是“下游应执行的原查询或复用查询”，尚未接入真实检索器、LLM 和公开数据。ERM 索引更新、EMA、RL/bandit 也不属于当前 v1。
+旧 v1 facade 的输出仍是“下游应执行的原查询或复用查询”；新的 episode/card 合同目前尚未接到旧 facade，避免两套生命周期被误当成已经整合。下一阶段是接入一个冻结的 BM25 BASE、结构化 state judge 与 FRESH fallback，再让旧 reliability/applicability gate 通过新版 Registry 消费卡片。EMA、RL/bandit 仍不属于首版。
 
 ## 本地启动
 
@@ -104,4 +115,4 @@ python -m ruff format --check src tests scripts
 
 - `data/`、`runs/` 和 `external/` 的大文件不提交 Git。
 - `archive/` 只跟踪说明文件，不提交旧代码、PDF 或历史运行产物。
-- GitHub 远端尚未创建；原因和下一步见 [GITHUB_SETUP.md](GITHUB_SETUP.md)。
+- GitHub 远端仓库已创建且本地 `origin` 已配置；当前命令行网络无法连接 GitHub，连接器仍待授权，因此尚未完成首次推送。见 [GITHUB_SETUP.md](GITHUB_SETUP.md)。

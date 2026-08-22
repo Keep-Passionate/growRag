@@ -1,5 +1,17 @@
 """Experience evidence records and lifecycle logic."""
 
+from growrag.experience.cards import (
+    ActivationStage,
+    CardActivation,
+    CardActivationPolicy,
+    CardLifecycle,
+    CardProvenance,
+    CardServing,
+    CardValidation,
+    ExperienceCard,
+    RepairSpecification,
+    VerificationTier,
+)
 from growrag.experience.ledger import (
     EvidenceRole,
     ExperienceLedger,
@@ -17,6 +29,7 @@ from growrag.experience.portfolio import (
     PortfolioSelection,
     select_hot_portfolio,
 )
+from growrag.experience.registry import ExperienceCardRegistry
 from growrag.experience.snapshot import (
     SCHEMA_VERSION,
     SUPPORTED_SCHEMA_VERSIONS,
@@ -30,6 +43,17 @@ from growrag.experience.snapshot import (
 from growrag.models import SUPPORTED_GAP_CATEGORIES
 
 __all__ = [
+    "ActivationStage",
+    "CardActivation",
+    "CardActivationPolicy",
+    "CardLifecycle",
+    "CardProvenance",
+    "CardServing",
+    "CardValidation",
+    "ExperienceCard",
+    "ExperienceCardRegistry",
+    "RepairSpecification",
+    "VerificationTier",
     "EvidenceRole",
     "ExperienceLedger",
     "ExperienceRecord",

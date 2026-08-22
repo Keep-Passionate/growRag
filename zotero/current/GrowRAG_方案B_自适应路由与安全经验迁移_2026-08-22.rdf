@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <!--
+    GrowRAG 方案 B 增量精读包（2026-08-22）
+    目标：核查 adaptive/agentic routing、结构化修复、经验记忆和 query transformation 的新颖性边界。
+    只收录此前 current RDF 未覆盖或需要补充导读的条目。
+    “仅预印本”表示截至 2026-08-22 未核实正式同行评审版本，不等于质量判断。
+  -->
+
+  <z:Collection rdf:about="#p0_boundary">
+    <dc:title>GrowRAG 08-22｜01 P0 直接近邻与创新边界</dc:title>
+    <dcterms:hasPart rdf:resource="#c3po"/>
+    <dcterms:hasPart rdf:resource="#sparkle"/>
+    <dcterms:hasPart rdf:resource="#segmem"/>
+    <dcterms:hasPart rdf:resource="#reme"/>
+    <dcterms:hasPart rdf:resource="#experience_rag_skill"/>
+    <dcterms:hasPart rdf:resource="#erskill"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#p1_repair">
+    <dc:title>GrowRAG 08-22｜02 查询修复算子与状态控制</dc:title>
+    <dcterms:hasPart rdf:resource="#skillrag"/>
+    <dcterms:hasPart rdf:resource="#stateaware"/>
+    <dcterms:hasPart rdf:resource="#hyde"/>
+    <dcterms:hasPart rdf:resource="#query2doc"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#p2_router">
+    <dc:title>GrowRAG 08-22｜03 后期路由基准</dc:title>
+    <dcterms:hasPart rdf:resource="#ragrouterbench"/>
+  </z:Collection>
+
+  <bib:Article rdf:about="#c3po">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>C-3PO: Compact Plug-and-Play Proxy Optimization to Achieve Human-like Retrieval-Augmented Generation</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://proceedings.mlr.press/v267/chen25an.html</z:url>
+    <dc:identifier>arXiv: 2502.06205; PMLR: v267/chen25an</dc:identifier>
+    <z:extra>发表状态：ICML 2025 正式同行评审论文。阅读优先级：P0。它做了什么：在冻结 retriever 与 LLM 之间加入轻量多 Agent proxy，由三个角色决定是否检索、生成查询和筛选文档，并用树状 rollout 与强化学习训练。它没做什么：没有跨问题的 query-repair episode、经验晋升、历史可靠性与当前适用性分离，也没有把 BASE 正确而干预后错误作为核心风险。GrowRAG 必学：plug-and-play、frozen base、agentic controller 不能作为创新；我们的增量必须来自可追溯且受伤害约束的历史修复迁移。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Guoxin</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Minpeng</foaf:givenName><foaf:surname>Liao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Peiying</foaf:givenName><foaf:surname>Yu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dingmin</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zile</foaf:givenName><foaf:surname>Qiao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chao</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xin</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kai</foaf:givenName><foaf:surname>Fan</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 42nd International Conference on Machine Learning</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>8530–8551</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-创新边界</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ICML</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Agentic-RAG</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#sparkle">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>SPARKLE: A Structured and Plug-and-play Agentic Retrieval Policy for Adaptive RAG Models</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.1793/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.1793</dc:identifier>
+    <z:extra>发表状态：ACL 2026 Long，正式同行评审论文。阅读优先级：P0，第 1 篇。它做了什么：增加独立 proxy，以结构化 KG reasoning chain 表达知识缺口，据此决定是否检索、生成目标查询并选择能补缺口的证据；用 PPO 和二叉树 rollout 训练。它没做什么：没有跨问题历史修复经验、episode 到长期卡片的晋升，也没有 reliability/applicability/conditional-harm 的安全复用协议。GrowRAG 必学：先显式表达失败原因再改写已经被覆盖；我们应把结构化 gap 当作历史经验匹配和事后验证接口，而不是创新本身。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Jinyuan</foaf:givenName><foaf:surname>Fang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zaiqiao</foaf:givenName><foaf:surname>Meng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Craig</foaf:givenName><foaf:surname>Macdonald</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>38699–38719</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-必须精读</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ACL</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>结构化缺口</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#segmem">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>SegMem-RAG: Adaptive Memory for Retrieval-Augmented Generation in Open-Ended Knowledge Environments</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/40320</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v40i36.40320</dc:identifier>
+    <z:extra>发表状态：AAAI 2026 Technical Track，正式同行评审论文。阅读优先级：P0。它做了什么：在开放、多语料环境中维护结构化记忆，通过经验与自反思学习跨语料路由；论文涉及 episodic、procedural、semantic memory。它没做什么：研究重点是语料源与检索路径选择，不是具体 q→q′ 修复的配对收益、来源版本和正确到错误风险。GrowRAG 必学：双层/多层记忆和经验路由都不是创新；我们必须把记忆单位和风险目标限定到单 query repair transfer。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Xuanbo</foaf:givenName><foaf:surname>Fan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tianqi</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yi</foaf:givenName><foaf:surname>Cheng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chi</foaf:givenName><foaf:surname>Xiu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiaxin</foaf:givenName><foaf:surname>Guo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Boci</foaf:givenName><foaf:surname>Peng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bingjing</foaf:givenName><foaf:surname>Xu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jessica</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Feng</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yan</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the AAAI Conference on Artificial Intelligence, Volume 40, Issue 36</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>30647–30655</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-记忆边界</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-AAAI</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>经验路由</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#reme">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Remember Me, Refine Me: A Dynamic Procedural Memory Framework for Experience-Driven Agent Evolution</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.findings-acl.829/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.findings-acl.829</dc:identifier>
+    <z:extra>发表状态：Findings of ACL 2026，正式同行评审，但不是 ACL Main。阅读优先级：P0。它做了什么：从成功模式、失败触发和成败对比中蒸馏 procedural memory，做情境适配复用，并以 utility 添加、精炼和淘汰记忆。它没做什么：任务是通用 Agent 工具使用，不是 RAG query repair；没有冻结 BASE 下 q→q′→evidence 的相同预算配对，也没有把 conditional harm 作为主要门控。GrowRAG 必学：成功/失败蒸馏、适用性和生命周期都已有工作；v1 的失败 episode 只用于审计、训练和禁用条件，不能把“保存失败”当创新。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Zouying</foaf:givenName><foaf:surname>Cao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiaji</foaf:givenName><foaf:surname>Deng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Li</foaf:givenName><foaf:surname>Yu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Weikang</foaf:givenName><foaf:surname>Zhou</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhaoyang</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Bolin</foaf:givenName><foaf:surname>Ding</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hai</foaf:givenName><foaf:surname>Zhao</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>16803–16822</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-生命周期基线</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Findings</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>失败经验</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#experience_rag_skill">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>An Agent-Oriented Pluggable Experience-RAG Skill for Experience-Driven Retrieval Strategy Orchestration</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2605.03989</z:url>
+    <dc:identifier>arXiv: 2605.03989</dc:identifier>
+    <z:extra>发表状态：仅 arXiv 预印本，6 页；截至 2026-08-22 未核实正式接收。阅读优先级：P0 近邻监控，但证据权重低于正式论文。它做了什么：在 Agent 与 retriever pool 之间加入可插拔 skill，分析 scene、查询经验记忆并选择检索策略；经验包含场景特征、各策略分数、最佳策略和优势。它没做什么：记忆的是某场景适合哪个 retriever/strategy，不是一次查询为什么失败、怎样修复以及是否相对 BASE 真正有益。GrowRAG 必学：不能声称首次经验驱动的检索编排；差异应落在 query-repair episode、provenance 和有害迁移控制。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Dutao</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Tian</foaf:givenName><foaf:surname>Liao</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-危险预印本</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>未同行评审</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>经验策略路由</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#erskill">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>ERSkill: Evolving for Skill-Guided Adaptive Memory Retrieval</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.12720</z:url>
+    <dc:identifier>arXiv: 2608.12720</dc:identifier>
+    <z:extra>发表状态：仅 arXiv v1 预印本，2026-08-13 提交；截至 2026-08-22 未核实正式接收。阅读优先级：P0 最新近邻。它做了什么：把检索行为表示为可执行 skills，以训练 router 选 skill；用 experience trie 记录探索路径，并用 capability/deployment 双 frontier 将探索与稳定上线分开。它没做什么：对象是 Agent 长期记忆检索技能，不是冻结外部语料 RAG 的 q→q′ 查询修复，也没有我们定义的 BASE-correct→REUSE-wrong 风险。GrowRAG 必学：技能路由、经验 trie、先验证再上线都已被覆盖；我们的卡片必须服务于可审计的查询修复迁移而不是泛化的 retrieval skill evolution。元数据提示：arXiv 网页把末位作者误写为 Guanrxu Zhu，论文 PDF 首页为 Guangxu Zhu，本条以 PDF 为准。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Haolong</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Liang</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhuo</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Lei</foaf:givenName><foaf:surname>Xue</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Guangxu</foaf:givenName><foaf:surname>Zhu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P0-最新近邻</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>未同行评审</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>学习型控制器</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#skillrag">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>Skill-RAG: Failure-State-Aware Retrieval Augmentation via Hidden-State Probing and Skill Routing</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2604.15771</z:url>
+    <dc:identifier>arXiv: 2604.15771</dc:identifier>
+    <z:extra>发表状态：仅 arXiv v4 预印本；截至 2026-08-22 未核实正式接收。阅读优先级：P1。它做了什么：在两个阶段用小型 hidden-state probe 判断失败，并将失败诊断为可分类型状态，再路由到 rewrite、decompose、evidence focus 或 exit。它没做什么：没有跨问题历史 query repair 的保存、晋升、可靠性或配对伤害。GrowRAG 必学：typed failure 与学习型 skill routing 都不是空白；v1 可借其动作词表，但先用可解释的 gap schema 和冻结 prompt。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Kai</foaf:givenName><foaf:surname>Wei</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Raymond</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xi</foaf:givenName><foaf:surname>Zhu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhaoqian</foaf:givenName><foaf:surname>Xue</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiaojiao</foaf:givenName><foaf:surname>Han</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jingcheng</foaf:givenName><foaf:surname>Niu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Fan</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P1-修复动作基线</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>未同行评审</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Typed-Failure</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#stateaware">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Reasoning with Memory: Adaptive Information Management for Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.findings-acl.1834/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.findings-acl.1834</dc:identifier>
+    <z:extra>发表状态：Findings of ACL 2026，正式同行评审，但不是 ACL Main。阅读优先级：P1。方法名为 State-Aware RAG。它做了什么：用显式 working memory 维护多跳中间状态，以轻量可训练 extractor 过滤、整合和更新记忆；retriever 与 generator 保持冻结。它没做什么：working memory 是本题内动态认知状态，不是跨问题的 query repair episode 和长期经验卡。GrowRAG 必学：冻结底座、小模型状态管理和局部 memory 已经有正式先例；我们的 local episode 是完成后冻结的审计记录，而不是推理时不断覆盖的工作记忆。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Hieu</foaf:givenName><foaf:surname>Man</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ro-ee</foaf:givenName><foaf:surname>Tal</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Abhishek</foaf:givenName><foaf:surname>Kumar</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jaejin</foaf:givenName><foaf:surname>Cho</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Benjamin</foaf:givenName><foaf:surname>Hsu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>36825–36841</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P1-局部状态</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-Findings</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Working-Memory</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#hyde">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Precise Zero-Shot Dense Retrieval without Relevance Labels</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://aclanthology.org/2023.acl-long.99/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2023.acl-long.99; arXiv: 2212.10496</dc:identifier>
+    <z:extra>发表状态：ACL 2023 Long，正式同行评审论文。方法名为 HyDE。阅读优先级：P1；选 dense BASE 时升为实现必读。它做了什么：由 LLM 生成假想相关文档，再以无监督 dense encoder 将其编码并检索真实文档；不是普通的句子级 query rewrite。它没做什么：没有历史经验、适用性判断或 harmful-reuse 控制。GrowRAG 用法：把 HyDE 作为 FRESH_REPAIR 或 ExperienceCard 中的候选 operator，与 DIRECT、普通 rewrite、Query2doc 和 structured-gap query 公平比较；不能把 HyDE 本身当创新。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Luyu</foaf:givenName><foaf:surname>Gao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xueguang</foaf:givenName><foaf:surname>Ma</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jimmy</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jamie</foaf:givenName><foaf:surname>Callan</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>1762–1777</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P1-查询变换</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-ACL</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>HyDE</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#query2doc">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Query2doc: Query Expansion with Large Language Models</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://aclanthology.org/2023.emnlp-main.585/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2023.emnlp-main.585; arXiv: 2303.07678</dc:identifier>
+    <z:extra>发表状态：EMNLP 2023 Main，正式同行评审论文。阅读优先级：P1；BM25-first 实现前建议先读。它做了什么：LLM 生成 pseudo-document，并与原始 query 拼接做 expansion，可用于 BM25 和 dense retrieval。它没做什么：没有持久经验、调用门控、跨题验证或负迁移控制。GrowRAG 用法：它比 HyDE 更适合首版 BM25 对照，因为保留原查询信号；ExperienceCard 只记录何时用 query2doc、填哪些 slot 和应得到什么证据，不复制历史实体。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Liang</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Nan</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Furu</foaf:givenName><foaf:surname>Wei</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>9414–9423</bib:pages>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P1-查询变换</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>同行评审-EMNLP</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Query-Expansion</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#ragrouterbench">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>RAGRouter-Bench: A Dataset and Benchmark for Adaptive RAG Routing</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2602.00296</z:url>
+    <dc:identifier>arXiv: 2602.00296</dc:identifier>
+    <z:extra>发表状态：仅 arXiv v2 预印本；截至 2026-08-22 未核实正式接收。阅读优先级：P2，完成单一文本 BASE 后再读。它做了什么：从 query-corpus compatibility 出发，在多种 RAG paradigm、查询类型、语料属性和成本指标之间建立路由基准。它没做什么：没有历史 query repair episode、经验可靠性或 conditional harm。GrowRAG 用法：后期用它检查 sidecar 能否在 Naive、Graph、Hybrid、Iterative BASE 间保持一致；首版不要被跨所有 RAG 范式的复杂性拖慢。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Ziqi</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xi</foaf:givenName><foaf:surname>Zhu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Shuhang</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Haochen</foaf:givenName><foaf:surname>Xue</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Minghao</foaf:givenName><foaf:surname>Guo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yongfeng</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+    <z:tags><rdf:Bag><rdf:li><z:AutomaticTag><rdf:value>P2-后期基准</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>未同行评审</rdf:value></z:AutomaticTag></rdf:li><rdf:li><z:AutomaticTag><rdf:value>Adaptive-Routing</rdf:value></z:AutomaticTag></rdf:li></rdf:Bag></z:tags>
+  </bib:Article>
+
+</rdf:RDF>
