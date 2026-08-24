@@ -3,6 +3,8 @@
 更新日期：2026-08-22
 状态：Schema v0 已落地；实现允许增加审计字段，但不能删掉核心语义
 
+> **2026-08-24 迁移说明**：用户已确定保留 `QueryEpisode / DocumentSession / ExperienceCard` 三层，并将 `DocumentSession` 从“可选归组容器”提升为严格绑定单篇文档精确版本的局部记忆。本文以下 DocumentSession 章节记录的是**当前已实现 v0**，不是最终设计；在用户确认 [EvidenceState、三层字段、QPP 与双控制器讨论稿](./2026-08-24_证据充分性_三层记忆_QPP与双控制器_讨论稿.md) 后创建 Schema v1 并修改代码。讨论阶段不原地改写 v0，以免文档与现有 188 项测试通过的实现失配。
+
 ## 1. 三个对象，不混为一谈
 
 ### QueryEpisode
