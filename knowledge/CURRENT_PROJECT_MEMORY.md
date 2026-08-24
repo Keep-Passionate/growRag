@@ -203,6 +203,7 @@ Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；
 - 2026-08-24 的三层记忆与 EvidenceState 是待确认 Schema v1；本轮只更新文档，没有提前改代码。
 - 本地 `origin` 已指向 `https://github.com/Keep-Passionate/growRag.git`；2026-08-22 已完成首次发布，此后继续同步 `main`。
 - GitHub 连接器不是 Git 提交/推送的必要条件；当前本机 Git 凭据已能完成仓库同步。
+- 2026-08-24 本轮研究文档与 RDF 已提交到本地 `main`；向 GitHub 推送时 `github.com:443` 连接被重置/超时，因此新提交尚未进入远端。GitHub 插件安装请求已发出，但当前任务中尚未出现可调用的 GitHub 连接器；重新载入/完成界面授权后再检查。
 
 ## 更新规则
 
