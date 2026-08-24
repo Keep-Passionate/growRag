@@ -2,6 +2,15 @@
 
 本目录保留当前精读包，并新增方案 B 的 adaptive/agentic routing 与安全经验迁移增量 RDF。新包可能与 08-14 / 08-19 包共享论文；导入后请按 DOI 或 arXiv ID 合并重复条目。
 
+## 证据闭环、REUSE 与 Query Transformation（最新）
+
+- `GrowRAG_证据闭环_REUSE与QueryTransformation_2026-08-24.rdf`：25 条论文、4 个集合；已排除与此前当前目录 RDF 的同名重复项。
+- 推荐先读：Sufficient Context → HALT → How Memory Management Impacts LLM Agents → AIR → Self-RAG（旧包回看）→ S2G-RAG（旧包回看）。
+- Query Transformation 查重链：DMQR-RAG → SAGE → Think Then Rewrite → ReFeed → MaFeRw → AdaQR → RetPO → SELF-multi-RAG。
+- 停止与迭代对照：ReflectiveRAG（旧包）→ SIM-RAG → TASR → Stop-RAG → When Should Multi-Round RAG Stop。
+- 每条 Zotero `Extra` 已标注发表状态、做了什么、没做什么以及 GrowRAG 要学习的内容。
+- 旧阅读包的逐篇发表层级审计见 `knowledge/literature/2026-08-24_现有Zotero阅读包_发表层级审计.md`。
+
 ## 方案 B 自适应路由与安全经验迁移
 
 - `GrowRAG_方案B_自适应路由与安全经验迁移_2026-08-22.rdf`：11 条论文、3 个集合。

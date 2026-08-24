@@ -1,7 +1,7 @@
 # GrowRAG 当前项目记忆
 
 更新日期：2026-08-24
-状态：方案 B「可信自适应查询修复」与三层记忆方向已确认；证据状态、文档层字段、QPP 和双控制器处于讨论确认阶段，尚未修改运行代码
+状态：方案 B「可信自适应查询修复」与三层记忆方向已确认；累计证据、冲突回滚、动态可靠性、Judge 和停止协议已形成讨论稿，尚未修改运行代码
 权威性：当前入口；旧路线 A 决策保留为历史记录，但不再代表当前主线
 
 ## 当前主问题
@@ -21,6 +21,7 @@
    - `REUSE_REPAIR`：有历史上可靠且当前适用的经验；
    - `FRESH_REPAIR`：没有安全可用的历史经验；
    - `STOP_ABSTAIN`：无进展或预算耗尽。
+   `CONFLICTED_OR_UNCERTAIN` 进一步分为：有可检索核验目标且仍有进展时 `FRESH_VERIFY_OR_REPAIR`；否则撤销 REUSE 分支并退回干预前检查点，回滚后仍不足则 `STOP_ABSTAIN`。
 4. 检索前 `PROACTIVE_REUSE` 只作为后续消融，不是首版默认。
 5. 原路线 A 的 reliability/applicability/harm gate 被吸收到方案 B，作为 REUSE 的安全部件；路线 A 不再单独作为论文。
 6. 原方案 C 不做主线；充分、无进展和预算停止只是方案 B 的必要控制。
@@ -41,11 +42,13 @@
    - `REPAIRABLE_GAP`：能显式指出缺的实体/属性/关系/桥接证据，进入修复；
    - `CONFLICTED_OR_UNCERTAIN`：证据冲突、问题含糊或 judge 不稳定，继续核验或弃答。
 3. 每轮保存 `needs -> evidence_refs` 支持图、结构化 gaps、contradictions 和 progress；先映射到现有 `sufficient / insufficient / unknown`，确认后再升级 schema。
+   “累计证据”固定拆为：不可变 `EvidenceLedger`、去重后的 `ActiveEvidenceView`、`NeedSupportGraph`、逐轮 `ProgressDelta` 和 REUSE 前 `BranchCheckpoint`。它不是持续改写的摘要，也不是把所有 top-k 文本直接拼接。
 4. FRESH 是同一 QueryEpisode 内的现场修复：始终以原问题 `q0` 为目标，根据累计证据的当前 gap 生成下一条 query；不调用跨题 ExperienceCard。
 5. 默认终止建议：充分即答；总共最多 4 次检索（1 BASE + 最多 3 repair）；连续 2 轮无 gap closure/新证据、query/gap/证据循环、持续冲突或预算耗尽则 `STOP_ABSTAIN`。具体阈值只在 dev 校准。
+   部分 need 已支持时只修复 `partial / missing / conflicted` 的残余 gap；候选 query 与既有 query 重复且没有新增实体/约束/关系/action intent 时执行前拒绝。最大轮数在 dev 比较 1/2/3/4 repair，选取接近最佳质量时成本最低的全局值，test 前冻结。
 6. 回答前 coverage gate 是主路由；回答后的 claim support check 暂作可开关安全项，不把两个 judge 混成一个含糊分数。
 
-参考边界：S2G-RAG 已覆盖累计证据上的二值 sufficiency 与结构化 gap；ReflectiveRAG 已覆盖本题内 `Sufficient/Refine`；Self-RAG/SURE-RAG 可参考回答后的支持检查。因此“证据不足后再搜”不是创新。
+参考边界：S2G-RAG 已覆盖累计句子证据、二值 sufficiency 与结构化 gap；ReflectiveRAG 已覆盖本题内 `Sufficient/Refine` 和边际改进停止；AIR 已覆盖围绕未支持 query terms 的迭代改写及无新词停止；2026-08 的 HALT 已覆盖预期 hop claims 的逐项证据匹配与覆盖停止；Self-RAG/SURE-RAG 可参考回答后的支持检查。因此“证据不足后再搜”“need coverage”“结构化 gap”都不是中心创新。
 
 ## 记忆设计
 
@@ -79,6 +82,8 @@
 
 选择顺序固定为：reliability 硬门 -> applicability 前置/禁用/能力约束 -> query/gap/action 结构匹配与 QPP 排序 -> 执行后的 evidence contract 验证。高适用性不能挽救低可靠经验，历史可靠也不能挽救当前不相关经验。
 
+每张卡的 reliability 随**经验证的 paired 使用事件**动态更新。保存不可变 benefit/harm/neutral/contract 账本，并使用收益概率保守下界与伤害概率保守上界控制 serving；EMA 只表示近期趋势和漂移警报，不替代历史账本。REUSE 失约或引入冲突时，当前 episode 禁用该卡、回滚到 pre-REUSE checkpoint，并将事件追加到卡片可靠性账本；不能因一次失败立即物理删除。
+
 RRM 已保存 applicability conditions、required evidence、query-adjustment patterns，并做衰减、合并和裁剪；这些字段与 top-k 淘汰不能归我们。GrowRAG 的候选增量是双轴显式分离、同题 paired harm 和执行后履约验证。
 
 ## 查询变换与 QPP
@@ -101,7 +106,9 @@ LLM rewrite 描述生成手段；expansion/paraphrase/decomposition 描述变换
 
 ## Prompt 与双控制器
 
-v1 冻结三个 prompt：`state_judge`、`fresh_repair`、`experience_apply`。
+v1 冻结三个 prompt：`state_judge`、`fresh_repair`、`experience_apply`。冻结包括模板、few-shot、模型版本、解码参数、JSON schema、阈值与 prompt version；开发集确定后测试期间不变。`state_judge` 只基于原问题、atomic needs 和当前 evidence IDs 判覆盖/gap，不生成 query，也不凭模型常识补答案。
+
+Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；不能表述为“query 被文档支持”。GrowRAG 分开检查：执行前卡片是否可用、执行后 query 是否履行 gap/evidence contract、回答后 claims 是否被证据支持。
 
 在线 `RetrievalController` 观察 EvidenceState、预算、QPP 和候选卡的 reliability/applicability，选择 `ANSWER / REUSE_TRANSFORM / FRESH_TRANSFORM / STOP_ABSTAIN`。它不只是两个失败分支。v1 用冻结规则/prompt。
 
@@ -156,8 +163,12 @@ v1 冻结三个 prompt：`state_judge`、`fresh_repair`、`experience_apply`。
 - QPP Query Variant Selection：检索前/后选择 query variant。
 - SIM-RAG：候选答案与累计证据的 Accept/Reject critic；不等同于回答前 coverage；
 - How Memory Management Impacts LLM Agents：经验跟随可能传播错误，支持用未来独立任务验证记忆质量。
+- HALT：expected hop claims 与累计证据覆盖停止；need coverage 已被直接覆盖，不能宣称为新贡献。
+- DMQR-RAG / SAGE：多种 query rewrite strategy 与自适应/学习选择，动作词表和策略路由不是中心创新。
+- Think Then Rewrite / ReFeed：先显式分析或利用失败反馈再改写，以及只保留成功改写轨迹，均已有直接近邻。
+- MaFeRw / AdaQR / RetPO / SELF-multi-RAG：多方面反馈、偏好训练与联合检索/改写控制，是以后训练 rewriter/controller 的主要对照。
 
-完整矩阵见 `knowledge/literature/2026-08-22_方案B自适应路由与新颖性边界.md`。
+完整矩阵见 `knowledge/literature/2026-08-22_方案B自适应路由与新颖性边界.md`；Query Transformation 最新查重见 `knowledge/literature/2026-08-24_QueryTransformation与REUSE四级门控_精读导图.md`。
 
 ## 数据与实验原则
 
@@ -171,9 +182,11 @@ v1 冻结三个 prompt：`state_judge`、`fresh_repair`、`experience_apply`。
 
 测试集不建库、不晋升、不选阈值、不调 prompt。所有动作必须在相同检索次数/top-k/context/token 预算下公平配对。
 
+系统需要带 gold 的 source/calibration 数据来产生 FRESH 轨迹并建立经验，但 v1 不要求梯度训练：空记忆时先走 BASE/FRESH；source split 产生 candidate cards；独立 calibration query/document 校准 reliability/applicability/Judge/停止；held-out test 冻结 memory。在线自进化只能作为另一个按时间顺序、无未来泄漏的 prequential 协议。以后训练小 controller 时，标签来自 train/dev 上实际执行 BASE/REUSE/FRESH 的 full-information oracle。
+
 ## 最近工作顺序
 
-1. 等用户确认 2026-08-24 架构讨论稿；
+1. 等用户确认 2026-08-24 两份架构讨论稿；
 2. 将现有 DocumentSession v0 归组容器升级为严格文档级 Schema v1，并补 EvidenceState/两轴 QueryTransform 合同；
 3. 固定一个文本 BASE RAG，跑 BASE/FRESH paired trajectories；
 4. 冻结 state/gap 与 repair prompts；
@@ -202,3 +215,8 @@ v1 冻结三个 prompt：`state_judge`、`fresh_repair`、`experience_apply`。
 ## 当前详细讨论入口
 
 - `knowledge/method/2026-08-24_证据充分性_三层记忆_QPP与双控制器_讨论稿.md`
+- `knowledge/method/2026-08-24_累计证据_FRESH停止_REUSE动态可靠性与Judge_讨论稿.md`
+- `knowledge/literature/2026-08-24_QueryTransformation与REUSE四级门控_精读导图.md`
+- `knowledge/literature/2026-08-24_现有Zotero阅读包_发表层级审计.md`
+- `knowledge/datasets/2026-08-19_Gold数据集与阶段规划.md`
+- `zotero/current/GrowRAG_证据闭环_REUSE与QueryTransformation_2026-08-24.rdf`

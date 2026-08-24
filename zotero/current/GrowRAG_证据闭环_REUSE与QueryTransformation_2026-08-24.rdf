@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <!-- GrowRAG 2026-08-24 增量包。旧包已有论文不重复收录。 -->
+
+  <z:Collection rdf:about="#p0_evidence">
+    <dc:title>GrowRAG 08-24｜01 P0 证据充分性、停止与经验风险</dc:title>
+    <dcterms:hasPart rdf:resource="#sufficient_context"/>
+    <dcterms:hasPart rdf:resource="#air"/>
+    <dcterms:hasPart rdf:resource="#subquestion_coverage"/>
+    <dcterms:hasPart rdf:resource="#simrag"/>
+    <dcterms:hasPart rdf:resource="#halt"/>
+    <dcterms:hasPart rdf:resource="#memory_impact"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#p1_stopping">
+    <dc:title>GrowRAG 08-24｜03 迭代检索与停止基线</dc:title>
+    <dcterms:hasPart rdf:resource="#tasr"/>
+    <dcterms:hasPart rdf:resource="#stoprag"/>
+    <dcterms:hasPart rdf:resource="#when_stop"/>
+    <dcterms:hasPart rdf:resource="#efficientrag"/>
+    <dcterms:hasPart rdf:resource="#iterretgen"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#p1_transform">
+    <dc:title>GrowRAG 08-24｜04 Query Transformation 扩展</dc:title>
+    <dcterms:hasPart rdf:resource="#stepback"/>
+    <dcterms:hasPart rdf:resource="#mugi"/>
+    <dcterms:hasPart rdf:resource="#mmlf"/>
+    <dcterms:hasPart rdf:resource="#qdream"/>
+    <dcterms:hasPart rdf:resource="#query_decomposition"/>
+    <dcterms:hasPart rdf:resource="#program"/>
+  </z:Collection>
+
+  <z:Collection rdf:about="#p0_transform_boundary">
+    <dc:title>GrowRAG 08-24｜02 P0 Query Rewriting 创新边界</dc:title>
+    <dcterms:hasPart rdf:resource="#dmqr"/>
+    <dcterms:hasPart rdf:resource="#sage"/>
+    <dcterms:hasPart rdf:resource="#think_rewrite"/>
+    <dcterms:hasPart rdf:resource="#refeed"/>
+    <dcterms:hasPart rdf:resource="#maferw"/>
+    <dcterms:hasPart rdf:resource="#adaqr"/>
+    <dcterms:hasPart rdf:resource="#retpo"/>
+    <dcterms:hasPart rdf:resource="#self_multi_rag"/>
+  </z:Collection>
+
+  <bib:Article rdf:about="#sufficient_context">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Sufficient Context: A New Lens on Retrieval Augmented Generation Systems</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://openreview.net/forum?id=Jjr2Odj8DJ</z:url>
+    <dc:identifier>OpenReview: Jjr2Odj8DJ</dc:identifier>
+    <z:extra>发表状态：ICLR 2025 正式同行评审论文。阅读优先级：P0，第 1 篇。它做了什么：区分当前上下文是否足以推出答案与模型是否凭参数知识答对，研究上下文不足时的回答行为。它没做什么：不生成结构化 gap，也不管理历史 query-repair 经验。GrowRAG 必学：最终答案答对不能反推检索证据充分；Judge 必须在 context-only 约束下判断。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Hailey</foaf:givenName><foaf:surname>Joren</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jianyi</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chun-Sung</foaf:givenName><foaf:surname>Ferng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Da-Cheng</foaf:givenName><foaf:surname>Juan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ankur</foaf:givenName><foaf:surname>Taly</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Cyrus</foaf:givenName><foaf:surname>Rashtchian</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>The Thirteenth International Conference on Learning Representations</dc:title></bib:Proceedings></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#air">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Unsupervised Alignment-based Iterative Evidence Retrieval for Multi-hop Question Answering</dc:title>
+    <dc:date>2020</dc:date>
+    <z:url>https://aclanthology.org/2020.acl-main.414/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2020.acl-main.414</dc:identifier>
+    <z:extra>发表状态：ACL 2020 Main，正式同行评审论文。阅读优先级：P0。它做了什么：围绕当前 justification 尚未覆盖的 query terms 迭代改写，并在 terms 已覆盖或没有新 query terms 时停止。它没做什么：没有 LLM ExperienceCard、动态可靠性或有害复用。GrowRAG 必学：partial coverage 驱动局部修复和透明 no-new-information 停止已有早期强基线。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Vikas</foaf:givenName><foaf:surname>Yadav</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Steven</foaf:givenName><foaf:surname>Bethard</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Mihai</foaf:givenName><foaf:surname>Surdeanu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>4514–4525</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#subquestion_coverage">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Do RAG Systems Cover What Matters? Evaluating and Optimizing Responses with Sub-Question Coverage</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.naacl-long.301/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.naacl-long.301</dc:identifier>
+    <z:extra>发表状态：NAACL 2025 Long，正式同行评审论文。阅读优先级：P0。它做了什么：把问题分成 core、background、follow-up 子问题，以 coverage 评价并改进检索和生成。它没做什么：不是迭代 FRESH/REUSE 控制，也不处理历史修复可靠性。GrowRAG 必学：atomic needs 可以有重要性；全部 required needs 与非必要补充项不能同权。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Kaige</foaf:givenName><foaf:surname>Xie</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Philippe</foaf:givenName><foaf:surname>Laban</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Prafulla Kumar</foaf:givenName><foaf:surname>Choubey</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Caiming</foaf:givenName><foaf:surname>Xiong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chien-Sheng</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of NAACL 2025: Human Language Technologies (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>5836–5849</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#simrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Knowing You Don't Know: Learning When to Continue Search in Multi-round RAG through Self-Practicing</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://doi.org/10.1145/3726302.3730018</z:url>
+    <dc:identifier>DOI: 10.1145/3726302.3730018; arXiv: 2505.02811</dc:identifier>
+    <z:extra>发表状态：SIGIR 2025 正式同行评审论文。阅读优先级：P0。它做了什么：通过自练习轨迹训练轻量 sufficiency Critic，在每轮 Accept/Reject 候选答案并控制继续搜索。它没做什么：Accept/Reject 容易混入答案正确性，不输出细粒度 gap，也不管理跨题 ExperienceCard。GrowRAG 必学：Judge 可由执行轨迹训练；false rejection 会导致过度检索并把正确答案搜错。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Diji</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Linda</foaf:givenName><foaf:surname>Zeng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jinmeng</foaf:givenName><foaf:surname>Rao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yi</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>1305–1315</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#halt">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>HALT: Verification-Aware Stopping for Retrieval-Augmented Search Agents</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.02009</z:url>
+    <dc:identifier>arXiv: 2608.02009</dc:identifier>
+    <z:extra>发表状态：截至 2026-08-24 仅确认 arXiv 预印本。阅读优先级：P0，最新重合风险。它做了什么：生成或使用 expected hop claims，将每项与累计证据匹配，全部覆盖后停止；可在无法验证覆盖时拒绝。它没做什么：不复用跨题 query repair，也没有 ExperienceCard reliability/applicability。GrowRAG 必学：need/hop coverage 已不能作为创新；我们必须把它作为历史经验迁移的执行后约束。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Daeyoung</foaf:givenName><foaf:surname>Roh</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Donghee</foaf:givenName><foaf:surname>Han</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#memory_impact">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>How Memory Management Impacts LLM Agents: An Empirical Study of Experience-Following Behavior</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.acl-long.27/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.acl-long.27</dc:identifier>
+    <z:extra>发表状态：ACL 2026 Main Long，正式同行评审论文。阅读优先级：P0。它做了什么：系统分析 memory addition/deletion，发现经验跟随、错误传播和 misaligned experience replay，并用未来任务评价作为记忆质量标签。它没做什么：不是 RAG query repair，也不做 BASE/REUSE 条件伤害。GrowRAG 必学：历史执行即使正确也可能不是好经验；卡片可靠性必须由独立未来题动态验证。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Zidi</foaf:givenName><foaf:surname>Xiong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yuping</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wenya</foaf:givenName><foaf:surname>Xie</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Pengfei</foaf:givenName><foaf:surname>He</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zirui</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiliang</foaf:givenName><foaf:surname>Tang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Himabindu</foaf:givenName><foaf:surname>Lakkaraju</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhen</foaf:givenName><foaf:surname>Xiang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>623–645</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#tasr">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>TASR: Training-Free Adaptive Stopping for Iterative Retrieval</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2606.13814</z:url>
+    <dc:identifier>arXiv: 2606.13814</dc:identifier>
+    <z:extra>发表状态：Agent4IR @ KDD 2026 Workshop；不是 KDD 主会，公开版本为 arXiv。阅读优先级：P1。它做了什么：用规范化答案重复和校准 logit margin 的简单规则停止，强调可审计与训练自由。它没做什么：答案稳定不等于证据 needs 已覆盖，也不处理历史经验。GrowRAG 必学：作为低成本 stopping baseline；不要把口头置信度当可靠信号。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Adrian</foaf:givenName><foaf:surname>Kieback</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Uyiosa Philip</foaf:givenName><foaf:surname>Amadasun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Aman</foaf:givenName><foaf:surname>Chadha</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Aaron</foaf:givenName><foaf:surname>Elkins</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Agent4IR Workshop at KDD 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#stoprag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Stop-RAG: Value-Based Retrieval Control for Iterative RAG</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://arxiv.org/abs/2510.14337</z:url>
+    <dc:identifier>arXiv: 2510.14337</dc:identifier>
+    <z:extra>发表状态：NeurIPS 2025 Multi-Turn Interactions in LLMs Workshop；不是 NeurIPS Main。阅读优先级：P1。它做了什么：将停止建成有限时域 MDP，用完整轨迹的 Q(lambda) 目标训练 value controller。它没做什么：不检查结构化 evidence needs，不做经验卡迁移。GrowRAG 必学：后期 learned-controller 对照；v1 不需要先上 RL。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Jaewan</foaf:givenName><foaf:surname>Park</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Solbee</foaf:givenName><foaf:surname>Cho</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jay-Yoon</foaf:givenName><foaf:surname>Lee</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>NeurIPS 2025 Workshop on Multi-Turn Interactions in Large Language Models</dc:title></bib:Proceedings></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#when_stop">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>When Should Multi-Round RAG Stop? Structured Stopping Judgments and Retrieval Reduction in Search-R1</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2608.13237</z:url>
+    <dc:identifier>arXiv: 2608.13237</dc:identifier>
+    <z:extra>发表状态：截至 2026-08-24 仅确认 arXiv 预印本。阅读优先级：P1 方法学警告。它做了什么：在冻结 Search-R1 上训练 S2G 风格结构 Judge，减少检索但报告 Exact Match 轻微下降。它没做什么：不证明安全停止，也不做历史复用。GrowRAG 必学：节省调用并不等于无损；停止需要同时报告质量、成本和伤害。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Weimeng</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#efficientrag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>EfficientRAG: Efficient Retriever for Multi-Hop Question Answering</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://aclanthology.org/2024.emnlp-main.199/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2024.emnlp-main.199</dc:identifier>
+    <z:extra>发表状态：EMNLP 2024 Main，正式同行评审论文。阅读优先级：P1。它做了什么：用轻量 Labeler/Filter 迭代产生 query 并过滤无关信息，避免每轮调用大 LLM。它没做什么：不复用跨题经验，也没有条件伤害门。GrowRAG 必学：FRESH/query filtering 可以轻量化；以后的小模型不必承担答案生成。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Ziyuan</foaf:givenName><foaf:surname>Zhuang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhiyang</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sitao</foaf:givenName><foaf:surname>Cheng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Fangkai</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jia</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Shujian</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Qingwei</foaf:givenName><foaf:surname>Lin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Saravan</foaf:givenName><foaf:surname>Rajmohan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dongmei</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Qi</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>3392–3411</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#iterretgen">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy</dc:title>
+    <dc:date>2023</dc:date>
+    <z:url>https://aclanthology.org/2023.findings-emnlp.620/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2023.findings-emnlp.620</dc:identifier>
+    <z:extra>发表状态：Findings of EMNLP 2023，正式同行评审，但不是 EMNLP Main。阅读优先级：P1。它做了什么：用上一轮完整生成结果作为下一轮 retrieval context，在检索与生成间迭代。它没做什么：没有显式 gap/evidence contract，也不复用历史卡。GrowRAG 必学：将生成文本直接当 query context 是强基线，但可能累积错误；我们的 query 必须由 evidence-supported gap 约束。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Zhihong</foaf:givenName><foaf:surname>Shao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yeyun</foaf:givenName><foaf:surname>Gong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yelong</foaf:givenName><foaf:surname>Shen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Minlie</foaf:givenName><foaf:surname>Huang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Nan</foaf:givenName><foaf:surname>Duan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Weizhu</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: EMNLP 2023</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>9248–9274</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#stepback">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Take a Step Back: Evoking Reasoning via Abstraction in Large Language Models</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://proceedings.iclr.cc/paper_files/paper/2024/hash/592da1445a51e54a3987958b5831948f-Abstract-Conference.html</z:url>
+    <dc:identifier>ICLR proceedings hash: 592da1445a51e54a3987958b5831948f</dc:identifier>
+    <z:extra>发表状态：ICLR 2024 正式同行评审论文。阅读优先级：P1。它做了什么：先将具体问题抽象成高层概念/原则，再用这些原则辅助推理。它没做什么：不是 RAG 经验记忆，也不评价 query retrieval gain。GrowRAG 必学：可作为 ABSTRACT/STEP_BACK transform；必须通过 evidence progress 而非语言合理性决定是否有用。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Huaixiu Steven</foaf:givenName><foaf:surname>Zheng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Swaroop</foaf:givenName><foaf:surname>Mishra</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xinyun</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Heng-Tze</foaf:givenName><foaf:surname>Cheng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ed H.</foaf:givenName><foaf:surname>Chi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Quoc V.</foaf:givenName><foaf:surname>Le</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Denny</foaf:givenName><foaf:surname>Zhou</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>International Conference on Learning Representations 2024</dc:title></bib:Proceedings></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#mugi">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Exploring the Best Practices of Query Expansion with Large Language Models</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://aclanthology.org/2024.findings-emnlp.103/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2024.findings-emnlp.103</dc:identifier>
+    <z:extra>发表状态：Findings of EMNLP 2024，正式同行评审，但不是 EMNLP Main。阅读优先级：P1。它做了什么：提出 MuGI，以多个 pseudo-reference 扩写 query，研究原 query/扩写平衡和 sparse/dense 融合。它没做什么：不判断哪条历史经验可靠，也不做 gap 履约。GrowRAG 必学：expansion 不是简单越长越好；它是 form，LLM 是 generator。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Le</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yihong</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Qian</foaf:givenName><foaf:surname>Yang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jian-Yun</foaf:givenName><foaf:surname>Nie</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: EMNLP 2024</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>1872–1883</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#mmlf">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>MMLF: Multi-query Multi-passage Late Fusion Retrieval</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.findings-naacl.367/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.findings-naacl.367</dc:identifier>
+    <z:extra>发表状态：Findings of NAACL 2025，正式同行评审，但不是 NAACL Main。阅读优先级：P1。它做了什么：生成 sub-queries 和 pseudo-documents，分别检索并用 reciprocal rank fusion 聚合。它没做什么：不做证据充分性和历史经验。GrowRAG 必学：decomposition/expansion 之后还需要明确结果融合；多 query 的收益与成本必须单独评价。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yuan-Ching</foaf:givenName><foaf:surname>Kuo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yi</foaf:givenName><foaf:surname>Yu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chih-Ming</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Chuan-Ju</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: NAACL 2025</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>6602–6613</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#qdream">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Optimizing Question Semantic Space for Dynamic Retrieval-Augmented Multi-hop Question Answering</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.acl-long.871/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.acl-long.871</dc:identifier>
+    <z:extra>发表状态：ACL 2025 Main Long，正式同行评审论文。阅读优先级：P1。它做了什么：Q-DREAM 将多跳问题分成 subquestions，建模依赖并动态对齐 passages。它没做什么：不复用跨题修复经验，也不做 harm gate。GrowRAG 必学：decomposition 不只是多个独立 query；QueryEpisode 的 needs 可以显式保存依赖。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Linhao</foaf:givenName><foaf:surname>Ye</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Lang</foaf:givenName><foaf:surname>Yu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhikai</foaf:givenName><foaf:surname>Lei</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Qin</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jie</foaf:givenName><foaf:surname>Zhou</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Liang</foaf:givenName><foaf:surname>He</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>17814–17824</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#query_decomposition">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Query Decomposition for RAG: Balancing Exploration-Exploitation</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.eacl-long.322/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.eacl-long.322</dc:identifier>
+    <z:extra>发表状态：EACL 2026 Main Long，正式同行评审论文。阅读优先级：P1。它做了什么：把多个 sub-query 的文档获取建成 exploration/exploitation，使用 bandit 方法动态选择有信息的 sub-query。它没做什么：不维护跨题 query-repair 记忆，也不控制 BASE-correct→REUSE-wrong。GrowRAG 必学：未来 decomposition 动作的预算分配基线；bandit 不是首版必要条件。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Roxana</foaf:givenName><foaf:surname>Petcu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kenton</foaf:givenName><foaf:surname>Murray</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Daniel</foaf:givenName><foaf:surname>Khashabi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Evangelos</foaf:givenName><foaf:surname>Kanoulas</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Maarten</foaf:givenName><foaf:surname>de Rijke</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Dawn</foaf:givenName><foaf:surname>Lawrie</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kevin</foaf:givenName><foaf:surname>Duh</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 19th Conference of the European Chapter of the Association for Computational Linguistics (Volume 1: Long Papers)</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>6857–6871</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#program">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>PROGRAM: Programmatic Retrieval Optimization with Generative Reasoning and Augmented Multi-queries</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://aclanthology.org/2026.findings-acl.1090/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2026.findings-acl.1090</dc:identifier>
+    <z:extra>发表状态：Findings of ACL 2026，正式同行评审，但不是 ACL Main。阅读优先级：P1。它做了什么：以 logical、temporal、causal 等 program type 组织多 query、主动剪枝与证据累积。它没做什么：不复用历史 query repair，不维护动态可靠性。GrowRAG 必学：结构化 action/type 已有近邻；我们的贡献不能是动作词表，而是安全迁移和履约验证。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Gun Il</foaf:givenName><foaf:surname>Kim</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jungkyu</foaf:givenName><foaf:surname>Shin</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jong Wook</foaf:givenName><foaf:surname>Kim</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Beakcheol</foaf:givenName><foaf:surname>Jang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>21685–21699</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#dmqr">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>DMQR-RAG: Diverse Multi-Query Rewriting for RAG</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://arxiv.org/abs/2411.13154</z:url>
+    <dc:identifier>arXiv: 2411.13154</dc:identifier>
+    <z:extra>发表状态：截至 2026-08-24 仅确认 arXiv 预印本。阅读优先级：P0，Query Transformation 直接近邻。它做了什么：设计四种不同信息量的改写策略、自适应选择策略、保留原 query 并融合多查询结果。它没做什么：没有跨题 ExperienceCard、历史 reliability/当前 applicability 分离和 BASE-correct→REUSE-wrong 风险。GrowRAG 必学：rewrite action pool、自适应选择和 KEEP 已被覆盖；不能作为中心创新。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Zhicong</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiahao</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhishu</foaf:givenName><foaf:surname>Jiang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hangyu</foaf:givenName><foaf:surname>Mao</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhongxia</foaf:givenName><foaf:surname>Chen</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jiazhen</foaf:givenName><foaf:surname>Du</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yuanxing</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Fuzheng</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Di</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yong</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#sage">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>SAGE: Strategy-Adaptive Generation Engine for Query Rewriting</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://arxiv.org/abs/2506.19783</z:url>
+    <dc:identifier>arXiv: 2506.19783</dc:identifier>
+    <z:extra>发表状态：截至 2026-08-24 仅确认 arXiv 预印本。阅读优先级：P0，动作选择直接近邻。它做了什么：用语义扩展、实体消歧等专家策略，以强化学习和策略级 credit shaping 自适应选策略。它没做什么：没有历史经验卡和动态可靠性，也不约束错误复用。GrowRAG 必学：根据 query 选择 rewrite action 已有直接工作；我们的 controller 必须围绕历史安全迁移，而非仅做策略路由。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Teng</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hailei</foaf:givenName><foaf:surname>Gong</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Changwang</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jun</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Journal><dc:title>arXiv</dc:title></bib:Journal></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#think_rewrite">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Think Then Rewrite: Reasoning Enhanced Query Rewriting for Domain Specific Retrieval</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/38527</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v40i18.38527</dc:identifier>
+    <z:extra>发表状态：AAAI 2026 Technical Track，正式同行评审论文。阅读优先级：P0。它做了什么：在法律和医学检索中先推理/消歧，再改写；使用对比互信息奖励和混合策略强化学习。它没做什么：不跨任务复用历史 repair，也不统计有害迁移。GrowRAG 必学：“先显式分析失败/约束，再改写”已被覆盖；我们的 gap 应服务证据闭环和经验履约，而不是宣称首次。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Ang</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yufei</foaf:givenName><foaf:surname>Shi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yuxuan</foaf:givenName><foaf:surname>Si</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yiquan</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Ming</foaf:givenName><foaf:surname>Cai</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xu</foaf:givenName><foaf:surname>Tan</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yi</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Changlong</foaf:givenName><foaf:surname>Sun</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xiaozhong</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kun</foaf:givenName><foaf:surname>Kuang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the AAAI Conference on Artificial Intelligence, Volume 40, Issue 18</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>15045–15053</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#refeed">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReFeed: Retrieval Feedback-Guided Dataset Construction for Style-Aware Query Rewriting</dc:title>
+    <dc:date>2026</dc:date>
+    <z:url>https://arxiv.org/abs/2603.01417</z:url>
+    <dc:identifier>arXiv: 2603.01417</dc:identifier>
+    <z:extra>发表状态：AAAI 2026 New Frontiers in IR Workshop；不是 AAAI Main，公开版本为 arXiv。阅读优先级：P0。它做了什么：定位检索失败，按相关文档风格改写，再检索验证并保留改善样本。它没做什么：成功后保存缺少同题 BASE/REUSE 伤害统计、卡片动态可靠性和当前适用性。GrowRAG 必学：无人工 rewrite 标签的冷启动方案；仅“成功后写入”不是创新，也不够安全。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Jiyoon</foaf:givenName><foaf:surname>Myung</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jungki</foaf:givenName><foaf:surname>Son</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kyungro</foaf:givenName><foaf:surname>Lee</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jihyeon</foaf:givenName><foaf:surname>Park</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Joohyung</foaf:givenName><foaf:surname>Han</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>AAAI 2026 New Frontiers in Information Retrieval Workshop</dc:title></bib:Proceedings></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#maferw">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>MaFeRw: Query Rewriting with Multi-Aspect Feedbacks for Retrieval-Augmented Large Language Models</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://ojs.aaai.org/index.php/AAAI/article/view/34732</z:url>
+    <dc:identifier>DOI: 10.1609/aaai.v39i24.34732</dc:identifier>
+    <z:extra>发表状态：AAAI 2025 Technical Track，正式同行评审论文。阅读优先级：P0/P1。它做了什么：用 gold 文档相似、排名、生成答案和人工改写等多方面奖励训练 query rewriter。它没做什么：强监督、无长期经验卡和明确 NOOP/伤害门。GrowRAG 必学：检索、证据、答案与改写相似度是不同反馈，不能压成一个不透明 R。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yujing</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hainan</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Liang</foaf:givenName><foaf:surname>Pang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Binghui</foaf:givenName><foaf:surname>Guo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hongwei</foaf:givenName><foaf:surname>Zheng</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zhiming</foaf:givenName><foaf:surname>Zheng</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the AAAI Conference on Artificial Intelligence, Volume 39, Issue 24</dc:title></bib:Proceedings></dcterms:isPartOf>
+  </bib:Article>
+
+  <bib:Article rdf:about="#adaqr">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Adaptive Query Rewriting: Aligning Rewriters through Marginal Probability of Conversational Answers</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://aclanthology.org/2024.emnlp-main.746/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2024.emnlp-main.746</dc:identifier>
+    <z:extra>发表状态：EMNLP 2024 Main，正式同行评审论文。阅读优先级：P1。它做了什么：不用 passage relevance 标签，以 top-k 文档条件下答案的边际概率评价 rewrite candidate，并用 DPO 对齐。它没做什么：面向对话改写训练，不做运行时历史经验复用。GrowRAG 必学：无文档 gold 时的弱监督 proxy，但必须在有 gold 的 held-out 数据上验证其是否识别 harmful reuse。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Tianhua</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kun</foaf:givenName><foaf:surname>Li</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Hongyin</foaf:givenName><foaf:surname>Luo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Xixin</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>James R.</foaf:givenName><foaf:surname>Glass</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Helen M.</foaf:givenName><foaf:surname>Meng</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>13444–13461</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#retpo">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Ask Optimal Questions: Aligning Large Language Models with Retriever’s Preference in Conversation</dc:title>
+    <dc:date>2025</dc:date>
+    <z:url>https://aclanthology.org/2025.findings-naacl.328/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2025.findings-naacl.328</dc:identifier>
+    <z:extra>发表状态：Findings of NAACL 2025，正式同行评审，但不是 NAACL Main。阅读优先级：P1。它做了什么：收集目标 retriever 对 41 万余 query rewrites 的真实检索偏好，并训练小模型对齐。它没做什么：没有 reliability/applicability 分离、卡片生命周期或 harmful reuse。GrowRAG 必学：经验有效性依赖 retriever；跨环境复用必须显式检查 capability/fingerprint。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Chanwoong</foaf:givenName><foaf:surname>Yoon</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Gangwoo</foaf:givenName><foaf:surname>Kim</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Byeongguk</foaf:givenName><foaf:surname>Jeon</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Sungdong</foaf:givenName><foaf:surname>Kim</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Yohan</foaf:givenName><foaf:surname>Jo</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Jaewoo</foaf:givenName><foaf:surname>Kang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: NAACL 2025</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>5914–5936</bib:pages>
+  </bib:Article>
+
+  <bib:Article rdf:about="#self_multi_rag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Learning When to Retrieve, What to Rewrite, and How to Respond in Conversational QA</dc:title>
+    <dc:date>2024</dc:date>
+    <z:url>https://aclanthology.org/2024.findings-emnlp.622/</z:url>
+    <dc:identifier>DOI: 10.18653/v1/2024.findings-emnlp.622</dc:identifier>
+    <z:extra>发表状态：Findings of EMNLP 2024，正式同行评审，但不是 EMNLP Main。阅读优先级：P1。它做了什么：将 conversational context 下的是否检索、如何总结/改写、返回 passage 是否相关和如何回答分成控制步骤。它没做什么：无跨题经验卡、条件伤害和 BASE/REUSE 配对。GrowRAG 必学：controller 决策与 query transform/generation 应分开；一个模型可扮演多角色但协议必须解耦。</z:extra>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Nirmal</foaf:givenName><foaf:surname>Roy</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Leonardo F. R.</foaf:givenName><foaf:surname>Ribeiro</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Rexhina</foaf:givenName><foaf:surname>Blloshmi</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Kevin</foaf:givenName><foaf:surname>Small</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <dcterms:isPartOf><bib:Proceedings><dc:title>Findings of the Association for Computational Linguistics: EMNLP 2024</dc:title></bib:Proceedings></dcterms:isPartOf>
+    <bib:pages>10604–10625</bib:pages>
+  </bib:Article>
+
+</rdf:RDF>
