@@ -2,6 +2,9 @@
 
 ## 0.3.0 — 2026-09-06
 
+Research snapshot tag: `v0.3.0-research.1` at `3b8da81`; 497 local/clean-export
+tests pass, GitHub Python 3.11/3.12 CI passes. See the knowledge verification record.
+
 - Add PRE-retrieval BASE/FRESH/REUSE comparison over the typed-card external RAG loop.
 - Fix form/intent before card selection; use one shared paired prompt version.
 - Validate independent adapters, declared configuration and provenance before execution.

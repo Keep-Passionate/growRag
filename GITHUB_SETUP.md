@@ -1,5 +1,7 @@
 # GitHub 设置说明
 
+2026-09-06 最新：活动分支为 `codex/query-card-actions-v1`，0.3.0 功能提交 `3b8da81` 已推送；标签 `v0.3.0-research.1` 可作为回退点。完整 497 项本地/干净副本测试通过，远端 Python 3.11/3.12 CI 成功。[验证记录](knowledge/experiments/2026-09-06_前置三分支_版本验证.md)。下文 Hotpot pilot 为此前历史，不是当前活动分支。
+
 远端仓库已经由项目负责人创建，现已包含代码与研究笔记：
 
 `https://github.com/Keep-Passionate/growRag.git`
@@ -24,14 +26,14 @@
 后续同步使用：
 
 ```powershell
-git push -u origin codex/hotpot-pilot-v1
+git push -u origin codex/query-card-actions-v1
 ```
 
 如以后安装 GitHub CLI，也可以：
 
 ```powershell
 gh auth login
-git push -u origin codex/hotpot-pilot-v1
+git push -u origin codex/query-card-actions-v1
 ```
 
 不要 force push。后续推送前先正常 fetch/pull，避免覆盖用户从网页或其他机器提交的内容。
