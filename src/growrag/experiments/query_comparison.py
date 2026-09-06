@@ -15,7 +15,7 @@ from dataclasses import asdict, dataclass
 from growrag.experience.cards import ActivationStage
 from growrag.experience.query_views import CardMemoryView
 from growrag.experiments.protocol import Action, ExecutionKind, RuntimeQuestion
-from growrag.outer_loop import LoopResult, RagBackend, run_outer_loop
+from growrag.outer_loop import LoopResult, LoopState, RagBackend, run_outer_loop
 from growrag.query_actions import (
     PAIRED_ACTION_PROMPT_VERSION,
     QueryGenerator,
@@ -34,7 +34,7 @@ def _text(value: str, name: str) -> None:
 @dataclass(frozen=True, slots=True)
 class QueryComparisonSpec:
     question: RuntimeQuestion
-    memory: CardMemoryView
+    memory: CardMemoryView | None
     form: RewriteForm
     # Experiment-level instruction fixed BEFORE selecting a card, not copied from it.
     intent: str
@@ -45,8 +45,8 @@ class QueryComparisonSpec:
     def __post_init__(self) -> None:
         if not isinstance(self.question, RuntimeQuestion):
             raise TypeError("comparison accepts a gold-free RuntimeQuestion")
-        if not isinstance(self.memory, CardMemoryView):
-            raise TypeError("comparison requires one preselected typed diagnostic card")
+        if self.memory is not None and not isinstance(self.memory, CardMemoryView):
+            raise TypeError("memory must be a typed diagnostic card or explicitly unavailable")
         for name in ("intent", "rag_fingerprint", "generator_fingerprint"):
             _text(getattr(self, name), name)
         if type(self.seed) is not int or self.seed < 0:
@@ -55,6 +55,8 @@ class QueryComparisonSpec:
             raise ValueError("only single-query forms are implemented")
         if not isinstance(self.form, RewriteForm):
             raise TypeError("form must be a RewriteForm")
+        if self.memory is None:
+            return
         if self.memory.form != self.form or self.memory.intent != self.intent:
             raise ValueError("card must match the independently fixed form and intent")
         if self.memory.is_source(self.question):
@@ -130,6 +132,7 @@ class QueryComparison:
             "max_rag_calls_per_arm": 1,
             "max_rewrite_calls_per_rewrite_arm": 1,
             "generator_protocol": PAIRED_ACTION_PROMPT_VERSION,
+            "memory_available": self.spec.memory is not None,
             "spec_fingerprint": self.spec.fingerprint,
             "spec": asdict(self.spec),
             "action_order": self.spec.action_order,
@@ -146,6 +149,7 @@ def run_query_comparison(
     *,
     execution_kind: ExecutionKind,
     allow_real: bool = False,
+    on_arm: Callable[[ComparisonArm], None] | None = None,
 ) -> QueryComparison:
     """Validate every arm before any execution; preserve ordinary backend failures.
 
@@ -159,8 +163,12 @@ def run_query_comparison(
         raise TypeError("execution provenance and real opt-in must be explicit")
     if execution_kind is ExecutionKind.REAL and not allow_real:
         raise ValueError("real comparison requires explicit allow_real=True")
+    if on_arm is not None and not callable(on_arm):
+        raise TypeError("on_arm must be a callback or None")
     components: dict[Action, ComparisonComponents] = {}
     for action in spec.action_order:
+        if action is Action.REUSE and spec.memory is None:
+            continue  # No fake reuse call or hidden replacement budget.
         bundle = factory(action)
         if not isinstance(bundle, ComparisonComponents):
             raise TypeError("factory must return ComparisonComponents")
@@ -187,6 +195,14 @@ def run_query_comparison(
 
     arms = []
     for action in spec.action_order:
+        if action is Action.REUSE and spec.memory is None:
+            arm = ComparisonArm(
+                action, LoopResult(LoopState(spec.question), "no_eligible_memory", ())
+            )
+            arms.append(arm)
+            if on_arm is not None:
+                on_arm(arm)
+            continue
         bundle = components[action]
         decision = (
             RewriteDecision()
@@ -202,5 +218,9 @@ def run_query_comparison(
             policy=lambda state, selected=decision: selected,
             max_rag_calls=1,
         )
-        arms.append(ComparisonArm(action, result))
+        arm = ComparisonArm(action, result)
+        arms.append(arm)
+        if on_arm is not None:
+            # A persistence failure aborts before any later paid arm is started.
+            on_arm(arm)
     return QueryComparison(spec, execution_kind, tuple(arms))

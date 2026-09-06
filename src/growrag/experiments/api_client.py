@@ -54,6 +54,7 @@ class ChatConfig:
     timeout_seconds: float = 45.0
     output_limit_parameter: str = "max_completion_tokens"
     enable_thinking: bool | None = None
+    temperature: float | None = None
 
     def __post_init__(self) -> None:
         parsed = urlsplit(self.base_url)
@@ -78,6 +79,13 @@ class ChatConfig:
             raise ValueError("unsupported output limit parameter")
         if self.enable_thinking is not None and type(self.enable_thinking) is not bool:
             raise ValueError("enable_thinking must be bool or None")
+        if self.temperature is not None and (
+            isinstance(self.temperature, bool)
+            or not isinstance(self.temperature, (int, float))
+            or not math.isfinite(self.temperature)
+            or not 0 <= self.temperature <= 1
+        ):
+            raise ValueError("temperature must be a finite value in [0, 1] or None")
 
 
 @dataclass(frozen=True, slots=True)
@@ -160,6 +168,8 @@ class LiveChatClient:
         }
         if self.config.enable_thinking is not None:
             payload["enable_thinking"] = self.config.enable_thinking
+        if self.config.temperature is not None:
+            payload["temperature"] = self.config.temperature
         body = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
         if api_key in body.decode("utf-8"):
             raise APIRequestError("credential detected in request content; no request was sent")

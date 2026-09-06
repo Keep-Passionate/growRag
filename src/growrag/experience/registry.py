@@ -12,7 +12,7 @@ from growrag.episodes import (
     VerificationTarget,
     VerificationVerdict,
 )
-from growrag.experience.cards import ExperienceCard, VerificationTier
+from growrag.experience.cards import CardProvenance, ExperienceCard, VerificationTier
 
 
 class ExperienceCardRegistry:
@@ -38,6 +38,8 @@ class ExperienceCardRegistry:
             raise KeyError(versioned_id) from None
 
     def register(self, card: ExperienceCard) -> None:
+        if not isinstance(card.provenance, CardProvenance):
+            raise ValueError("legacy registry accepts archived episode provenance only")
         if card.versioned_id in self._cards:
             raise ValueError(f"experience card version already exists: {card.versioned_id}")
         missing_parents = sorted(set(card.parent_versioned_ids).difference(self._cards))

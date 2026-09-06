@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from math import isfinite
 
@@ -163,6 +163,101 @@ class CardProvenance:
 
 
 @dataclass(frozen=True, slots=True)
+class PreSourceMetrics:
+    """Offline source-pair scores, never cross-question transfer trials."""
+
+    base_answer_em: float
+    fresh_answer_em: float
+    base_answer_f1: float
+    fresh_answer_f1: float
+    base_support_recall: float
+    fresh_support_recall: float
+    query_changed: bool
+
+    def __post_init__(self) -> None:
+        for name in (
+            "base_answer_em",
+            "fresh_answer_em",
+            "base_answer_f1",
+            "fresh_answer_f1",
+            "base_support_recall",
+            "fresh_support_recall",
+        ):
+            value = getattr(self, name)
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not (isfinite(value) and 0 <= value <= 1)
+            ):
+                raise ValueError("source scores must be finite numbers in [0, 1]")
+        if type(self.query_changed) is not bool:
+            raise TypeError("query_changed must be bool")
+
+    @property
+    def eligible(self) -> bool:
+        return (
+            self.query_changed
+            and self.fresh_answer_em == 1.0
+            and self.fresh_answer_em >= self.base_answer_em
+            and self.fresh_answer_f1 >= self.base_answer_f1
+            and self.fresh_support_recall >= self.base_support_recall
+            and (
+                self.fresh_answer_em > self.base_answer_em
+                or self.fresh_answer_f1 > self.base_answer_f1
+                or self.fresh_support_recall > self.base_support_recall
+            )
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class PreSourceRef:
+    """Pointer to an independent PRE pair, explicitly NOT an EpisodeTurnRef."""
+
+    source_id: str
+    source_fingerprint: str
+    admission: PreSourceMetrics
+
+    def __post_init__(self) -> None:
+        _require_text_fields(source_id=self.source_id)
+        if (
+            not isinstance(self.source_fingerprint, str)
+            or len(self.source_fingerprint) != 64
+            or any(c not in "0123456789abcdef" for c in self.source_fingerprint)
+        ):
+            raise ValueError("source_fingerprint must be a SHA-256 digest")
+        if not isinstance(self.admission, PreSourceMetrics) or not self.admission.eligible:
+            raise ValueError("PRE source references require eligible source-pair observations")
+
+
+@dataclass(frozen=True, slots=True)
+class PreSourceProvenance:
+    """Separate provenance variant; old episode/snapshot contracts stay intact."""
+
+    source_refs: tuple[PreSourceRef, ...]
+    extraction_prompt_version: str
+    independent_document_count: int
+    source_type: str = field(default="pre_independent_pair.v1", init=False)
+
+    def __post_init__(self) -> None:
+        _require_text_fields(extraction_prompt_version=self.extraction_prompt_version)
+        if (
+            not isinstance(self.source_refs, tuple)
+            or not self.source_refs
+            or not all(isinstance(ref, PreSourceRef) for ref in self.source_refs)
+        ):
+            raise TypeError("PRE provenance requires immutable PreSourceRef records")
+        if len({ref.source_id for ref in self.source_refs}) != len(self.source_refs):
+            raise ValueError("PRE source IDs must be unique")
+        if type(self.independent_document_count) is not int or self.independent_document_count < 0:
+            raise ValueError("independent_document_count must be a nonnegative integer")
+
+    @property
+    def independent_episode_count(self) -> int:
+        # Compatibility for policy diagnostics, not an old BASE-first episode.
+        return len(self.source_refs)
+
+
+@dataclass(frozen=True, slots=True)
 class CardValidation:
     """Sufficient statistics; confidence estimates remain recomputable."""
 
@@ -251,7 +346,7 @@ class ExperienceCard:
     created_at: str
     activation: CardActivation
     repair: RepairSpecification
-    provenance: CardProvenance
+    provenance: CardProvenance | PreSourceProvenance
     validation: CardValidation
     serving: CardServing
     activation_policy: CardActivationPolicy = CardActivationPolicy()
@@ -266,6 +361,22 @@ class ExperienceCard:
             schema_version=self.schema_version,
         )
         object.__setattr__(self, "lifecycle_state", CardLifecycle(self.lifecycle_state))
+        if not isinstance(self.provenance, (CardProvenance, PreSourceProvenance)):
+            raise TypeError("card provenance must declare a supported source type")
+        if isinstance(self.provenance, PreSourceProvenance):
+            if self.lifecycle_state is not CardLifecycle.CANDIDATE:
+                raise ValueError("PRE source cards are diagnostic CANDIDATE records only")
+            if (
+                self.schema_version != "experience_card.v1"
+                or self.activation.stage is not ActivationStage.PRE_RETRIEVAL
+                or self.activation.gap_pattern is not None
+                or not isinstance(self.repair.action_body, ParaphraseBody)
+            ):
+                raise ValueError("PRE source cards require a PRE v1 paraphrase without a gap")
+            if self.validation != CardValidation(
+                VerificationTier.PROXY, (), 0, 0, 0, 0, 0, 0.0, None
+            ):
+                raise ValueError("source observations are not matched transfer trials")
         if self.repair.action_body is not None and self.schema_version != "experience_card.v1":
             raise ValueError("typed action bodies require experience_card.v1")
         object.__setattr__(

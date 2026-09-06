@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 — 2026-09-06
+
+- Add honest independent PRE source records and explicit source-provenance cards.
+- Admit source-only candidate observations without fabricating target validation.
+- Add fixed 32/16 train-only development manifests and a shared 5 CNY budget entry point.
+- Connect actual source generation, procedural extraction, frozen candidate selection and target comparisons.
+- Persist each completed arm before continuing; retain unavailable REUSE separately from BASE fallback.
+- Add descriptive batch reports, fixed temperature configuration and offline contract tests.
+
+Pre-run verification: 598 local tests pass (101 added); lint and format checks pass.
+
+Research boundary: query-only lexical selection is a weak diagnostic baseline,
+not an automatic trust gate. Live outcomes are reported separately after execution.
+
 ## 0.3.0 — 2026-09-06
 
 Research snapshot tag: `v0.3.0-research.1` at `3b8da81`; 497 local/clean-export

@@ -13,7 +13,7 @@ from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 
 from growrag.episodes import EpisodeAction, EpisodeArchive
-from growrag.experience.cards import ActivationStage, CardLifecycle, ExperienceCard
+from growrag.experience.cards import ActivationStage, CardLifecycle, CardProvenance, ExperienceCard
 from growrag.experiments.data_protocol import normalize_question
 from growrag.experiments.protocol import Evidence, MemoryView, RuntimeQuestion
 from growrag.query_operators import ExpansionBody, ParaphraseBody, RewriteForm
@@ -163,6 +163,8 @@ def card_to_view(
     to the generator. Arbitrary procedural text still needs semantic auditing.
     """
     body = card.repair.action_body
+    if not isinstance(card.provenance, CardProvenance):
+        raise ValueError("PRE source pairs require pre_source_card_to_view")
     if body is None or card.schema_version != "experience_card.v1":
         raise ValueError("legacy cards require an explicit typed, revalidated revision")
     if card.lifecycle_state not in (CardLifecycle.CANDIDATE, CardLifecycle.ACTIVE):
