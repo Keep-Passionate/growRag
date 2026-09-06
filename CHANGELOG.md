@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0 — 2026-09-06
+
+- Add PRE-retrieval BASE/FRESH/REUSE comparison over the typed-card external RAG loop.
+- Fix form/intent before card selection; use one shared paired prompt version.
+- Validate independent adapters, declared configuration and provenance before execution.
+- Separate gold-free runtime from post-run layered evaluation and all three contrasts.
+- Track planned versus executed actions, failed arms, unknown evidence/usage and harm types.
+- Add exclusive raw JSON, machine-readable report and escaped human-readable Markdown output.
+- Add a standalone, explicitly scripted zero-API demonstration and regression tests.
+- Preserve ordinary component failures without silently losing other comparison arms.
+
+Research status: executable controlled comparison, NOT an automatic trusted-memory
+selector or new evidence of model-quality gains. No new live API run or training.
+POST-retrieval shared-prefix comparison and semantic applicability remain future work.
+
 ## 0.2.0 — 2026-09-06
 
 Research snapshot tag: `v0.2.0-research.1` on `codex/query-card-actions-v1`.

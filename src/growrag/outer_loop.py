@@ -46,9 +46,15 @@ class RagReply:
     def __post_init__(self) -> None:
         if not isinstance(self.answer, Answer):
             raise TypeError("answer must be an Answer")
+        if not isinstance(self.component_events, tuple) or not all(
+            isinstance(event, CallEvent) for event in self.component_events
+        ):
+            raise TypeError("component events must be immutable CallEvent records")
         if self.evidence is not None:
             if not isinstance(self.evidence, tuple):
                 raise TypeError("evidence must be an immutable tuple or unavailable")
+            if not all(isinstance(item, Evidence) for item in self.evidence):
+                raise TypeError("evidence must contain Evidence records")
             known = {item.evidence_id for item in self.evidence}
             if len(known) != len(self.evidence):
                 raise ValueError("duplicate evidence ID")
@@ -127,6 +133,8 @@ def _event(operation: str, kind: ExecutionKind, start: float, result: object) ->
 
 
 def _checked(result: CallResult, kind: ExecutionKind) -> CallResult:
+    if not isinstance(result, CallResult) or not isinstance(result.usage, Usage):
+        raise TypeError("component must return an audited CallResult with typed usage")
     allowed = {
         "local_compute",
         "composed_rag",
@@ -143,6 +151,26 @@ def _checked(result: CallResult, kind: ExecutionKind) -> CallResult:
             transport_source=result.transport_source,
         )
     return result
+
+
+def _call_failure(error: Exception, returned: object = None) -> BackendCallError:
+    """Sanitize unexpected component errors without inventing unobserved usage.
+
+    A returned audited envelope may contain known cost even when its value is
+    invalid. If the call raised before returning, only BackendCallError carries
+    trustworthy call metadata. Never serialize an arbitrary exception message.
+    """
+    if isinstance(error, BackendCallError):
+        return error
+    metadata = {}
+    if isinstance(returned, CallResult):
+        metadata["usage"] = returned.usage if isinstance(returned.usage, Usage) else Usage()
+        for field in ("provider", "model", "request_id", "audit_path", "transport_source"):
+            value = getattr(returned, field)
+            metadata[field] = value if isinstance(value, str) else None
+    return BackendCallError(
+        "component execution or response validation failed; no retry", **metadata
+    )
 
 
 def _sum_usage(usages: tuple[Usage, ...]) -> Usage:
@@ -221,6 +249,7 @@ def run_outer_loop(
             if generator is None:
                 return finish("rewriter_unavailable")
             start = perf_counter()
+            generated = None
             try:
                 generated = generator.generate(
                     question,
@@ -229,8 +258,9 @@ def run_outer_loop(
                     previous_queries=tuple(r.search_query for r in state.rounds),
                 )
                 _checked(generated, backend.execution_kind)
-            except BackendCallError as error:
-                events.append(_event("rewrite", backend.execution_kind, start, error))
+            except Exception as error:
+                failure = _call_failure(error, generated)
+                events.append(_event("rewrite", backend.execution_kind, start, failure))
                 return finish("rewrite_error")
             events.append(_event("rewrite", backend.execution_kind, start, generated))
             query = generated.value
@@ -247,17 +277,19 @@ def run_outer_loop(
             decision = RewriteDecision()
             query = question.text
         start = perf_counter()
+        result = None
         try:
             result = backend.run(RagRequest(question, query))
             _checked(result, backend.execution_kind)
-        except BackendCallError as error:
-            events.append(_event("rag", backend.execution_kind, start, error))
-            components.extend(getattr(error, "component_events", ()))
+            if not isinstance(result.value, RagReply):
+                raise TypeError("backend must return a RagReply")
+        except Exception as error:
+            failure = _call_failure(error, result)
+            events.append(_event("rag", backend.execution_kind, start, failure))
+            components.extend(getattr(failure, "component_events", ()))
             return finish("rag_error")
         events.append(_event("rag", backend.execution_kind, start, result))
         reply = result.value
-        if not isinstance(reply, RagReply):
-            raise TypeError("backend must return a RagReply")
         components.extend(reply.component_events)
         observed = {item.evidence_id: item for item in state.observed_evidence}
         before_ids = set(observed)
@@ -274,6 +306,7 @@ def run_outer_loop(
         feedback = Feedback()
         if assessor and reply.evidence is not None:
             start = perf_counter()
+            assessed = None
             try:
                 assessed = assessor(previous_state, reply)
                 if isinstance(assessed, Feedback):
@@ -285,8 +318,11 @@ def run_outer_loop(
                         transport_source="local_compute",
                     )
                 _checked(assessed, backend.execution_kind)
-            except BackendCallError as error:
-                events.append(_event("assess", backend.execution_kind, start, error))
+                if not isinstance(assessed.value, Feedback):
+                    raise TypeError("assessor must return Feedback, not gold or raw labels")
+            except Exception as error:
+                failure = _call_failure(error, assessed)
+                events.append(_event("assess", backend.execution_kind, start, failure))
                 return finish("assessment_error")
             events.append(_event("assess", backend.execution_kind, start, assessed))
             feedback = assessed.value
@@ -332,26 +368,39 @@ class RetrieverReaderBackend:
     def run(self, request: RagRequest) -> CallResult[RagReply]:
         calls: list[CallEvent] = []
         start = perf_counter()
+        retrieved = None
         try:
             retrieved = self.retriever.retrieve(request.search_query, top_k=self.top_k)
             _checked(retrieved, self.execution_kind)
-        except BackendCallError as error:
-            calls.append(_event("rag.retrieve", self.execution_kind, start, error))
-            raise RagCallFailure(error, tuple(calls)) from None
+            if not isinstance(retrieved.value, tuple) or not all(
+                isinstance(item, Evidence) for item in retrieved.value
+            ):
+                raise TypeError("retriever must return an immutable tuple of Evidence")
+            if len(retrieved.value) > self.top_k:
+                raise ValueError("retriever exceeded its top_k contract")
+            if len({item.evidence_id for item in retrieved.value}) != len(retrieved.value):
+                raise ValueError("retriever returned duplicate evidence IDs")
+        except Exception as error:
+            failure = _call_failure(error, retrieved)
+            calls.append(_event("rag.retrieve", self.execution_kind, start, failure))
+            raise RagCallFailure(failure, tuple(calls)) from None
         calls.append(_event("rag.retrieve", self.execution_kind, start, retrieved))
-        if len(retrieved.value) > self.top_k:
-            raise ValueError("retriever exceeded its top_k contract")
         start = perf_counter()
+        answered = None
         try:
             answered = self.reader.answer(request.question, retrieved.value)
             _checked(answered, self.execution_kind)
-        except BackendCallError as error:
-            calls.append(_event("rag.answer", self.execution_kind, start, error))
-            raise RagCallFailure(error, tuple(calls)) from None
+            # Validate the actual reader-visible evidence before accepting the
+            # answer. A malformed response still consumed its reported cost.
+            reply = RagReply(answered.value, retrieved.value)
+        except Exception as error:
+            failure = _call_failure(error, answered)
+            calls.append(_event("rag.answer", self.execution_kind, start, failure))
+            raise RagCallFailure(failure, tuple(calls)) from None
         calls.append(_event("rag.answer", self.execution_kind, start, answered))
 
         return CallResult(
-            RagReply(answered.value, retrieved.value, tuple(calls)),
+            RagReply(reply.answer, reply.evidence, tuple(calls)),
             usage=_sum_usage((retrieved.usage, answered.usage)),
             provider=answered.provider,
             model=answered.model,

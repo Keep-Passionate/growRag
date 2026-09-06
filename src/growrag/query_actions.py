@@ -72,6 +72,7 @@ class QueryGenerator(Protocol):
 
 ACTION_PROMPT_VERSION = "growrag-outer-single-query-v1"
 CARD_ACTION_PROMPT_VERSION = "growrag-outer-typed-card-v1"
+PAIRED_ACTION_PROMPT_VERSION = "growrag-paired-query-v1"
 ACTION_PROMPT = """Generate ONE search query for the original question.
 The requested form is either paraphrase or expand. Paraphrase changes wording
 while preserving meaning (e.g. vocabulary alignment); expand adds useful search
@@ -89,9 +90,12 @@ Return only JSON with exactly one key: {"query": "search query"}.
 class APISingleQueryGenerator:
     """Use the existing opt-in, audited transport; no calls on construction."""
 
-    def __init__(self, client: LiveChatClient) -> None:
+    def __init__(self, client: LiveChatClient, *, paired_prompt: bool = False) -> None:
+        if type(paired_prompt) is not bool:
+            raise TypeError("paired_prompt must be bool")
         self.client = client
         self.execution_kind = _execution_kind(client)
+        self.comparison_protocol_id = PAIRED_ACTION_PROMPT_VERSION if paired_prompt else None
 
     def generate(
         self,
@@ -124,6 +128,14 @@ class APISingleQueryGenerator:
                 "not pre-verified for this question. Do not assume they hold. Follow its "
                 "body only when compatible with current inputs; otherwise return the original "
                 "question unchanged. Do not infer reliability from its existence.\n"
+            )
+        if self.comparison_protocol_id is not None:
+            version = self.comparison_protocol_id
+            prompt = ACTION_PROMPT + (
+                "\nIf an optional historical card is supplied, its conditions are not "
+                "pre-verified for the current question. Use its procedure only when "
+                "compatible with current inputs; otherwise ignore it. Whether or not a "
+                "card is supplied, you may return the original question unchanged.\n"
             )
         response = _request(self.client, prompt, payload, version, "outer_rewrite")
         metadata = _metadata(response, self.client)

@@ -28,3 +28,5 @@ jobs:
         run: python -m ruff format --check src tests scripts
       - name: CLI smoke test
         run: python -m growrag demo
+      - name: Query comparison smoke test (no API)
+        run: python scripts/demo_query_comparison.py --output runs/ci-query-comparison

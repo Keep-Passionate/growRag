@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "growrag"
-version = "0.2.0"
+version = "0.3.0"
 description = "Research harness for safe reuse of historically validated query transformations in RAG."
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
