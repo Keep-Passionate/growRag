@@ -9,6 +9,9 @@
 
 Verification: 633 local tests pass, plus lint and format checks. Source replay
 matches archived evidence; manual retrieval ablations carry no generated answer scores.
+The clean export also passes 633 tests and CLI checks. Code commit `a79d923` is
+local; three push attempts encountered GitHub connection errors. Remote still
+points to `8081af4` as of 2026-09-07 00:12 Asia/Shanghai; 0.4.1 CI is not yet run.
 
 ## 0.4.0 — 2026-09-06
 
