@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.1 — 2026-09-07
+
+- Distinguish no-memory skips, execution failures, abstentions and unscored outputs.
+- Add an offline-only source retrieval probe with archived BASE/FRESH replay checks.
+- Preserve the original live run and document the zero-coverage outcome and competing
+  explanations for the single source improvement; no additional model call or training.
+
+Verification: 633 local tests pass, plus lint and format checks. Source replay
+matches archived evidence; manual retrieval ablations carry no generated answer scores.
+
 ## 0.4.0 — 2026-09-06
 
 - Add honest independent PRE source records and explicit source-provenance cards.
@@ -9,10 +19,18 @@
 - Persist each completed arm before continuing; retain unavailable REUSE separately from BASE fallback.
 - Add descriptive batch reports, fixed temperature configuration and offline contract tests.
 
-Pre-run verification: 598 local tests pass (101 added); lint and format checks pass.
+Pre-run verification: 598 local and clean-export tests pass (101 added); lint and
+format checks pass. Python 3.11/3.12 CI passed. Tag `v0.4.0-research.1` resolves
+to the actual live-run code `8081af4`; main remains unchanged.
 
 Research boundary: query-only lexical selection is a weak diagnostic baseline,
 not an automatic trust gate. Live outcomes are reported separately after execution.
+
+The live PRE pilot ran at `8081af4`: 32 sources yielded one candidate; all 16 targets
+had no eligible memory. BASE EM 6/16, FRESH 5/16; REUSE was not executed, not 0/16.
+145 real API calls cost an estimated 0.0209324 CNY. No memory-effect claim follows.
+Post-run fixes distinguish unavailable memory, failed execution and abstention in
+reports, and render an absent budget block as no block. Original artifacts are retained.
 
 ## 0.3.0 — 2026-09-06
 

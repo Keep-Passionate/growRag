@@ -4,6 +4,8 @@
 
 运行前验证：598 项本地测试通过，静态与格式检查通过。新增 101 项测试覆盖独立来源、清单、防泄漏、无卡与预算边界；测试替身不计作真实模型效果。
 
+真实首批已于9月6日完成：[结果与边界](../knowledge/experiments/2026-09-06_PRE真实建库与比较_结果.md)。32来源1卡，16目标无卡，REUSE未执行；145次API估算0.0209324元。下面的真实命令是历史协议，不应自动重新收费运行。
+
 ## 新增的最小连接
 
 ```text
@@ -74,3 +76,13 @@
 ## 首批之后
 
 先逐卡核查是否过度抽象、来源实体是否残留，再逐题比较 REUSE−FRESH、BASE正确被改错、选择覆盖和费用。若没有额外作用，记录负结果；不要换掉坏题或偷偷改规则。下一步才比较更好的适用性/表示与 QPP，小模型训练、多轮和文档层仍后置。
+
+## 0.4.1：不收费的来源检索对比
+
+`experiments/retrieval_probe.py` 对同一来源题运行本地 BM25：比较原查询、实际成功改写和人工拆出的查询成分。先核对原 BASE/FRESH 的有序证据与归档完全一致，再保存新诊断；不调用 Reader，不读取 API 配置，不给人工查询填入原答案成绩。
+
+```powershell
+.\.venv\Scripts\python.exe -m growrag.experiments.retrieval_probe --manifest data/hotpotqa/train_preview_200_v1/manifest.json --source-record runs/2026-09-06_pre_pilot_32_16_v1/sources/025/source_record.json --output runs/2026-09-07_pre_source_retrieval_probe_v1/probe.json --candidate entities_only "Kim Clijsters Mary Pierce" --candidate entities_age "Kim Clijsters Mary Pierce age" --candidate entities_vs "Kim Clijsters vs Mary Pierce" --candidate without_tennis "Between Kim Clijsters and Mary Pierce, who is older?"
+```
+
+上述诊断已运行，输出保留且不覆盖。四个人工候选为事后探索，不是预注册的方法比较；只证明这次本地排序如何变化，不证明新答案或跨题效果。0.4.1 本地 633 项测试、静态和格式检查通过；本次后续无新增 API。
