@@ -49,6 +49,8 @@ archive/**
 
 # Experiment artifacts
 *.jsonl
+# Handwritten public CLI fixture required by clean-checkout tests.
+!/examples/trusted_reuse/requests.jsonl
 *.parquet
 *.arrow
 *.npy

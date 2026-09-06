@@ -1,0 +1,3 @@
+{"target_query_id":"target-reuse","target_query":"Who was born first, Carol or David?","signatures":["comparison","two_entity"],"signature_extractor_id":"toy-query-only-rules","signature_extractor_version":"v1","signature_input_scope":"query_only"}
+{"target_query_id":"target-not-applicable","target_query":"When was Carol born?","signatures":["single_entity"],"signature_extractor_id":"toy-query-only-rules","signature_extractor_version":"v1","signature_input_scope":"query_only"}
+{"target_query_id":"target-missing-plan","target_query":"Who was born first, Erin or Frank?","signatures":["comparison","two_entity"],"signature_extractor_id":"toy-query-only-rules","signature_extractor_version":"v1","signature_input_scope":"query_only"}
