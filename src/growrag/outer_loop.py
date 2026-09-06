@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from time import perf_counter
 from typing import Protocol
 
+from .experience.query_views import CardMemoryView
 from .experiments.data_protocol import normalize_question
 from .experiments.protocol import (
     Action,
@@ -206,8 +207,15 @@ def run_outer_loop(
             raise TypeError("policy must return RewriteDecision or None")
         if decision.form is RewriteForm.DECOMPOSE:
             return finish("decomposition_not_implemented")
-        if decision.memory and decision.memory.source_query_id == question.question_id:
+        if decision.memory and decision.memory.is_source(question):
             return finish("same_question_memory_rejected")
+        if isinstance(decision.memory, CardMemoryView):
+            try:
+                decision.memory.check_stage(
+                    after_retrieval=bool(state.rounds), evidence=state.observed_evidence
+                )
+            except ValueError:
+                return finish("card_stage_or_evidence_mismatch")
         query = question.text
         if decision.action is not Action.BASE:
             if generator is None:

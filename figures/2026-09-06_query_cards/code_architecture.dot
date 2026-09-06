@@ -1,0 +1,30 @@
+digraph Code {
+  graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.35", ranksep="0.45", fontname="Microsoft YaHei", fontsize=19, label="GrowRAG 代码地图：经验卡 → 改写 → 独立 RAG", labelloc=t];
+  node [shape=box, style="rounded,filled", fillcolor="#EEF5FD", color="#2464A0", fontname="Microsoft YaHei", fontsize=13, margin="0.20,0.16", width=3.8];
+  edge [fontname="Microsoft YaHei", fontsize=11, color="#46627B", arrowsize=0.7];
+  subgraph cluster_memory {
+    label="经验侧：程序性记忆"; fontsize=14; color="#BACBDB"; style=rounded; margin=24;
+    shell [label="experience/cards.py\n统一外壳\n版本 / 条件 / 来源 / 验证"];
+    body [label="query_operators.py\n不同正文\n语义改写 / 扩写"];
+    view [label="experience/query_views.py\n只读视图\n只送必要字段，排除全部来源题"];
+    shell -> body [label="包含一种正文"];
+    body -> view;
+  }
+  input [label="RuntimeQuestion\n原始问题 q₀"];
+  loop [label="outer_loop.py\n选择与停止规则\nBASE / FRESH / REUSE"];
+  rewrite [label="query_actions.py\n固定改写接口 → 检索查询 q₁"];
+  rag [label="RagBackend\n原有检索器 + 回答器\n回答目标仍然是 q₀", fillcolor="#F1F1F1", color="#62676E"];
+  reply [label="RagReply + Feedback\n回答 / 本轮证据 / 审计\n真实 judge 待接"];
+  end [label="LoopResult\n逐轮记录 + 停止原因", fillcolor="#EAF4EE", color="#3A7655"];
+  qpp [label="preflight_qpp.py\n独立 QPP 训练\n尚未控制路由", style="rounded,dashed", color="#AD7A24"];
+  input -> loop;
+  view -> rewrite [label="仅 REUSE\n实验指定卡"];
+  loop -> rewrite [label="FRESH / REUSE"];
+  loop -> rag [label="BASE：不改写"];
+  rewrite -> rag [label="q₀ + q₁"];
+  rag -> reply;
+  reply -> end [label="停止"];
+  reply -> loop [label="允许继续", constraint=false, color="#2464A0"];
+  qpp -> loop [label="以后验证后接入", style=dashed];
+  {rank=same; input; qpp;}
+}

@@ -135,6 +135,10 @@ class MemoryView:
         for field in ("memory_id", "source_query_id", "source_step_id", "view_type", "text"):
             _nonempty(getattr(self, field), field)
 
+    def is_source(self, question: RuntimeQuestion) -> bool:
+        """Specialized multi-source views override this without changing old payloads."""
+        return self.source_query_id == question.question_id
+
 
 @dataclass(frozen=True, slots=True)
 class Answer:

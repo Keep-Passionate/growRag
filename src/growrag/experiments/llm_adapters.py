@@ -12,6 +12,8 @@ from dataclasses import asdict
 from urllib.parse import urlsplit
 from uuid import uuid4
 
+from growrag.experience.query_views import CardMemoryView
+
 from .api_client import APIRequestError, ChatResponse, LiveChatClient
 from .protocol import (
     Answer,
@@ -116,7 +118,9 @@ class APIRewriter:
             raise TypeError("rewriter accepts only a gold-free DecisionState")
         if memory is not None and not isinstance(memory, MemoryView):
             raise TypeError("memory must be a MemoryView or None")
-        if memory is not None and memory.source_query_id == state.question.question_id:
+        if isinstance(memory, CardMemoryView):
+            raise ValueError("typed cards require the versioned APISingleQueryGenerator")
+        if memory is not None and memory.is_source(state.question):
             raise ValueError("target question cannot be its own source experience")
         payload = {
             "original_question": state.question.text,

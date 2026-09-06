@@ -126,10 +126,7 @@ class PairedRunner:
         if len({spec.branch_id for spec in specs}) != len(specs):
             raise ValueError("branch IDs must be unique")
         for spec in specs:
-            if (
-                spec.memory is not None
-                and spec.memory.source_query_id == state.question.question_id
-            ):
+            if spec.memory is not None and spec.memory.is_source(state.question):
                 raise ValueError("cross-query reuse cannot use the target query as its source")
         results = tuple(self._run_branch(state, spec) for spec in specs)
         return PairedRun(state, self.execution_kind, results, self.top_k)

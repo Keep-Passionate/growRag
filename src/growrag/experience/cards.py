@@ -7,6 +7,7 @@ from enum import StrEnum
 from math import isfinite
 
 from growrag.episodes.models import EpisodeTurnRef
+from growrag.query_operators import ActionBody, ExpansionBody, ParaphraseBody
 
 
 class CardLifecycle(StrEnum):
@@ -76,17 +77,16 @@ class CardActivation:
 
     stage: ActivationStage
     query_pattern: str
-    gap_pattern: str
+    gap_pattern: str | None = None
     preconditions: tuple[str, ...] = ()
     contraindications: tuple[str, ...] = ()
     required_retriever_capabilities: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "stage", ActivationStage(self.stage))
-        _require_text_fields(
-            query_pattern=self.query_pattern,
-            gap_pattern=self.gap_pattern,
-        )
+        _require_text_fields(query_pattern=self.query_pattern)
+        if self.gap_pattern is not None:
+            _require_text_fields(gap_pattern=self.gap_pattern)
         for field_name in (
             "preconditions",
             "contraindications",
@@ -104,15 +104,28 @@ class RepairSpecification:
     """Entity-neutral repair procedure and its observable success contract."""
 
     operator_type: str
-    slot_template: str
+    slot_template: str | None
     evidence_contract: str
+    action_body: ActionBody | None = None
+    intent: str | None = None
 
     def __post_init__(self) -> None:
         _require_text_fields(
             operator_type=self.operator_type,
-            slot_template=self.slot_template,
             evidence_contract=self.evidence_contract,
         )
+        if self.action_body is None:
+            _require_text_fields(slot_template=self.slot_template)
+            if self.intent is not None:
+                raise ValueError("typed intent requires an action body")
+        else:
+            if not isinstance(self.action_body, (ParaphraseBody, ExpansionBody)):
+                raise TypeError("unsupported action body")
+            if self.operator_type != self.action_body.form.value:
+                raise ValueError("operator_type must agree with the action body form")
+            if self.slot_template is not None:
+                raise ValueError("typed body replaces slot_template; do not duplicate instructions")
+            _require_text_fields(intent=self.intent)
 
 
 @dataclass(frozen=True, slots=True)
@@ -253,6 +266,8 @@ class ExperienceCard:
             schema_version=self.schema_version,
         )
         object.__setattr__(self, "lifecycle_state", CardLifecycle(self.lifecycle_state))
+        if self.repair.action_body is not None and self.schema_version != "experience_card.v1":
+            raise ValueError("typed action bodies require experience_card.v1")
         object.__setattr__(
             self,
             "parent_versioned_ids",
@@ -311,7 +326,9 @@ class ExperienceCard:
             serving=CardServing(expected_cost=expected_cost),
             activation_policy=self.activation_policy,
             parent_versioned_ids=(self.versioned_id,),
-            schema_version=self.schema_version,
+            schema_version=(
+                "experience_card.v1" if repair.action_body is not None else self.schema_version
+            ),
         )
 
     def activation_policy_failures(self) -> tuple[str, ...]:

@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
-from enum import StrEnum
 from typing import Protocol
 
+from .experience.query_views import CardMemoryView
 from .experiments.api_client import LiveChatClient
 from .experiments.llm_adapters import _execution_kind, _metadata, _request
 from .experiments.protocol import (
@@ -22,13 +22,7 @@ from .experiments.protocol import (
     MemoryView,
     RuntimeQuestion,
 )
-
-
-class RewriteForm(StrEnum):
-    KEEP = "keep"
-    PARAPHRASE = "paraphrase"
-    EXPAND = "expand"
-    DECOMPOSE = "decompose"
+from .query_operators import RewriteForm
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,8 +42,19 @@ class RewriteDecision:
         if self.action is Action.REUSE:
             if not isinstance(self.memory, MemoryView):
                 raise ValueError("REUSE requires one selected procedure")
+            if isinstance(self.memory, CardMemoryView) and (
+                self.form != self.memory.form or self.intent != self.memory.intent
+            ):
+                raise ValueError("decision form and intent must match the selected card")
         elif self.memory is not None:
             raise ValueError("BASE/FRESH cannot receive historical memory")
+
+
+def diagnostic_reuse_decision(view: CardMemoryView) -> RewriteDecision:
+    """Use an explicitly preselected experimental card, not automatic trusted routing."""
+    if not isinstance(view, CardMemoryView):
+        raise TypeError("a typed card view is required")
+    return RewriteDecision(Action.REUSE, view.form, view.intent, view)
 
 
 class QueryGenerator(Protocol):
@@ -66,6 +71,7 @@ class QueryGenerator(Protocol):
 
 
 ACTION_PROMPT_VERSION = "growrag-outer-single-query-v1"
+CARD_ACTION_PROMPT_VERSION = "growrag-outer-typed-card-v1"
 ACTION_PROMPT = """Generate ONE search query for the original question.
 The requested form is either paraphrase or expand. Paraphrase changes wording
 while preserving meaning (e.g. vocabulary alignment); expand adds useful search
@@ -97,8 +103,10 @@ class APISingleQueryGenerator:
     ) -> CallResult[str]:
         if decision.form not in (RewriteForm.PARAPHRASE, RewriteForm.EXPAND):
             raise ValueError("only single-query paraphrase/expand are implemented")
-        if decision.memory and decision.memory.source_query_id == question.question_id:
+        if decision.memory and decision.memory.is_source(question):
             raise ValueError("a target question cannot reuse its own experience")
+        if isinstance(decision.memory, CardMemoryView):
+            decision.memory.check_stage(after_retrieval=bool(previous_queries), evidence=evidence)
         payload = {
             "original_question": question.text,
             "form": decision.form.value,
@@ -108,9 +116,16 @@ class APISingleQueryGenerator:
         }
         if decision.memory is not None:
             payload["optional_historical_procedure"] = asdict(decision.memory)
-        response = _request(
-            self.client, ACTION_PROMPT, payload, ACTION_PROMPT_VERSION, "outer_rewrite"
-        )
+        version, prompt = ACTION_PROMPT_VERSION, ACTION_PROMPT
+        if isinstance(decision.memory, CardMemoryView):
+            version = CARD_ACTION_PROMPT_VERSION
+            prompt += (
+                "\nThe historical text is a structured diagnostic card. Its conditions are "
+                "not pre-verified for this question. Do not assume they hold. Follow its "
+                "body only when compatible with current inputs; otherwise return the original "
+                "question unchanged. Do not infer reliability from its existence.\n"
+            )
+        response = _request(self.client, prompt, payload, version, "outer_rewrite")
         metadata = _metadata(response, self.client)
         try:
             value = json.loads(response.content)
