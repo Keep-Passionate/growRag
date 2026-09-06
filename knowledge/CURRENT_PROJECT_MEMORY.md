@@ -1,17 +1,104 @@
 # GrowRAG 当前项目记忆
 
-更新日期：2026-08-24
-状态：方案 B「可信自适应查询修复」与三层记忆方向已确认；累计证据、冲突回滚、动态可靠性、Judge 和停止协议已形成讨论稿，尚未修改运行代码
+更新日期：2026-09-06
+状态：HotpotQA 跨题经验优先，首版两层、文档层后置。用户已保存普通百炼配置并授权低成本小测试；首次真实连通检查已完成，固定 qwen3.7-flash-2026-07-15，API 1 次、输入 23/输出 5 tokens。尚未运行真实 HotpotQA 配对，没有正向效果结论。304 项测试通过；不购买 Token Plan 个人版用于实验。9 月 8 日 22:50（北京时间）仍自动跟进一次
 权威性：当前入口；旧路线 A 决策保留为历史记录，但不再代表当前主线
+
+## 2026-09-06 最新实施：单步真模型试跑与数据协议
+
+- 用户明确授权架构设计、编码、小开发题测试和 GitHub 同步。架构先记录在 `docs/architecture_v1.md`，当前实现使用独立实验执行器，不由旧 facade 决定研究方向。
+- 首版六个职责：数据隔离、本地检索、固定模型、候选经验、配对执行、离线评价。自动 gap、来源笔记提取、BASE/FRESH/REUSE 已接通，运行结果另行追加，不提前宣称效果。
+- 新权威数据协议为 `knowledge/datasets/2026-09-06_正式数据协议与阶段划分.md`，覆盖旧的 40/35/25 与 dev 500 pilot 建议：保留官方划分，train 内约 80/10/10 用于经验来源/选择器训练/校准；本轮不触碰官方 dev。比例由我们设计，不称来自某篇论文。
+- 只下载 Hotpot train 前 200 条完整记录：稳定散列划分得到 163/21/16，首轮来源 8＋校准 8 题在调用前冻结。它不是全量随机样本，尚未下载或实体化全部 90,447 条的划分。
+- 当前没有梯度训练；“训练”首先指从独立 train 题积累经验。以后选择器训练只能用 train 的独立角色。2Wiki 后续域内验证，MuSiQue 先冻结跨数据迁移，QASPER 文档层后置。
+- 仅用现有普通百炼固定快照执行低成本试跑：上限 96 请求/768 输出 tokens/估算 1 元，无重试；不为换平台新增采购。GLM 免费 Flash 可作开发备选，但需新账号密钥与另立模型实验，不混入本轮。
+- 来源 FRESH 正确且有新 gold 支持只晋升候选，不叫 trusted。目标阶段冻结源库，词汇相似度选 top-1 是弱基线，不是我们最终可信算法；gold 只用于离线反馈。DocumentSession、EMA、QPP、模型训练暂不激活。
+
+## 2026-09-06 最新：按量 API 连通与 Token Plan 购买边界
+
+- 详情：`knowledge/decisions/2026-09-06_TokenPlan与按量API_首次真实连通检查.md`。Token Plan 个人版只用于允许工具的交互式使用，不能用于我们的批量实验脚本；Lite/Standard/Pro 均非本项目实验采购建议。
+- 用户文件 `qwenAPI.md` 最初为空，后保存了普通北京百炼业务空间地址与一个按量 API Key。保留原 endpoint，文件加入 Git 忽略，不显示/提交密钥，不改为订阅或中转接口。
+- 已真实发送一次短 JSON 连通探针；请求/返回均为 `qwen3.7-flash-2026-07-15`，usage 为 23 输入/5 输出，未重试。记录 `runs/2026-09-06_qwen_flash_connectivity_v1/summary.json`。这是首次真实 API 调用，但不是 RAG 或改写结果；下文“API=0”属于此前状态。
+- 本次按官方北京短上下文价估算 0.0000086 元，不是已核对账单。关闭思考，最多 1 请求/64 输出 tokens。未购买产品、未下载数据、未跑研究评测。
+- 新增普通百炼预检查与本地句级 BM25，304 项测试通过。后者只是候选集诊断，不是 fullwiki；真实首检、gap、经验积累及完整配对尚未贯通。
+- 后续低成本质量实验使用固定快照；不因用户希望正向结果而筛选好题或丢弃负结果。Hotpot gold 自动评价优先，模型 Judge 作为辅助；对话助手不冒充固定 GPT API 裁判。
+
+## 2026-09-06 此前：双层起步、分层反馈与最小代码已实施
+
+- 用户本轮明确允许在讨论同时实现最小骨架，不再处于纯文档规划阶段。详细记录：`knowledge/decisions/2026-09-06_HotpotQA_双层起步与分层反馈_实施记录.md`；操作入口：`docs/minimal_experiment_quickstart.md`。
+- 用户考虑取消文档层，尚未确认永久删除。工程先不依赖 DocumentSession，只让单题状态/轨迹与跨题经验输入参与配对；保留文档层构思/旧接口，QASPER 可在以后检验真实文档内导航价值。
+- 采用证据层与答案层反馈分开记录：有新文本≠有新支持≠改善答案；答案正确也不等于当前动作有功。来源有效性与目标 REUSE 相对同状态 FRESH 的增量另分开。非 gold 反馈只能标代理，不能自动成为可信标签。
+- 前人并非只看相似度：ERM 已有检索/生成 OR 验证，GAM 判句子证据，RRM 已按适用条件/证据要求/失败模式选择及维护经验。RRM 还明确采用三层；Useful Memories v2 §6.2 已指出抽象会剥离适用前提。层数、条件字段及发现丢前提有害都不能归我们首创。
+- 仍探索两个相连问题：低成本地选择真正优于 FRESH 的经验；给真正带来证据/答案增量的操作记功与保留必要信息。必须有具体机制和实证，尚不宣称已具备独创算法或优于近邻。
+- 新 `experiments/paired_runner.py` 从外部首检快照执行 BASE/FRESH/REUSE，修复最多再检索一次；禁止 source=target、mock/real 混用、证据越界、超 top_k、覆盖旧结果；失败保留费用与审计链。
+- 新 `experiments/hotpot.py` 读取本地官方 JSON、gold 与题型/难度不进 RuntimeQuestion。分层评价实现句级 gold 支持与答案 EM/F1，`answer_supported=None`，不把引用存在当成文本蕴含；并非完整 Hotpot 官方评价替代品。
+- 新 `api_client.py` / `llm_adapters.py` 是待 live 验证的 HTTPS 与 query/reader 适配器。默认网络关闭、密钥从显式环境变量读、不碰 Codex 登录信息；禁止失败后 mock 回填。记录请求/响应、模型/版本、usage 与失败，已知密钥回显脱敏；未调用外部模型。
+- mock 为手写测试替身，不是费用估计器。演示中 REUSE 的成功是预设剧情，不能当算法结果。已运行 `runs/2026-09-06_single_repair_mock_v1/run.json`，明确 API=0；回放只重读记录不重新执行。
+- 本轮 256 项测试通过、新代码 Ruff 通过；使用已有 `.venv` Python 3.11.15，没有安装、下载全库/模型、训练或推送 Git。未实现真实首检/索引、自动 gap Judge、自动建卡、QPP 选择或完整修复循环。分支费用明确未含外部首检成本。
+- 本机实测约16GB RAM、RTX4060 Laptop 8GB显存。API-first无需现在申请GPU；后续实验室24GB显存/64GB RAM是8B原精度或14B量化的合理起点，具体估算见 `knowledge/experiments/2026-09-06_资源与API选型_核验.md`。
+- 真实试跑还需厂商/地区、固定模型与费用上限。不要在聊天中索取密钥。当前对话输出不等于 GrowRAG API 结果；GPT-5.5/5.6 的官方 API 文档也不等于账户已可调用。
+
+## 2026-09-06 用户已确认：HotpotQA 跨题经验优先
+
+- 用户对优先级问题的明确回复：“先跨题经验：HotpotQA 起步，文档层后置（推荐）”。此项由建议升级为已决定，后续不重复询问同一选择。
+- 第一阶段研究跨题查询修复经验，起步数据为 HotpotQA；三层架构保留，DocumentSession 不作为最小配对实验的前置条件。
+- 最小实验沿用同一首检快照、一次后续修复、FRESH/REUSE 配对和 BASE 参考；笔记写法与选择策略逐项比较，不同时上线多轮、EMA、自动合并或小模型训练。
+- QASPER 仍是文档层后续候选，不因本次选择而视为具体数据协议已全部批准。样本量、模型/设备和真实费用上限仍待运行前确认。
+- 本次确认只更新计划状态，没有启动真实模型、下载数据、安装依赖或推送 Git。
+
+## 2026-09-06 本轮答疑：先让比较对象能被理解、被检验
+
+- 最新完整记录：`knowledge/decisions/2026-09-06_表示实验_QPP与三层数据适配_答疑.md`。本轮依学术实验规划流程记录假设和验证边界，没有运行模型。
+- 用户不理解“表示实验”，以后先称“经验笔记写法对比”：同一源步骤写成具体改写例子/抽象规则/例子＋最少前提，固定当前题与证据比较。不是 embedding 训练，也不是把 S2G 当跨题卡片系统。
+- QPP 可加入。尚未生成的 query 没有该 query 的传统 QPP；先生成 FRESH/REUSE 再做检索前 QPP，是易解释的对照协议，须计两支生成费用。首检的检索后信号只能描述当前状态，不能充当未执行新 query 的检索后信号。
+- 更收紧的候选主张：保留经验中必要前提，能否在当前已知/缺失证据下改善相对 FRESH 的选择；必须胜过 QPP-only 与已有 ReFormeR/RRM 风格情境/条件匹配。条件字段、相对收益目标、三层组合本身不新。
+- 新近邻：Tian 等 RAG Utility/Answer Quality Prediction 已由 Springer 核准 ECIR 2026；Dado 等 Predicting the Benefit of Retrieval Augmentation 的 v3 作者报告 CIKM 2026，出版端本轮未独立确认。不能再将“预测相对增益”作为首次。
+- 重要更正：GAM-RAG 不仅同题反复记忆，Table 2 / 附 D 已有按 2Wiki 题型拆开来源/目标的 Different Query 实验。不能把测独立新题当作它没做过。旧数据总表相关表述已补正。
+- 数据建议：HotpotQA 先调通跨题单步修复，2Wiki 关系条件验证，MuSiQue 更困难迁移后置。三者不天然提供同文档连续多题，用户对 DocumentSession 的质疑成立。
+- 文档层建议单独用 QASPER（NAACL 2021）诊断：同论文多个问题，人工答案/证据；按文档划分、只从已读证据累计导航/别名/歧义，禁止后题 gold，文档结束冻结。需先审计现象频度；不能保证别名足够多或第二层一定有效。
+- 文档层首版只做有出处的别名/术语、章节位置、歧义避坑；局部 action 统计延后。对照无局部记忆、已读段落缓存与同预算静态文档地图，不能把缓存效应包装成经验学习。
+- 三层保留设计，但不要求首个实验全部上线；若第二层没有独立增益，不强行宣称三层必要。
+- 当前 `external/` 仍只有 README，并非某个上游 fork；`paired.py` 只整理输入分数，不执行配对。下一步是共享首检快照→真实 FRESH/REUSE 分支→隔离 gold 评价。建议成熟检索组件＋薄实验层，非从零写搜索引擎。
+- QPP-4-RAG 的 MIT LICENSE 已核；S2G 未核得 LICENSE，ReFormeR 仅核到 README MIT 声明，直接复制前再核。上游 oracle 命名也有歧义，应以实际使用真实结果或预测分数区分。
+- 上述答疑产生时新增方案属建议；同日后续用户已确认 HotpotQA 跨题优先，其余具体参数仍待定。未克隆上游、下载全库、安装依赖、付费实验或推送 Git。第一批先共享协议/假模型测试，再接单步真实调用与逐题报告；模型端点/硬件、真实预算运行前确认。
+
+## 2026-09-06 最新确认：两个方向共同推进规划
+
+- 用户已明确认可研究问题 1、2，不应在下一次复盘又要求从三个问题中只能选一个。少 gold 的谨慎增长仍作后续储备。
+- 最新入口：`knowledge/decisions/2026-09-06_经验选择与紧凑表示_联合研究方案.md` 和 `knowledge/experiments/2026-09-06_双方向最小实验与编码路线.md`。
+- 建议联合立意、实验分开：固定实际 source_step_id 比较具体查询对/抽象卡/实例＋最少前提；再固定表示比较选择器，最后交叉验证。联合主线与实施顺序是建议，尚未由用户选择。
+- 一份不可变来源记录、多种读取视图，不复制三套库。修复前状态必须由当时证据支持，不从成功后的文档回填；事后抽象前提标待验证。角色化 query-pair 只绑定当前题可支持的实体。
+- 对旧“长期卡默认不读取具体 q→q′”作范围修订：为表示研究允许受控比较具体视图；最终默认仍待实验。完整 CoT、历史答案、gold 与文档正文不进入默认在线经验。
+- 首个实验只在同一首检状态后再做一次修复，先不接完整多轮/在线 DocumentSession/EMA。保留成功来源优先、冻结 prompt、单 query episode、三层职责。
+- 选择目标是相对 FRESH 的实际增益，而非来源答对。无 gold 的线上只做预测，不预知目标结果；gold 和配对结果只在隔离开发/评价侧使用。
+- 两种预算口径分开：同改写/检索机会与同总成本上限。总成本下允许 FRESH 用省下的选择开销做预定的额外生成/自检。增加等次数多 FRESH 对照，避免 oracle 仅因多抽样取最大值占优；最佳标签需要稳定性审计。
+- 当前代码重点缺口：旧 facade 不执行 FRESH；默认候选是 Jaccard 而非 BM25；新卡/episode 尚未接通真实管线；配对 baseline 主要受限单轮 BASE；预算是声明而非分支实测。下一次实施优先协议/视图、同状态分支执行器、FRESH 对照报告、再做选择器。
+- 候选默认组合：联合立意且先表示实验、桥接实体/关系修复、质量优先。用户本轮要求给选择，尚未确认这三项。
+- 只补 EPR（NAACL 2022）与 CEIL（ICML 2023），后者延后选读。效用导向示例选择与去冗余已有工作，不能独立宣称创新。补充 RDF：`zotero/curated/GrowRAG_选择与表示_补充2篇_2026-09-06.rdf`，原 20 篇包不改。
+- 本轮是研究与编码方向规划，没有获得付费真实实验预算；没有修改 src/tests、安装依赖、运行模型或推送 Git。
+
+## 2026-09-05 必须先读的修正
+
+- RRM 已直接覆盖 OQR/FRESH、适用条件、query-only 经验与生命周期；ReFormeR 已覆盖成功 query pair 的模式抽取与当前情境选择。可插拔、三层、reliability/applicability 的概念分工都不是独立新贡献。
+- Hu 等 *When Continual Learning Moves to Memory* 已报告 baseline-success / baseline-fail 的 retention / new learning 和 harmful reuse。不能再把 correct→wrong 指标本身当新贡献。
+- LivingRAG（08-26 新预印本）在固定图 RAG 上增加经验，以 grounding/novelty 控制写入，是上轮之后新增直接近邻。
+- “安全”目前是待评估的质量退化控制目标，不是代码保证；现有 2 次观测、0.70 风险上界是 demo 默认值。逐卡严格统计门存在样本稀缺，应先评估全局/动作族校准，卡级记录作为特征。
+- 历史四日期批次共 5 RDF、106 条、86 篇：62 正式会议/论文集、1 TACL 期刊、1 作者确认 COLM camera-ready、4 workshop、18 仅确认预印本。ERM、GAM-RAG、潜空间版 ExpWeaver 的 ICML 2026 官方记录已确认。不能把 Findings/Short/Industry 直接等同低质量，也不能把 arXiv 链接等同未录用。
+- 建议首先比较相同检索前缀和预算下的 FRESH、具体历史 query-pair REUSE、抽象卡 REUSE；先看 oracle 是否有额外空间，再研究便宜选择器。保留 DocumentSession 设计，暂不让其在线控制成为首个实验前置条件。
+- 40%/35%/25% 是官方 train 内工程初值，不是论文标准比例。MuSiQue-Full 不可回答标签仅针对给定缺证据上下文，不能直接用于能搜回缺失证据的开放全库拒答评价。
+
+完整依据：`decisions/2026-09-05_重新评估_项目路线与贡献边界.md`；`literature/2026-09-05_可插拔经验系统与安全复用新颖性复核.md`。下文未修订的细节继续作为 08-24 架构候选，不代表全部应同时实现。
 
 ## 当前主问题
 
-> 在不修改基础 RAG 的条件下，能否把经过验证的单问题查询修复轨迹，以保留来源的方式晋升为长期经验，并通过历史可靠度、当前适用性和 BASE→REUSE 配对伤害来安全决定是否调用？
+> 保留基础检索器、索引与回答模型，在同一个证据缺口下，什么时候复用历史查询修复比不看历史的现场修复更有益？能否用执行前可见信息作出有效、低成本且少退化的选择？
 
 暂定简单标题：
 
-- 中文：检索增强生成中的跨任务查询修复可信复用
-- 英文：Safe Cross-Task Reuse of Query Repairs in RAG
+- 中文：RAG 中的查询修复经验选择性复用
+- 英文：Selective Reuse of Query Repairs for RAG
+
+以上为 09-05 新标题建议，尚未由用户敲定；得到实证前不在标题暗示安全保证。
 
 ## 已确认的架构
 
@@ -63,7 +150,7 @@
 9. `serving memory` 统一称“在线可用库”：只有 active cards 和精确版本匹配的文档层可影响当前 query；`cold archive` 统一称“审计档案库”：保存冻结 episode、失败、隔离/退役卡和旧版本，默认不进入在线 prompt。
 10. `forget/retire` 默认只从在线可用库移除，不物理删除原始记录；合并生成带 parent 的新版本。
 
-三层的一行定义：QueryEpisode 记录“这道题发生了什么”；DocumentSession 记录“在这一篇文档里怎样找”；ExperienceCard 记录“跨文档仍可能怎样修”。三层本身不是创新，Useful Memories 与 SegMem-RAG 已明显覆盖相邻思想。
+三层的一行定义：QueryEpisode 记录“这道题发生了什么”；DocumentSession 记录“在这一篇文档里怎样找”；ExperienceCard 记录“跨文档仍可能怎样修”。三层本身不是创新，Useful Memories 与 SegMem-RAG 已覆盖相邻思想，RRM 明确提出不同职责的三层。09-06 最小实施暂不激活文档层，以上继续作为保留设计而非首版必须实现的清单。
 
 ## 成功与晋升
 
@@ -80,11 +167,11 @@
 - `reliability` 回答“这张卡过去在独立题/文档上是否相对 BASE 反复有益、伤害率是否低”，是卡片级、慢更新历史统计；
 - `applicability` 回答“可靠的卡是否适合眼前的 q0、gap、文档版本与 retriever 能力”，是每题重算的瞬时匹配。
 
-选择顺序固定为：reliability 硬门 -> applicability 前置/禁用/能力约束 -> query/gap/action 结构匹配与 QPP 排序 -> 执行后的 evidence contract 验证。高适用性不能挽救低可靠经验，历史可靠也不能挽救当前不相关经验。
+08-24 候选四级流程为：reliability 硬门 -> applicability 约束 -> query/gap/action 与 QPP 排序 -> 执行后 evidence contract。09-05 复核后不再把这个顺序视为已确定最优方案：卡级小样本不能可靠估计低风险，首先对比历史特征、当前状态特征、条件门和联合选择；明确禁用条件可硬拒绝，其他分数的权重与门限在独立 calibration 上确定。未知不等于已证明不可靠。
 
-每张卡的 reliability 随**经验证的 paired 使用事件**动态更新。保存不可变 benefit/harm/neutral/contract 账本，并使用收益概率保守下界与伤害概率保守上界控制 serving；EMA 只表示近期趋势和漂移警报，不替代历史账本。REUSE 失约或引入冲突时，当前 episode 禁用该卡、回滚到 pre-REUSE checkpoint，并将事件追加到卡片可靠性账本；不能因一次失败立即物理删除。
+每张卡保留**经验证的 paired 使用事件**账本，EMA 只表示近期趋势和漂移警报。首轮主实验冻结经验与选择策略，动态更新另用无未来泄漏的在线协议。Gold 缺失时 contract/支持判断只能作为标明来源的 proxy，不能写成真实 benefit/harm。REUSE 失约时保留审计与可回退状态；冲突新证据可能更准确，不能仅因来源是 REUSE 就删除。回滚仍计入所有调用成本。
 
-RRM 已保存 applicability conditions、required evidence、query-adjustment patterns，并做衰减、合并和裁剪；这些字段与 top-k 淘汰不能归我们。GrowRAG 的候选增量是双轴显式分离、同题 paired harm 和执行后履约验证。
+RRM 已保存 applicability conditions、required evidence、query-adjustment patterns，并做衰减、合并和裁剪；这些字段与 top-k 淘汰不能归我们。GrowRAG 的候选增量必须落实为相对 FRESH / 现有经验选择的预测与决策收益，不能仅靠双轴术语、paired harm 或 contract 字段声称创新。
 
 ## 查询变换与 QPP
 
@@ -123,17 +210,17 @@ Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；
 - 长期卡只声明必要能力，例如 dense search 或 graph neighbor expansion；跨 retriever/corpus 是后续泛化实验，不要求首版同时解决所有变量。
 - EMA/Kalman-inspired gain 只作为后续 priority/recent reliability 更新，不证明当前 applicability，也不是主创新。
 
-## 当前最可守的中心贡献
+## 当前待验证的中心问题与候选贡献
 
-中心命题：**同题配对、伤害感知的查询修复安全迁移**，而不是“三层记忆 + QPP + actions”。
+中心问题：**何时值得复用过去的查询修复？** 不再将“配对伤害指标”或“安全架构”写成已成立贡献。
 
-1. BASE/REUSE/FRESH 在同题、同环境和同预算下配对，不能仅因 treatment 答对就给经验记功；
-2. 历史 reliability 与当前 applicability 明确分离，任一不合格都拒绝复用；
-3. 结构化 gap 与 evidence contract 让“预测适用”接受执行后核验；
-4. 显式统计并约束 `P(REUSE bad | BASE good)`，允许安全退回 FRESH 或普通 RAG；
-5. 不可变 episode、精确文档版本与版本化卡片为上述统计提供可审计来源。
+1. 先证明在同一 q + evidence + gap、相同预算下，历史经验相对无记忆 FRESH 确有额外收益空间；
+2. 再证明当前状态与历史迁移结果可以预测这个空间，而不只是检索到语义相似的卡；
+3. 在相近修复收益、经验调用率或总成本下，比最近邻、ReFormeR/RRM 风格选择减少退化；
+4. 对照具体 query pair 与抽象卡，不能预设抽象一定好；
+5. 独立题、去近重复与跨数据集评价成立后，再接入完整多轮和动态记忆。
 
-三层记忆、QPP、动作词表、衰减/top-k/merge/forget 和 sufficiency loop 都是支撑模块或基线，不能并列包装成多个“创新”。这仍可能被审稿人评价为 RRM + S2G + ReFormeR + Useful Memories 的组合，必须用 paired-benefit、reliability/applicability、harm gate、scope-aware memory 等消融回答。
+以上全部是可证伪研究假设，当前没有真实 QA 实验确认。三层、QPP、动作词表、衰减/top-k/merge/forget、sufficiency loop 是支撑模块。不能保证不存在相似工作，不使用“首次”表述。
 
 ## 已确认不能作为创新的内容
 
@@ -165,6 +252,9 @@ Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；
 - How Memory Management Impacts LLM Agents：经验跟随可能传播错误，支持用未来独立任务验证记忆质量。
 - HALT：expected hop claims 与累计证据覆盖停止；need coverage 已被直接覆盖，不能宣称为新贡献。
 - DMQR-RAG / SAGE：多种 query rewrite strategy 与自适应/学习选择，动作词表和策略路由不是中心创新。
+- When Continual Learning Moves to Memory：已成功题保留率与失败题新学会率、harmful reuse；correct→wrong 不是我们的新指标。
+- LivingRAG：Graph RAG 上的经验增强、grounding/novelty 写入；支持度不等于未来效用。
+- Useful Memories 08-29 v2：追加式与不可见旧摘要等新消融仍保留具体轨迹对照优势；仅版本化/禁止覆盖不保证消除抽象损坏。
 - Think Then Rewrite / ReFeed：先显式分析或利用失败反馈再改写，以及只保留成功改写轨迹，均已有直接近邻。
 - MaFeRw / AdaQR / RetPO / SELF-multi-RAG：多方面反馈、偏好训练与联合检索/改写控制，是以后训练 rewriter/controller 的主要对照。
 
@@ -176,7 +266,7 @@ Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；
 
 1. 小样本 TREC-RAG/QPP 资源：校验 query variants、retrieval metric 与 answer metric；
 2. HotpotQA fullwiki + 2WikiMultiHopQA：主跨题、跨文档 repair transfer 与 harmful reuse；
-3. MuSiQue：困难 gap、无进展停止和拒绝压力；
+3. MuSiQue-Ans：困难 gap 与多跳泛化；MuSiQue-Full 只在遵守其缺证据候选上下文设定时作拒答压力，不直接当开放全库不可回答 gold；
 4. BEIR/BRIGHT/TREC DL：query operator 和跨检索器外部有效性；
 5. RAGRouter-Bench：后期跨 Naive/Graph/Hybrid/Iterative BASE 验证，不是首个实现目标。
 
@@ -184,17 +274,28 @@ Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；
 
 系统需要带 gold 的 source/calibration 数据来产生 FRESH 轨迹并建立经验，但 v1 不要求梯度训练：空记忆时先走 BASE/FRESH；source split 产生 candidate cards；独立 calibration query/document 校准 reliability/applicability/Judge/停止；held-out test 冻结 memory。在线自进化只能作为另一个按时间顺序、无未来泄漏的 prequential 协议。以后训练小 controller 时，标签来自 train/dev 上实际执行 BASE/REUSE/FRESH 的 full-information oracle。
 
-## 最近工作顺序
+## 最近工作顺序（09-05 建议，待讨论）
 
-1. 等用户确认 2026-08-24 两份架构讨论稿；
-2. 将现有 DocumentSession v0 归组容器升级为严格文档级 Schema v1，并补 EvidenceState/两轴 QueryTransform 合同；
-3. 固定一个文本 BASE RAG，跑 BASE/FRESH paired trajectories；
-4. 冻结 state/gap 与 repair prompts；
-5. verified beneficial episode → candidate card；
-6. 接入 REUSE gate，完成三臂 oracle；
-7. 验证跨 query/document 的 benefit/harm/coverage/cost；
-8. 现象成立后训练小 controller；
-9. 最后换另一种 BASE 检验 sidecar 兼容。
+### 本日后续用户决定：先精读，再选中心切口
+
+- 用户要求将最值得逐句精读及最接近的论文整合为 Zotero RDF，先阅读几天；不能假定用户已读完之前的清单，也不能在阅读期间继续扩建系统。
+- 当前阅读入口：`zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf`。20 篇是旧推荐的精选整合，含 12 核心、5 直接近邻、3 配套，20 条独立导读子笔记及一条总览；不含 PDF、不直接写 Zotero 数据库。
+- 三个待选问题见 `knowledge/decisions/2026-09-05_阅读后待选择的三个研究切口.md`：①历史是否比同预算 FRESH 更值得选；②保留适用前提的最小经验表示；③少量 gold 校准下的谨慎准入。它们不是旧 A/B/C，也未被用户敲定为贡献。先做第 1 项的建议仍待讨论，不代表授权实验。
+- 用户已明确选择“三天后自动继续一次”。本对话一次性跟进已建立：2026-09-08 22:50，Asia/Shanghai；automation id 为 `growrag`。仅复核文献、结合新增读书笔记、更新候选路线与项目记忆；不改运行代码、不装依赖、不运行付费实验、不推送 Git，不替用户决定。不得重复建立自动化或解释为持续后台研究。
+- 发表核验、研究路线和数据协议仍以本日复核文件为准；精选导读优先于旧包未经修正的 Extra。引用数没有实时计量核验，不编造高引标签。
+
+### 阅读讨论结束后的候选实施顺序
+
+1. 读本轮近邻复核，确认中心问题与最小实验；不先继续扩展完整 Schema；
+2. 固定一个文本 BASE、一个 FRESH、同一个 Judge 和预算，实际采集配对轨迹；
+3. 从独立 source 建小型冻结经验库，保留具体 query pair 与抽象卡两种表示；
+4. 在训练/开发子集跑 FRESH 与多个 REUSE 候选，估计离线 oracle 空间；
+5. 对比便宜选择器及相似度/适用性/QPP 基线，独立校准；
+6. 留出评估 benefit/harm/coverage/cost，失败则改表示或缩小任务，不继续堆模块；
+7. 信号成立才接多轮、执行后核验、严格文档层和生命周期；
+8. 再考虑小 controller 与第二种 BASE。
+
+可用 HotpotQA 官方 train 内 4,000 题的预算切片：1,600 建库、1,400 影子迁移/未来训练、1,000 调参校准；官方 dev 另留 500 题作一次性 pilot 评价。40/35/25 是工程初值，不是论文给出的比例。更完整协议见同日数据集总表。
 
 ## 代码与仓库状态
 
@@ -215,6 +316,11 @@ Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；
 
 ## 当前详细讨论入口
 
+- `knowledge/decisions/2026-09-05_重新评估_项目路线与贡献边界.md`
+- `knowledge/literature/2026-09-05_可插拔经验系统与安全复用新颖性复核.md`
+- `knowledge/literature/2026-09-05_四批阅读包发表状态复核.md`
+- `knowledge/literature/2026-09-05_必读路线与RAG术语学习单.md`
+- `knowledge/datasets/2026-09-05_历史论文数据集总表与划分依据.md`
 - `knowledge/method/2026-08-24_证据充分性_三层记忆_QPP与双控制器_讨论稿.md`
 - `knowledge/method/2026-08-24_累计证据_FRESH停止_REUSE动态可靠性与Judge_讨论稿.md`
 - `knowledge/literature/2026-08-24_QueryTransformation与REUSE四级门控_精读导图.md`

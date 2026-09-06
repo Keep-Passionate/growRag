@@ -1,8 +1,16 @@
 # 当前导入包
 
-本目录保留当前精读包，并新增方案 B 的 adaptive/agentic routing 与安全经验迁移增量 RDF。新包可能与 08-14 / 08-19 包共享论文；导入后请按 DOI 或 arXiv ID 合并重复条目。
+本目录保留历史四日期批次精读包和后续增量。旧包可能共享论文；导入后请按 DOI 或 arXiv ID 合并重复条目。
 
-## 证据闭环、REUSE 与 Query Transformation（最新）
+## 09-05 重新评估（当前入口）
+
+- 新增 `GrowRAG_重新评估_两篇关键近邻_2026-09-05.rdf`，仅 2 条新论文、1 个集合；中文导读在 Zotero 的 Extra 字段，没有重复打包原 86 篇。
+- 两篇为 *When Continual Learning Moves to Memory* 与 *LivingRAG*；本轮均只核实为预印本，不冒称已同行评审。
+- 旧四批发表状态已逐篇重新核对：`knowledge/literature/2026-09-05_四批阅读包发表状态复核.md`。原 5 RDF 共 106 条、86 篇；加本增量后为 6 RDF、108 条、88 篇。后一个统计不应混入“四批”结果。
+- 当前阅读顺序统一见 `knowledge/literature/2026-09-05_必读路线与RAG术语学习单.md`。下方各批优先级是历史记录，不再各自构成一套同时必须完成的阅读清单。
+- 新 RDF 保留作者、日期、arXiv ID/DOI、状态与导读，未下载 PDF 附件，也未自动修改 Zotero 数据库。已有条目的最新发表信息请参考复核表，不因旧 Extra 中的标签忽略 ICML/ACL 正式记录。
+
+## 证据闭环、REUSE 与 Query Transformation（08-24 历史包）
 
 - `GrowRAG_证据闭环_REUSE与QueryTransformation_2026-08-24.rdf`：25 条论文、4 个集合；已排除与此前当前目录 RDF 的同名重复项。
 - 推荐先读：Sufficient Context → HALT → How Memory Management Impacts LLM Agents → AIR → Self-RAG（旧包回看）→ S2G-RAG（旧包回看）。

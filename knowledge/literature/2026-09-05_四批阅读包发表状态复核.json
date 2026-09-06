@@ -1,0 +1,1433 @@
+{
+  "audited_at": "2026-09-05",
+  "stats": {
+    "raw": 106,
+    "unique": 86,
+    "categories": {
+      "conference": 62,
+      "preprint_venue_unconfirmed": 18,
+      "journal": 1,
+      "accepted_author_report": 1,
+      "workshop": 4
+    },
+    "batches": [
+      {
+        "batch": "2026-08-14",
+        "raw": 38,
+        "unique": 38,
+        "new": 38
+      },
+      {
+        "batch": "2026-08-19",
+        "raw": 32,
+        "unique": 27,
+        "new": 12
+      },
+      {
+        "batch": "2026-08-22",
+        "raw": 11,
+        "unique": 11,
+        "new": 11
+      },
+      {
+        "batch": "2026-08-24",
+        "raw": 25,
+        "unique": 25,
+        "new": 25
+      }
+    ]
+  },
+  "records": [
+    {
+      "audit_id": 1,
+      "title": "C-3PO: Compact Plug-and-Play Proxy Optimization to Achieve Human-like Retrieval-Augmented Generation",
+      "doi": null,
+      "arxiv": "2502.06205",
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "conference",
+      "venue": "ICML 2025",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.mlr.press/v267/chen25an.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 2,
+      "title": "SPARKLE: A Structured and Plug-and-play Agentic Retrieval Policy for Adaptive RAG Models",
+      "doi": "10.18653/v1/2026.acl-long.1793",
+      "arxiv": null,
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2026 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.acl-long.1793/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 3,
+      "title": "SegMem-RAG: Adaptive Memory for Retrieval-Augmented Generation in Open-Ended Knowledge Environments",
+      "doi": "10.1609/aaai.v40i36.40320",
+      "arxiv": null,
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "conference",
+      "venue": "AAAI 2026 Technical Track",
+      "verification": "verified-official",
+      "source_url": "https://ojs.aaai.org/index.php/AAAI/article/view/40320",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 4,
+      "title": "Remember Me, Refine Me: A Dynamic Procedural Memory Framework for Experience-Driven Agent Evolution",
+      "doi": "10.18653/v1/2026.findings-acl.829",
+      "arxiv": null,
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of ACL 2026",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.findings-acl.829/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 5,
+      "title": "An Agent-Oriented Pluggable Experience-RAG Skill for Experience-Driven Retrieval Strategy Orchestration",
+      "doi": null,
+      "arxiv": "2605.03989",
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2605.03989",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 6,
+      "title": "ERSkill: Evolving for Skill-Guided Adaptive Memory Retrieval",
+      "doi": null,
+      "arxiv": "2608.12720",
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2608.12720",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 7,
+      "title": "Skill-RAG: Failure-State-Aware Retrieval Augmentation via Hidden-State Probing and Skill Routing",
+      "doi": null,
+      "arxiv": "2604.15771",
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2604.15771",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 8,
+      "title": "Reasoning with Memory: Adaptive Information Management for Retrieval-Augmented Generation",
+      "doi": "10.18653/v1/2026.findings-acl.1834",
+      "arxiv": null,
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of ACL 2026",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.findings-acl.1834/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 9,
+      "title": "Precise Zero-Shot Dense Retrieval without Relevance Labels",
+      "doi": "10.18653/v1/2023.acl-long.99",
+      "arxiv": "2212.10496",
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2023 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2023.acl-long.99/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 10,
+      "title": "Query2doc: Query Expansion with Large Language Models",
+      "doi": "10.18653/v1/2023.emnlp-main.585",
+      "arxiv": "2303.07678",
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "conference",
+      "venue": "EMNLP 2023",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2023.emnlp-main.585/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 11,
+      "title": "RAGRouter-Bench: A Dataset and Benchmark for Adaptive RAG Routing",
+      "doi": null,
+      "arxiv": "2602.00296",
+      "first_batch": "2026-08-22",
+      "batches": [
+        "2026-08-22"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2602.00296",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 12,
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "doi": null,
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "NeurIPS 2020",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.neurips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 13,
+      "title": "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection",
+      "doi": null,
+      "arxiv": "2310.11511",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "ICLR 2024",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/25f7be9694d7b32d5cc670927b8091e1-Abstract-Conference.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 14,
+      "title": "Query Rewriting in Retrieval-Augmented Large Language Models",
+      "doi": "10.18653/v1/2023.emnlp-main.322",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "EMNLP 2023",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2023.emnlp-main.322/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 15,
+      "title": "Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity",
+      "doi": "10.18653/v1/2024.naacl-long.389",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "NAACL 2024 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2024.naacl-long.389/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 16,
+      "title": "RaFe: Ranking Feedback Improves Query Rewriting for RAG",
+      "doi": "10.18653/v1/2024.findings-emnlp.49",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of EMNLP 2024",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2024.findings-emnlp.49/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 17,
+      "title": "ReflectiveRAG: Rethinking Adaptivity in Retrieval-Augmented Generation",
+      "doi": "10.18653/v1/2026.eacl-industry.27",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "EACL 2026 Industry",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.eacl-industry.27/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 18,
+      "title": "S2G-RAG: Structured Sufficiency and Gap Judging for Iterative Retrieval-Augmented QA",
+      "doi": "10.18653/v1/2026.acl-long.1185",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2026 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.acl-long.1185/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 19,
+      "title": "Memory-R1: Enhancing Large Language Model Agents to Manage and Utilize Memories via Reinforcement Learning",
+      "doi": "10.18653/v1/2026.acl-long.583",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2026 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.acl-long.583/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 20,
+      "title": "Towards Adaptive Memory-Based Optimization for Enhanced Retrieval-Augmented Generation",
+      "doi": "10.18653/v1/2025.findings-acl.418",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of ACL 2025",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2025.findings-acl.418/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 21,
+      "title": "Reflective RAG: Self-Evaluation Driven Strategy Optimization in Agentic Retrieval-Augmented Generation",
+      "doi": "10.18653/v1/2026.findings-acl.648",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of ACL 2026",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.findings-acl.648/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 22,
+      "title": "RAG without Forgetting: Continual Query-Infused Key Memory",
+      "doi": null,
+      "arxiv": "2602.05152",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "ICML 2026 Poster",
+      "verification": "verified-official",
+      "source_url": "https://icml.cc/virtual/2026/poster/63200",
+      "additional_source": null,
+      "note": "arXiv 未写 ICML 不代表未录用；ICML 官网页已核对标题、作者和 Poster。"
+    },
+    {
+      "audit_id": 23,
+      "title": "GAM-RAG: Gain-Adaptive Memory for Evolving Retrieval in Retrieval-Augmented Generation",
+      "doi": null,
+      "arxiv": "2603.01783",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "ICML 2026 Poster",
+      "verification": "verified-official",
+      "source_url": "https://icml.cc/virtual/2026/poster/65843",
+      "additional_source": null,
+      "note": "arXiv 未写 ICML 不代表未录用；ICML 官网页已核对标题、作者和 Poster。"
+    },
+    {
+      "audit_id": 24,
+      "title": "RRM: Experience-Driven Reflective Retrieval Memory for Long-Horizon Multimodal Reasoning",
+      "doi": null,
+      "arxiv": "2607.28156",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2607.28156",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 25,
+      "title": "Useful Memories Become Faulty When Continuously Updated by LLMs",
+      "doi": null,
+      "arxiv": "2605.12978",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表；2026-08-29 v2",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2605.12978",
+      "additional_source": null,
+      "note": "v2 更新日期晚于上轮阅读包；建议与 v1 对照。"
+    },
+    {
+      "audit_id": 26,
+      "title": "Corrective Retrieval Augmented Generation",
+      "doi": null,
+      "arxiv": "2401.15884",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2401.15884",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 27,
+      "title": "Rethinking Experience Utilization in Self-Evolving Language Model Agents",
+      "doi": null,
+      "arxiv": "2605.07164",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2605.07164",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 28,
+      "title": "Memory as a Controlled Process: Learned Adaptive Memory Management for LLM Agents",
+      "doi": null,
+      "arxiv": "2607.13591",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2607.13591",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 29,
+      "title": "ReFormeR: Learning and Applying Explicit Query Reformulation Patterns",
+      "doi": "10.1007/978-3-032-21300-6_30",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "ECIR 2026／Springer LNCS 论文集",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1007/978-3-032-21300-6_30",
+      "additional_source": "https://api.crossref.org/works/10.1007/978-3-032-21300-6_30",
+      "note": "正式论文出版已核验；旧笔记 Short／Best Short Paper 细项本次尚未由官方 programme 复核，不能把它当质量分数。"
+    },
+    {
+      "audit_id": 30,
+      "title": "Matches Made in Heaven: Toolkit and Large-Scale Datasets for Supervised Query Reformulation",
+      "doi": "10.1145/3459637.3482009",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "CIKM 2021",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1145/3459637.3482009",
+      "additional_source": "https://api.crossref.org/works/10.1145/3459637.3482009",
+      "note": "正式论文出版已核验；旧 Resource Track 细项本次未独立核验。"
+    },
+    {
+      "audit_id": 31,
+      "title": "Interleaving Retrieval with Chain-of-Thought Reasoning for Knowledge-Intensive Multi-Step Questions",
+      "doi": "10.18653/v1/2023.acl-long.557",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2023 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2023.acl-long.557/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 32,
+      "title": "RAG-Critic: Leveraging Automated Critic-Guided Agentic Workflow for Retrieval Augmented Generation",
+      "doi": "10.18653/v1/2025.acl-long.179",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2025 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2025.acl-long.179/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 33,
+      "title": "HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering",
+      "doi": "10.18653/v1/D18-1259",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "EMNLP 2018",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/D18-1259/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 34,
+      "title": "Constructing A Multi-hop QA Dataset for Comprehensive Evaluation of Reasoning Steps",
+      "doi": "10.18653/v1/2020.coling-main.580",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "COLING 2020",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2020.coling-main.580/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 35,
+      "title": "MuSiQue: Multihop Questions via Single-hop Question Composition",
+      "doi": "10.1162/tacl_a_00475",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "journal",
+      "venue": "TACL 2022，Vol. 10，539–554",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2022.tacl-1.31/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 36,
+      "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+      "doi": "10.52202/075280-0377",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "NeurIPS 2023",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/1b44b878bb782e6954cd888628510e90-Abstract-Conference.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 37,
+      "title": "ExpeL: LLM Agents Are Experiential Learners",
+      "doi": "10.1609/aaai.v38i17.29936",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "AAAI 2024",
+      "verification": "verified-official",
+      "source_url": "https://ojs.aaai.org/index.php/AAAI/article/view/29936",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 38,
+      "title": "Agent Workflow Memory",
+      "doi": null,
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "ICML 2025",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.mlr.press/v267/wang25bx.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 39,
+      "title": "Dynamic Cheatsheet: Test-Time Learning with Adaptive Memory",
+      "doi": "10.18653/v1/2026.eacl-long.333",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "EACL 2026 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.eacl-long.333/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 40,
+      "title": "ReasoningBank: Scaling Agent Self-Evolving with Reasoning Memory",
+      "doi": null,
+      "arxiv": "2509.25140",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "ICLR 2026 Poster",
+      "verification": "verified-official",
+      "source_url": "https://iclr.cc/virtual/2026/poster/10007887",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 41,
+      "title": "Retrieval-of-Thought: Efficient Reasoning via Reusing Thoughts",
+      "doi": null,
+      "arxiv": "2509.21743",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "ICLR 2026 Poster",
+      "verification": "verified-official",
+      "source_url": "https://iclr.cc/virtual/2026/poster/10009010",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 42,
+      "title": "Procedural Knowledge at Scale Improves Reasoning",
+      "doi": null,
+      "arxiv": "2604.01348",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "accepted_author_report",
+      "venue": "COLM 2026 Camera Ready（作者确认）",
+      "verification": "verified-author-acceptance",
+      "source_url": "https://arxiv.org/abs/2604.01348",
+      "additional_source": null,
+      "note": "作者 arXiv v3 明示 COLM 2026 Camera Ready；本次未取得官方 proceedings，故与官方录用核验分开计数。"
+    },
+    {
+      "audit_id": 43,
+      "title": "RAG over Thinking Traces Can Improve Reasoning Tasks",
+      "doi": null,
+      "arxiv": "2605.03344",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2605.03344",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 44,
+      "title": "SelectiveNet: A Deep Neural Network with an Integrated Reject Option",
+      "doi": null,
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "ICML 2019",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.mlr.press/v97/geifman19a.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 45,
+      "title": "Counterfactual Harm",
+      "doi": "10.52202/068431-2634",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "NeurIPS 2022",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/ebcf1bff7b2fe6dcc3fbe666faaa50f1-Abstract-Conference.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 46,
+      "title": "Causal Episodic Memory for Feedback-Driven Agent Repair",
+      "doi": null,
+      "arxiv": "2608.05906",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14",
+        "2026-08-19"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2608.05906",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 47,
+      "title": "From Faulty Memories to Corrected Actions: Dependency-Guided Rollback Repair for Memory-Augmented Agents",
+      "doi": null,
+      "arxiv": "2608.10502",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2608.10502",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 48,
+      "title": "A Contextual-Bandit Approach to Personalized News Article Recommendation",
+      "doi": "10.1145/1772690.1772758",
+      "arxiv": null,
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "WWW 2010",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1145/1772690.1772758",
+      "additional_source": "https://api.crossref.org/works/10.1145/1772690.1772758",
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 49,
+      "title": "Doubly Robust Policy Evaluation and Learning",
+      "doi": null,
+      "arxiv": "1103.4601",
+      "first_batch": "2026-08-14",
+      "batches": [
+        "2026-08-14"
+      ],
+      "publication_category": "conference",
+      "venue": "ICML 2011",
+      "verification": "verified-official",
+      "source_url": "https://icml.cc/2011/papers/554_icmlpaper.pdf",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 50,
+      "title": "Can QPP Choose the Right Query Variant? Evaluating Query Variant Selection for RAG Pipelines",
+      "doi": "10.1145/3805712.3808571",
+      "arxiv": null,
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "SIGIR 2026",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1145/3805712.3808571",
+      "additional_source": "https://api.crossref.org/works/10.1145/3805712.3808571",
+      "note": "正式 SIGIR 2026 出版已核验；旧 Reproducibility Track 细项本次未独立核验。"
+    },
+    {
+      "audit_id": 51,
+      "title": "A Reproducibility Study of LLM-Based Query Reformulation",
+      "doi": "10.1145/3805712.3808560",
+      "arxiv": null,
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "SIGIR 2026 Reproducibility",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1145/3805712.3808560",
+      "additional_source": "https://api.crossref.org/works/10.1145/3805712.3808560",
+      "note": "正式 SIGIR 2026 出版及作者项目站 Reproducibility 说明已核验。"
+    },
+    {
+      "audit_id": 52,
+      "title": "Not All Queries Need Rewriting: When Prompt-Only LLM Refinement Helps and Hurts Dense Retrieval",
+      "doi": null,
+      "arxiv": "2603.13301",
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "workshop",
+      "venue": "ICLR 2026 CAO Workshop",
+      "verification": "verified-official",
+      "source_url": "https://openreview.net/pdf?id=tmpVrh40jX",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 53,
+      "title": "RQ-RAG: Learning to Refine Queries for Retrieval Augmented Generation",
+      "doi": null,
+      "arxiv": "2404.00610",
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "COLM 2024",
+      "verification": "verified-official",
+      "source_url": "https://openreview.net/attachment?id=tzE7VqsaJ4&name=pdf",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 54,
+      "title": "Query Performance Prediction: From Ad-hoc to Conversational Search",
+      "doi": "10.1145/3539618.3591919",
+      "arxiv": null,
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "SIGIR 2023",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1145/3539618.3591919",
+      "additional_source": "https://api.crossref.org/works/10.1145/3539618.3591919",
+      "note": "正式 SIGIR 2023 出版已核验；旧 Reproducibility Track 细项本次未独立核验。"
+    },
+    {
+      "audit_id": 55,
+      "title": "Q-PRM: Adaptive Query Rewriting for Retrieval-Augmented Generation via Step-level Process Supervision",
+      "doi": "10.18653/v1/2025.findings-emnlp.817",
+      "arxiv": null,
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of EMNLP 2025",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2025.findings-emnlp.817/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 56,
+      "title": "Masking or Mitigating? Deconstructing the Impact of Query Rewriting on Retriever Biases in RAG",
+      "doi": "10.18653/v1/2026.findings-acl.414",
+      "arxiv": null,
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of ACL 2026",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.findings-acl.414/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 57,
+      "title": "Controlling Counterfactual Harm in Decision Support Systems Based on Prediction Sets",
+      "doi": "10.52202/079017-4113",
+      "arxiv": null,
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "NeurIPS 2024",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/e9e3e5bdb017bbc887271c6f6de5353f-Abstract-Conference.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 58,
+      "title": "QueryGym: A Toolkit for Reproducible LLM-Based Query Reformulation",
+      "doi": "10.1145/3774905.3793135",
+      "arxiv": null,
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "The Web Conference 2026 Companion／Demo",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1145/3774905.3793135",
+      "additional_source": "https://api.crossref.org/works/10.1145/3774905.3793135",
+      "note": "勿与 IBM 同名 QueryGym 数据库交互论文混淆。"
+    },
+    {
+      "audit_id": 59,
+      "title": "Beyond Retrieval: Query-Conditioned Reuse of Long-Horizon Agent Trajectories",
+      "doi": null,
+      "arxiv": "2608.12847",
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2608.12847",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 60,
+      "title": "CoEvo-Mem: Co-Evolving Retrieval Policy and Memory Bank for LLM Agents",
+      "doi": null,
+      "arxiv": "2608.01739",
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2608.01739",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 61,
+      "title": "ExpWeaver: LLM Agents Learn from Experience via Latent RAG",
+      "doi": null,
+      "arxiv": "2606.01041",
+      "first_batch": "2026-08-19",
+      "batches": [
+        "2026-08-19"
+      ],
+      "publication_category": "conference",
+      "venue": "ICML 2026 Poster",
+      "verification": "verified-official",
+      "source_url": "https://icml.cc/virtual/2026/poster/66387",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 62,
+      "title": "Sufficient Context: A New Lens on Retrieval Augmented Generation Systems",
+      "doi": null,
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "ICLR 2025",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 63,
+      "title": "Unsupervised Alignment-based Iterative Evidence Retrieval for Multi-hop Question Answering",
+      "doi": "10.18653/v1/2020.acl-main.414",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2020",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2020.acl-main.414/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 64,
+      "title": "Do RAG Systems Cover What Matters? Evaluating and Optimizing Responses with Sub-Question Coverage",
+      "doi": "10.18653/v1/2025.naacl-long.301",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "NAACL 2025 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2025.naacl-long.301/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 65,
+      "title": "Knowing You Don't Know: Learning When to Continue Search in Multi-round RAG through Self-Practicing",
+      "doi": "10.1145/3726302.3730018",
+      "arxiv": "2505.02811",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "SIGIR 2025",
+      "verification": "verified-publisher-deposit",
+      "source_url": "https://doi.org/10.1145/3726302.3730018",
+      "additional_source": "https://api.crossref.org/works/10.1145/3726302.3730018",
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 66,
+      "title": "HALT: Verification-Aware Stopping for Retrieval-Augmented Search Agents",
+      "doi": null,
+      "arxiv": "2608.02009",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2608.02009",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 67,
+      "title": "How Memory Management Impacts LLM Agents: An Empirical Study of Experience-Following Behavior",
+      "doi": "10.18653/v1/2026.acl-long.27",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2026 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.acl-long.27/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 68,
+      "title": "TASR: Training-Free Adaptive Stopping for Iterative Retrieval",
+      "doi": null,
+      "arxiv": "2606.13814",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "workshop",
+      "venue": "KDD 2026 Agent4IR Workshop",
+      "verification": "verified-author-acceptance",
+      "source_url": "https://arxiv.org/abs/2606.13814",
+      "additional_source": null,
+      "note": "作者 arXiv comments 明示 workshop accepted；不等于 KDD 主会。"
+    },
+    {
+      "audit_id": 69,
+      "title": "Stop-RAG: Value-Based Retrieval Control for Iterative RAG",
+      "doi": null,
+      "arxiv": "2510.14337",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "workshop",
+      "venue": "NeurIPS 2025 MTI-LLM Workshop",
+      "verification": "verified-author-acceptance",
+      "source_url": "https://arxiv.org/abs/2510.14337",
+      "additional_source": null,
+      "note": "作者 arXiv comments 明示 NeurIPS MTI-LLM Workshop；不等于 NeurIPS 主会。"
+    },
+    {
+      "audit_id": 70,
+      "title": "When Should Multi-Round RAG Stop? Structured Stopping Judgments and Retrieval Reduction in Search-R1",
+      "doi": null,
+      "arxiv": "2608.13237",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2608.13237",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 71,
+      "title": "EfficientRAG: Efficient Retriever for Multi-Hop Question Answering",
+      "doi": "10.18653/v1/2024.emnlp-main.199",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "EMNLP 2024",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2024.emnlp-main.199/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 72,
+      "title": "Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy",
+      "doi": "10.18653/v1/2023.findings-emnlp.620",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of EMNLP 2023",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2023.findings-emnlp.620/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 73,
+      "title": "Take a Step Back: Evoking Reasoning via Abstraction in Large Language Models",
+      "doi": null,
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "ICLR 2024",
+      "verification": "verified-official",
+      "source_url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/592da1445a51e54a3987958b5831948f-Abstract-Conference.html",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 74,
+      "title": "Exploring the Best Practices of Query Expansion with Large Language Models",
+      "doi": "10.18653/v1/2024.findings-emnlp.103",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of EMNLP 2024",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2024.findings-emnlp.103/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 75,
+      "title": "MMLF: Multi-query Multi-passage Late Fusion Retrieval",
+      "doi": "10.18653/v1/2025.findings-naacl.367",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of NAACL 2025",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2025.findings-naacl.367/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 76,
+      "title": "Optimizing Question Semantic Space for Dynamic Retrieval-Augmented Multi-hop Question Answering",
+      "doi": "10.18653/v1/2025.acl-long.871",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "ACL 2025 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2025.acl-long.871/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 77,
+      "title": "Query Decomposition for RAG: Balancing Exploration-Exploitation",
+      "doi": "10.18653/v1/2026.eacl-long.322",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "EACL 2026 Long",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.eacl-long.322/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 78,
+      "title": "PROGRAM: Programmatic Retrieval Optimization with Generative Reasoning and Augmented Multi-queries",
+      "doi": "10.18653/v1/2026.findings-acl.1090",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of ACL 2026",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2026.findings-acl.1090/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 79,
+      "title": "DMQR-RAG: Diverse Multi-Query Rewriting for RAG",
+      "doi": null,
+      "arxiv": "2411.13154",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2411.13154",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 80,
+      "title": "SAGE: Strategy-Adaptive Generation Engine for Query Rewriting",
+      "doi": null,
+      "arxiv": "2506.19783",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "preprint_venue_unconfirmed",
+      "venue": "arXiv；未确认正式发表",
+      "verification": "verified-preprint-metadata",
+      "source_url": "https://arxiv.org/abs/2506.19783",
+      "additional_source": null,
+      "note": "论文公开版本已核验；本次没有确认正式接收信息。不能据此推断未投稿、被拒或质量低。"
+    },
+    {
+      "audit_id": 81,
+      "title": "Think Then Rewrite: Reasoning Enhanced Query Rewriting for Domain Specific Retrieval",
+      "doi": "10.1609/aaai.v40i18.38527",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "AAAI 2026 Technical Track",
+      "verification": "verified-official",
+      "source_url": "https://ojs.aaai.org/index.php/AAAI/article/view/38527",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 82,
+      "title": "ReFeed: Retrieval Feedback-Guided Dataset Construction for Style-Aware Query Rewriting",
+      "doi": null,
+      "arxiv": "2603.01417",
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "workshop",
+      "venue": "AAAI 2026 New Frontiers in IR Workshop",
+      "verification": "verified-author-acceptance",
+      "source_url": "https://arxiv.org/abs/2603.01417",
+      "additional_source": null,
+      "note": "作者 arXiv comments 明示 workshop accepted；不等于 AAAI 主会。"
+    },
+    {
+      "audit_id": 83,
+      "title": "MaFeRw: Query Rewriting with Multi-Aspect Feedbacks for Retrieval-Augmented Large Language Models",
+      "doi": "10.1609/aaai.v39i24.34732",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "AAAI 2025 Technical Track",
+      "verification": "verified-official",
+      "source_url": "https://ojs.aaai.org/index.php/AAAI/article/view/34732",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 84,
+      "title": "Adaptive Query Rewriting: Aligning Rewriters through Marginal Probability of Conversational Answers",
+      "doi": "10.18653/v1/2024.emnlp-main.746",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "EMNLP 2024",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2024.emnlp-main.746/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 85,
+      "title": "Ask Optimal Questions: Aligning Large Language Models with Retriever’s Preference in Conversation",
+      "doi": "10.18653/v1/2025.findings-naacl.328",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of NAACL 2025",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2025.findings-naacl.328/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    },
+    {
+      "audit_id": 86,
+      "title": "Learning When to Retrieve, What to Rewrite, and How to Respond in Conversational QA",
+      "doi": "10.18653/v1/2024.findings-emnlp.622",
+      "arxiv": null,
+      "first_batch": "2026-08-24",
+      "batches": [
+        "2026-08-24"
+      ],
+      "publication_category": "conference",
+      "venue": "Findings of EMNLP 2024",
+      "verification": "verified-official",
+      "source_url": "https://aclanthology.org/2024.findings-emnlp.622/",
+      "additional_source": null,
+      "note": "标题、出处与官方记录相符。"
+    }
+  ]
+}

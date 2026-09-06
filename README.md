@@ -1,14 +1,26 @@
 # GrowRAG
 
-GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在不修改基础 RAG 的前提下，建立一个可绕过、可追溯、可拒绝历史经验的轻量修复闭环：
+GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在保留基础检索器、索引与回答模型的前提下，建立一个可绕过、可追溯、可拒绝历史经验的轻量修复闭环；控制层会改变查询与调用流程，并非整个执行架构完全不变：
 
 > 原查询先运行一次基础 RAG；若证据不足，则显式说明缺口，在可信历史修复与本题现场修复之间选择；没有进展或预算耗尽时停止并承认证据不足。
 
 它可以发展成轻量级单控制器 Agentic RAG，但“Agentic、adaptive、插件式或 query rewriting”都不是项目的既定创新。第一阶段要测量单 Query repair episode 是否真的能跨题迁移，以及能否控制 `BASE 原本正确、REUSE 反而错误` 的非对称伤害。
 
+2026-09-05 重新评估：RRM、ReFormeR 和新近论文已覆盖许多拟议机制，correct→wrong 诊断也已有先行工作。建议先研究“同一证据缺口下，何时历史查询修复优于无历史 FRESH”，用小型冻结记忆与配对实验验证后再扩展完整系统；这是待讨论建议，不是已取得结果。当前代码仍是脚手架，本轮只更新研究材料。
+
+2026-09-06 最新：已接通 train 数据划分、本地句级 BM25、固定 prompt 的 gap、真实模型三分支、来源经验提取与冻结、逐题分层反馈和费用审计。**这是小型研究执行器，不是已证明有效的可信控制器。** 首轮冻结 8 个来源题＋8 个开发题；实时结果另行记录，原 mock 演示不能当研究结果。文档层后置，Token Plan 个人版不用于实验脚本。
+
+先读 [最小骨架使用说明](docs/minimal_experiment_quickstart.md)，完整讨论见 [双层起步与分层反馈实施记录](knowledge/decisions/2026-09-06_HotpotQA_双层起步与分层反馈_实施记录.md)。
+
 ## 当前入口
 
+- [最小研究架构 v1](docs/architecture_v1.md)
+- [正式数据协议与阶段划分](knowledge/datasets/2026-09-06_正式数据协议与阶段划分.md)
 - [项目当前记忆](knowledge/CURRENT_PROJECT_MEMORY.md)
+- [09-05 重新规划与贡献边界](knowledge/decisions/2026-09-05_重新评估_项目路线与贡献边界.md)
+- [四批 86 篇发表状态复核](knowledge/literature/2026-09-05_四批阅读包发表状态复核.md)
+- [历史论文数据集与划分依据](knowledge/datasets/2026-09-05_历史论文数据集总表与划分依据.md)
+- [12 篇必读路线与 RAG 术语](knowledge/literature/2026-09-05_必读路线与RAG术语学习单.md)
 - [方案 B 已确认决策](knowledge/decisions/2026-08-22_方案B可信自适应查询修复_已确认.md)
 - [单 Query Episode 与长期经验卡 Schema v0](knowledge/method/2026-08-22_单Query_Episode与长期经验卡_Schema_v0.md)
 - [Adaptive / Agentic 路由与新颖性边界](knowledge/literature/2026-08-22_方案B自适应路由与新颖性边界.md)
@@ -30,7 +42,7 @@ GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在�
 
 ## 代码状态
 
-`src/growrag` 是 2026-08-19 新建的最小研究脚手架。旧版 GrowRAG 已退出活动工程并归档。当前代码保留可靠历史复用子模块，并新增方案 B 的不可变 QueryEpisode、配对验证和长期 ExperienceCard 数据合同；尚未接入真实检索器和 LLM，因此还不是可运行的完整 Agentic 修复闭环。
+`src/growrag` 是 2026-08-19 新建的研究脚手架。旧版 GrowRAG 已退出活动工程并归档。原有代码保留可靠历史复用子模块及 QueryEpisode/ExperienceCard 数据合同。09-06 新增 `experiments/` 单步配对执行器：首检、gap、BASE/FRESH/REUSE、源经验积累与冻结、隔离 gold 评价均有独立职责。它仍不是多轮 Agentic 修复闭环。
 
 当前第一批实现包括：
 
@@ -52,7 +64,7 @@ GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在�
 - 可重算 benefit/neutral/correct-to-wrong harm 的经验卡注册边界；
 - 可配置但显式记录的 ACTIVE 门槛，默认拒绝 proxy-only 和单次成功。
 
-旧 v1 facade 的输出仍是“下游应执行的原查询或复用查询”；新的 episode/card 合同目前尚未接到旧 facade，避免两套生命周期被误当成已经整合。下一阶段是接入一个冻结的 BM25 BASE、结构化 state judge 与 FRESH fallback，再让旧 reliability/applicability gate 通过新版 Registry 消费卡片。EMA、RL/bandit 仍不属于首版。
+旧 v1 facade 的输出仍是“下游应执行的原查询或复用查询”；新实验执行器使用独立的候选笔记，不强行串联旧 gate。源题一次成功只得到 candidate，实验性 REUSE 不等于通过生产 ACTIVE 门槛。下一阶段比较词汇相似度、前提匹配与 QPP，然后再研究选择器训练；EMA、RL/bandit 暂不启用。
 
 ## 本地启动
 

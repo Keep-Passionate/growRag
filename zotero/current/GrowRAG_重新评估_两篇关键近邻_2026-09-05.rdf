@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:z="http://www.zotero.org/namespaces/export#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:bib="http://purl.org/net/biblio#"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+
+  <z:Collection rdf:about="#growrag_sep05_boundaries">
+    <dc:title>GrowRAG 09-05｜两篇关键近邻与贡献修正</dc:title>
+    <dcterms:hasPart rdf:resource="#hu_memory_reuse_2026"/>
+    <dcterms:hasPart rdf:resource="#livingrag_2026"/>
+  </z:Collection>
+
+  <bib:Article rdf:about="#hu_memory_reuse_2026">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>When Continual Learning Moves to Memory: A Study of Experience Reuse in LLM Agents</dc:title>
+    <dc:date>2026-04-29</dc:date>
+    <z:url>https://arxiv.org/abs/2604.27003</z:url>
+    <dc:identifier>DOI: 10.48550/arXiv.2604.27003</dc:identifier>
+    <dc:identifier>arXiv: 2604.27003</dc:identifier>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Qisheng</foaf:givenName><foaf:surname>Hu</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Quanyu</foaf:givenName><foaf:surname>Long</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Wenya</foaf:givenName><foaf:surname>Wang</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:extra>核验日期：2026-09-05。当前仅确认 arXiv v1，作者注明 Working in progress；未核实正式会刊接收，不推断是否投稿。arXiv DOI 不代表期刊发表。阅读顺序：本轮核心路线第 12 篇；创新边界核查时应提前读 §2.3。
+做了什么：在冻结底座的 LLM Agent 经验复用设置中，按 no-memory baseline 的成功/失败划分样本，报告 Retention Rate 和 New Learning，并分析 harmful / ineffective reuse；讨论经验表示与跨任务迁移。实验对象包含 ALFWorld、BabyAI。
+对 GrowRAG 的直接修正：相同比较对象及二值标签下，我们所谓 conditional breakage 等于 1−Retention Rate；“原本答对、复用后答错”不是新指标或新现象。不能再把它作为独立中心贡献。
+与我们的研究差别：该文主要是 Agent 经验迁移研究，不是固定文本 RAG 中同一证据缺口下 FRESH 与 REUSE 的查询选择实现。这个设定差异不自动构成方法创新，需要证明廉价选择器在同预算、相近收益/覆盖率下带来增益。
+精读问题：baseline 如何定义？成功/失败子集的分母是什么？训练经验与测试任务如何隔离？抽象经验何时不如具体经验？先读 §2.3、跨任务结果和相关附录。
+引用数：本轮未统一核验，不标高被引。
+原文：https://arxiv.org/html/2604.27003v1</z:extra>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-09-05</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>P0-核心近邻</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-正式接收未确认</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>有害复用-已有指标</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+
+  <bib:Article rdf:about="#livingrag_2026">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>LivingRAG: Augmenting Graph RAG with Experience</dc:title>
+    <dc:date>2026-08-26</dc:date>
+    <z:url>https://arxiv.org/abs/2608.25960</z:url>
+    <dc:identifier>DOI: 10.48550/arXiv.2608.25960</dc:identifier>
+    <dc:identifier>arXiv: 2608.25960</dc:identifier>
+    <bib:authors><rdf:Seq>
+      <rdf:li><foaf:Person><foaf:givenName>Yuzhuo</foaf:givenName><foaf:surname>Cui</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Zongye</foaf:givenName><foaf:surname>Zhang</foaf:surname></foaf:Person></rdf:li>
+      <rdf:li><foaf:Person><foaf:givenName>Qingjie</foaf:givenName><foaf:surname>Liu</foaf:surname></foaf:Person></rdf:li>
+    </rdf:Seq></bib:authors>
+    <z:extra>核验日期：2026-09-05。当前仅确认 arXiv v1，未核实正式会刊接收；首发晚于 08-24 阅读包，因此是新增近邻。arXiv DOI 不代表期刊发表。阅读优先级：完成基础路线后的最新 RAG 边界核查，不取代 ReFormeR/RRM。
+做了什么：在 LinearRAG 的语料图与图排序过程上加入经验库，保存 query 表示、稀疏图激活、紧凑推理 scaffold 与验证信息；经验影响图实体初始激活及回答上下文。以 grounding 和 novelty 筛选写入，grounding 使用 NLI 判断当前证据支持；在线积累不依赖当前 gold answer 写入。
+必须读清：原文明示 grounding 不是未来任务效用。因此 supported、值得存、值得在新问题上用，是不同判断。不能把该方法误述为 gold correctness-gated。
+与 GrowRAG 的边界：两者都有固定底座上的经验增强，但该文不是纯 query 字符串旁路，会影响图激活与生成 scaffold。我们若只影响 query，需要实验证明优势；更窄的接口本身不保证性能更好。
+精读问题：哪些底座部分固定、哪些输入改变？经验写入与读取各依据什么？旧经验怎样影响当前事实检索？在线顺序评估与冻结库独立迁移测试有何区别？全文的否定性判断仅限本轮查阅，不能说它完全不研究可靠性。
+引用数：本轮未统一核验，不标高被引。
+原文：https://arxiv.org/html/2608.25960v1</z:extra>
+    <z:tags><rdf:Bag>
+      <rdf:li><z:AutomaticTag><rdf:value>GrowRAG-09-05</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>P1-最新RAG近邻</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>预印本-正式接收未确认</rdf:value></z:AutomaticTag></rdf:li>
+      <rdf:li><z:AutomaticTag><rdf:value>GraphRAG-经验记忆</rdf:value></z:AutomaticTag></rdf:li>
+    </rdf:Bag></z:tags>
+  </bib:Article>
+</rdf:RDF>

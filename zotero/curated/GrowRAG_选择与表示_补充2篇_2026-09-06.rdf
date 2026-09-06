@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:bib="http://purl.org/net/biblio#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/" xmlns:z="http://www.zotero.org/namespaces/export#">
+  <rdf:Description rdf:about="urn:growrag:reading:20260906:epr">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Learning To Retrieve Prompts for In-Context Learning</dc:title>
+    <dc:date>2022</dc:date>
+    <bib:authors><rdf:Seq><rdf:li><foaf:Person><foaf:givenName>Ohad</foaf:givenName><foaf:surname>Rubin</foaf:surname></foaf:Person></rdf:li><rdf:li><foaf:Person><foaf:givenName>Jonathan</foaf:givenName><foaf:surname>Herzig</foaf:surname></foaf:Person></rdf:li><rdf:li><foaf:Person><foaf:givenName>Jonathan</foaf:givenName><foaf:surname>Berant</foaf:surname></foaf:Person></rdf:li></rdf:Seq></bib:authors>
+    <dc:identifier><dcterms:URI><rdf:value>https://aclanthology.org/2022.naacl-main.191/</rdf:value></dcterms:URI></dc:identifier>
+    <dcterms:isPartOf><bib:Journal><dc:title>Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies</dc:title><dc:identifier>DOI 10.18653/v1/2022.naacl-main.191</dc:identifier></bib:Journal></dcterms:isPartOf>
+    <bib:pages>2655-2671</bib:pages>
+    <dc:description>NAACL 2022 主会，正式审稿论文；NLP 主要会议。 先补读：接在 ReFormeR/QPP 后。 核验日期 2026-09-06；见中文导读子笔记。</dc:description>
+    <dc:subject>GrowRAG/选择与表示补读2026-09-06</dc:subject>
+    <dc:subject>阅读/优先补读</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260906:epr:guide"/>
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260906:epr:guide"><rdf:value>&lt;div&gt;&lt;h2&gt;1｜EPR｜经验选择补读&lt;/h2&gt;&lt;p&gt;整理与发表核验日期：2026-09-06。AI 辅助导读，不代表用户已读。&lt;/p&gt;&lt;h3&gt;阅读位置与发表&lt;/h3&gt;&lt;p&gt;先补读：接在 ReFormeR/QPP 后。 NAACL 2022 主会，正式审稿论文；NLP 主要会议。&lt;/p&gt;&lt;h3&gt;学什么、边界与自检&lt;/h3&gt;&lt;p&gt;用候选示例加入后 gold 输出的条件概率形成正负例，再训练推理时不使用 gold 的检索器。这说明按有用性选例并非新思想。条件概率是代理，不等于实际答对率；训练仍需标注。重点读方法与训练反馈：候选从哪里来、什么是正负例、线上为什么不需要答案。我们可借其监督检索思路，但需要测的是当前检索失败状态下 REUSE 相对 FRESH 的实际增益，不是直接复制语义解析示例检索。自检：训练时能看答案，为什么测试选择时不能看？冻结 LLM 是否代表整套方法没训练？本篇不是具体/抽象卡压缩的答案。&lt;/p&gt;&lt;h3&gt;与当前项目的关系&lt;/h3&gt;&lt;p&gt;当前两个认可的研究问题是：什么时候历史比同状态 FRESH 更有用；保留什么信息有利于该判断。两个问题均待实验验证。不能单独声称首次效用学习、首次冻结底座、首次经验选择。&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://aclanthology.org/2022.naacl-main.191/&quot;&gt;正式论文与元数据入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;无实时引用次数核验，不给虚构高引数字；不含 PDF 附件。此前 20 篇精选包及其阅读顺序不变。&lt;/p&gt;&lt;/div&gt;</rdf:value></bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260906:ceil">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Compositional Exemplars for In-context Learning</dc:title>
+    <dc:date>2023</dc:date>
+    <bib:authors><rdf:Seq><rdf:li><foaf:Person><foaf:givenName>Jiacheng</foaf:givenName><foaf:surname>Ye</foaf:surname></foaf:Person></rdf:li><rdf:li><foaf:Person><foaf:givenName>Zhiyong</foaf:givenName><foaf:surname>Wu</foaf:surname></foaf:Person></rdf:li><rdf:li><foaf:Person><foaf:givenName>Jiangtao</foaf:givenName><foaf:surname>Feng</foaf:surname></foaf:Person></rdf:li><rdf:li><foaf:Person><foaf:givenName>Tao</foaf:givenName><foaf:surname>Yu</foaf:surname></foaf:Person></rdf:li><rdf:li><foaf:Person><foaf:givenName>Lingpeng</foaf:givenName><foaf:surname>Kong</foaf:surname></foaf:Person></rdf:li></rdf:Seq></bib:authors>
+    <dc:identifier><dcterms:URI><rdf:value>https://proceedings.mlr.press/v202/ye23c.html</rdf:value></dcterms:URI></dc:identifier>
+    <dcterms:isPartOf><bib:Journal><dc:title>Proceedings of the 40th International Conference on Machine Learning</dc:title><prism:volume>202</prism:volume></bib:Journal></dcterms:isPartOf>
+    <bib:pages>39818-39833</bib:pages>
+    <dc:description>ICML 2023，机器学习主要顶级会议正式论文。 后置选读：开始考虑一次多条经验时再读。 核验日期 2026-09-06；见中文导读子笔记。</dc:description>
+    <dc:subject>GrowRAG/选择与表示补读2026-09-06</dc:subject>
+    <dc:subject>阅读/后置选读</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260906:ceil:guide"/>
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260906:ceil:guide"><rdf:value>&lt;div&gt;&lt;h2&gt;2｜CEIL｜经验选择补读&lt;/h2&gt;&lt;p&gt;整理与发表核验日期：2026-09-06。AI 辅助导读，不代表用户已读。&lt;/p&gt;&lt;h3&gt;阅读位置与发表&lt;/h3&gt;&lt;p&gt;后置选读：开始考虑一次多条经验时再读。 ICML 2023，机器学习主要顶级会议正式论文。&lt;/p&gt;&lt;h3&gt;学什么、边界与自检&lt;/h3&gt;&lt;p&gt;把上下文示例作为一个集合选择，用 DPP 建模相关性及示例间作用，通过模型偏好学习。通俗地说，几条各自不错的例子凑在一起仍可能冗余，应该考虑互补。它不是本项目的必要模块，也不等于已经解决查询修复经验的适用性。先理解整组效用、冗余、互补，不要求现在实现 DPP 或搬入整套训练工程。自检：top-k 单条评分最高是否就是最好的组合？为什么我们首轮固定只读取一条经验？本篇支持多经验扩展的思想，不替代 Useful Memories 对具体/抽象表示的直接研究。&lt;/p&gt;&lt;h3&gt;与当前项目的关系&lt;/h3&gt;&lt;p&gt;当前两个认可的研究问题是：什么时候历史比同状态 FRESH 更有用；保留什么信息有利于该判断。两个问题均待实验验证。不能单独声称首次效用学习、首次冻结底座、首次经验选择。&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://proceedings.mlr.press/v202/ye23c.html&quot;&gt;正式论文与元数据入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;无实时引用次数核验，不给虚构高引数字；不含 PDF 附件。此前 20 篇精选包及其阅读顺序不变。&lt;/p&gt;&lt;/div&gt;</rdf:value></bib:Memo>
+<z:Collection rdf:about="urn:growrag:reading:20260906:collection"><dc:title>GrowRAG｜选择与表示补读 2 篇｜2026-09-06</dc:title><dcterms:hasPart rdf:resource="urn:growrag:reading:20260906:epr"/><dcterms:hasPart rdf:resource="urn:growrag:reading:20260906:ceil"/></z:Collection>
+</rdf:RDF>
+

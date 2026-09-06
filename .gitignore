@@ -17,6 +17,9 @@ venv/
 .env
 .env.*
 !.env.example
+# Local user-provided API credentials; never commit these files.
+/qwenAPI.md
+/configs/*.local.toml
 
 # Data, models, runs and upstream repositories
 data/**
@@ -56,4 +59,3 @@ mlruns/
 # OS
 .DS_Store
 Thumbs.db
-
