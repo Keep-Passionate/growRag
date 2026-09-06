@@ -161,7 +161,7 @@ class CardValidation:
     harm_count: int
     direct_correct_trials: int
     mean_gain: float
-    last_validated_at: str
+    last_validated_at: str | None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -169,9 +169,11 @@ class CardValidation:
             "verification_tier",
             VerificationTier(self.verification_tier),
         )
-        _require_text_fields(
-            last_validated_at=self.last_validated_at,
-        )
+        if self.last_validated_at is None:
+            if self.matched_trials:
+                raise ValueError("validated trials require last_validated_at")
+        else:
+            _require_text_fields(last_validated_at=self.last_validated_at)
         object.__setattr__(
             self,
             "verification_event_ids",
@@ -269,6 +271,48 @@ class ExperienceCard:
     @property
     def versioned_id(self) -> str:
         return f"{self.card_id}@{self.version}"
+
+    def revised_candidate(
+        self,
+        *,
+        version: str,
+        created_at: str,
+        activation: CardActivation,
+        repair: RepairSpecification,
+        expected_cost: float,
+    ) -> ExperienceCard:
+        """A changed/compressed representation does not inherit validation.
+
+        Caller must explicitly supply the revised scope and cost estimate. The
+        old card and its evidence remain intact; this child is unvalidated, not
+        automatically worse or better. This function is NOT a compressor.
+        """
+        if version == self.version:
+            raise ValueError("revision requires a new version")
+        return ExperienceCard(
+            card_id=self.card_id,
+            version=version,
+            lifecycle_state=CardLifecycle.CANDIDATE,
+            created_at=created_at,
+            activation=activation,
+            repair=repair,
+            provenance=self.provenance,
+            validation=CardValidation(
+                VerificationTier.PROXY,
+                (),
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.0,
+                None,
+            ),
+            serving=CardServing(expected_cost=expected_cost),
+            activation_policy=self.activation_policy,
+            parent_versioned_ids=(self.versioned_id,),
+            schema_version=self.schema_version,
+        )
 
     def activation_policy_failures(self) -> tuple[str, ...]:
         """Explain why the card is not yet trusted under its recorded policy."""

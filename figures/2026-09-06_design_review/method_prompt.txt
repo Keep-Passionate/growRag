@@ -1,0 +1,37 @@
+Use case: infographic-diagram. Create ONE clear scientific METHOD diagram for GrowRAG, matching a white, flat, pale-blue/teal/amber academic architecture figure. Landscape 16:10, large readable English text, thin precise connectors, Arial-like font. No decorative icons, robots, gradients, 3D, charts, invented measurements or performance claims. This is a conceptual design under review, NOT an implemented or proven method.
+
+Main title: "Partial reuse, grounded in current evidence"
+Subtitle clearly visible: "Proposed method — implementation and novelty pending"
+Three well-separated numbered panels. Dominant point: a useful historical procedure need not be accepted or rejected as a whole; current evidence determines which of its steps may execute.
+
+TOP LEFT panel (a), about 35% width: "One historical procedure". A compact vertical chain with 3 rounded boxes:
+"1  Work → author"
+"2  Author → university"
+"3  University → founding year"
+Downward dependency arrows between boxes. Note under the chain: "Keep operators and dependencies. Re-obtain all target values."
+A thin gray source tag "ExperienceCard". Do NOT write any historical proper names or answers into this card; generic operators only.
+
+TOP RIGHT panel (b), about 60% width: "Check each step against the current state".
+At the top, a clear inset example headed "ILLUSTRATIVE EXAMPLE — fictional, not an experiment".
+Question: "When was the university attended by the author of Silver River founded?"
+Current evidence e1: "Mira Chen wrote Silver River."
+Gap: "university ?   founding year ?"
+Below, an aligned three-row table with headings "Step", "Current binding", "Decision":
+"1" | "author = Mira Chen [e1]" | "SKIP: already supported" (muted gray)
+"2" | "author = Mira Chen [e1]" | "REUSE: ready" (teal)
+"3" | "university = unknown" | "WAIT: missing input" (amber)
+Use a connector from panel (a) to this decision table. The steps and current bindings must stay aligned.
+From ONLY the teal row, route an arrow to a query box: "q1: Mira Chen university attended".
+Then an arrow to "Same retriever R", then an arrow to "New current evidence E1". Do not show an invented returned answer or a fake successful result.
+Below these nodes a small amber dashed note: "Unknown premise: verify with FRESH. Conflict: verify or decline. Count both against the budget."
+No arrow from the waiting row to any executed query. Any future update must be drawn as a labeled thin dashed conceptual connector "Recheck after evidence update", not as a claim that multi-round execution already exists.
+
+BOTTOM FULL-WIDTH panel (c), about 25% height: "Offline test: did history add value beyond FRESH?".
+Start with one small shared-state box "Same q0, E0, candidate memory, model and retrieval budget". Split into two equal and independent branches "FRESH: no history" and "PARTIAL REUSE: grounded steps". Merge only into "Separate feedback" with three clearly separated small labels: "Needed evidence recovered" | "Answer correctness / harmful flips" | "Calls and tokens".
+Under this strip: "Gold is used only in offline evaluation; not in the online decision. No test-time memory updates."
+Do not imply running both branches is required for deployment; this lower strip is an OFFLINE experiment.
+
+Footer, two concise lines:
+"Stop: sufficient support | no useful evidence gain | repeated query | budget exhausted"
+"Incomplete evidence at stop → abstain or report limits. Current pilot: at most one repair per branch."
+Use amber dashed borders for the proposed method mechanism and a legend "Dashed amber: proposed". Keep the illustrative example visually separate from real-data feedback. This figure must not claim novelty for preconditions, rebinding, or counterfactual comparison alone. Readability and accurate arrows matter more than decoration.

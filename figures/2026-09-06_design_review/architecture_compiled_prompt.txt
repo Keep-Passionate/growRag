@@ -1,0 +1,27 @@
+Create a publication-quality system architecture figure for a computer science or engineering paper. Focus on the full module hierarchy, data flow, interfaces, and the role of each functional block.
+
+Clearly show inputs, preprocessing, model or algorithm components, memory or retrieval stores, controllers, hardware accelerators, communication links, and outputs where relevant. Use arrows and short annotations to explain how data, signals, or control messages move through the system. Make the main path explicit and keep side branches visually secondary.
+
+Use a clean white background, balanced panel spacing, concise professional typography, and a colorblind-friendly semantic palette. Blue should emphasize the proposed architecture or core path, green can mark optimized or validated outputs, red can mark bottlenecks, fallback branches, or failure analysis, and non-focal infrastructure should stay neutral gray. Avoid decorative AI-art effects and keep every label legible.
+
+Output at journal-ready resolution with modular blocks suitable for later editing.
+
+Technical Background:
+Use case: infographic-diagram. Create ONE polished research-paper SYSTEM ARCHITECTURE diagram for GrowRAG, not a poster and not a chart. Wide landscape canvas, 16:10 aspect ratio, pure white, restrained pale blue/teal/amber, charcoal text, crisp Arial-like sans-serif, modular flat rounded rectangles, consistent thin arrows, generous spacing. Precise English labels only. No illustrations of robots, brains, people, 3D, glow, gradients, decorative logos, invented numbers, or performance claims.
+
+Dominant message: "Reuse search procedures, not historical answers." Small subtitle: "Design review v1 — routing remains proposed".
+Use TWO clearly separated horizontal lanes:
+(a) OFFLINE: TRAIN ONLY (upper ~30%).
+Left-to-right: "Training questions" -> "QueryEpisode" [small: "query • gap • action • evidence"] -> "Source validation" [small: "answer + new supporting evidence"] -> "ExperienceCard" [small: "operator • conditions • provenance"] -> "Frozen memory".
+Place a small isolated "Train gold" node feeding ONLY Source validation. There must be no arrow from Train gold into the online lane. All offline nodes are implemented solid outlines. Draw a labeled, deliberate boundary between lanes: "Freeze before evaluation". Frozen memory has ONE downward arrow into the online Candidate retrieval node, labeled "procedures only".
+
+(b) ONLINE: UNSEEN QUESTION (lower ~60%).
+Create a clear primary flow: "Original question q0" -> "Base retrieval R" -> "Current state" [small: "q0 + evidence E0 + gap"] -> a large pale-blue container "GrowRAG query repair layer".
+Inside the repair layer, show "Candidate retrieval" (solid) above "Evidence-aware selection" (AMBER dashed outline, small badge "PROPOSED"). State flows to selection, candidate retrieval feeds selection.
+Selection has exactly THREE clearly labeled outgoing choices: "BASE / no rewrite" along an upper bypass to Reader, "FRESH / no memory" to a small query-rewrite node, and "REUSE / selected procedure" to another query-rewrite node. The two rewrite choices merge into "Next query q1", then into "Additional retrieval R" outside the repair layer, then into "Current evidence E0 ∪ E1", then into "Reader" and finally "Answer / abstain". BASE bypass carries E0 straight to the SAME Reader, avoiding additional retrieval. Both retrieval boxes use the same R notation. Reader always answers q0; show a slim q0 input or annotate Reader "answer q0 from current evidence".
+A small optional "Support check" box between Reader and output must use AMBER dashed outline and "PROPOSED" badge. Do not draw an arrow from memory directly to Reader.
+Use solid blue/teal outlines for the implemented source-building, retrieval, rewrite, record, and reader modules. Only future Evidence-aware selection and Support check have amber dashed borders. Outline semantics refer to modules, not whether data arrows are real.
+Below online lane, add a compact "QueryEpisode audit" box [small: "queries • evidence • citations • cost • stop reason"] with a faint connector from the repair path. Explicit note "Evaluation episodes do not update frozen memory".
+Footer legend with three short notes: "Solid: implemented components" / "Dashed amber: proposed policy/checks" / "Pilot: paired branches; ≤1 repair per branch".
+Separate small gray footer tag, NOT an active connected module: "DocumentSession: deferred". Do NOT add a multi-round loop, do not suggest sufficient-judge guarantees truth, and do not include scores.
+Overall composition should be publication-ready-looking yet openly labeled as a design draft. Prioritize clean, unambiguous routing and readable text over dense decoration.

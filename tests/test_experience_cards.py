@@ -103,6 +103,46 @@ def test_active_card_keeps_recomputable_paired_statistics() -> None:
         card.version = "v2"  # type: ignore[misc]
 
 
+def test_revised_card_is_new_unvalidated_candidate_and_preserves_parent() -> None:
+    parent = _card()
+    revised_scope = replace(parent.activation, preconditions=("current entity unambiguous",))
+    child = parent.revised_candidate(
+        version="v2",
+        created_at="2026-09-06T12:00:00+08:00",
+        activation=revised_scope,
+        repair=replace(parent.repair, slot_template="Shorter rule"),
+        expected_cost=0.5,
+    )
+    assert child.lifecycle_state is CardLifecycle.CANDIDATE
+    assert child.validation.matched_trials == 0
+    assert child.validation.last_validated_at is None
+    assert child.validation.conditional_harm_rate is None
+    assert child.parent_versioned_ids == (parent.versioned_id,)
+    assert child.activation == revised_scope
+    assert child.serving.use_count == 0
+    assert parent.validation.matched_trials == 2
+    assert parent.lifecycle_state is CardLifecycle.ACTIVE
+    with pytest.raises(ValueError, match="ACTIVE"):
+        replace(child, lifecycle_state=CardLifecycle.ACTIVE)
+
+
+def test_revision_cannot_silently_replace_same_card_version() -> None:
+    parent = _card()
+    with pytest.raises(ValueError, match="new version"):
+        parent.revised_candidate(
+            version=parent.version,
+            created_at=parent.created_at,
+            activation=parent.activation,
+            repair=parent.repair,
+            expected_cost=1.0,
+        )
+
+
+def test_observed_validation_cannot_claim_unknown_validation_time() -> None:
+    with pytest.raises(ValueError, match="require last_validated_at"):
+        _validation(last_validated_at=None)
+
+
 def test_card_validation_counts_and_event_refs_must_form_a_complete_partition() -> None:
     with pytest.raises(ValueError, match="must equal matched_trials"):
         _validation(matched_trials=3)

@@ -1,0 +1,22 @@
+digraph GrowRAG {
+  graph [rankdir=LR, bgcolor="white", pad="0.3", nodesep="0.35", ranksep="0.55", fontname="Microsoft YaHei", fontsize=18, labelloc=t, label="GrowRAG 最小代码架构：前置查询层 + RAG 外部循环"];
+  node [shape=box, style="rounded,filled", fillcolor="#F1F6FD", color="#2464A0", fontname="Microsoft YaHei", fontsize=13, margin="0.17,0.12", penwidth=1.3];
+  edge [fontname="Microsoft YaHei", fontsize=11, color="#446078", arrowsize=0.7];
+  q [label="原始问题 q₀"];
+  control [label="outer_loop.py\n控制与停止规则\nBASE / FRESH / REUSE"];
+  action [label="query_actions.py\n统一改写接口\n语义改写 / 扩写"];
+  rag [label="RagBackend 接口\n独立 RAG\n原问题 + 检索查询", fillcolor="#F2F2F2", color="#60656C"];
+  check [label="外部反馈接口\n回答 + 本轮证据\n充分 / 不足 / 未知"];
+  end [label="停止与审计结果\n停止 ≠ 已验证正确", fillcolor="#EAF4EE", color="#347357"];
+  mem [label="可选经验\n形式 / 目的 / 条件\n压缩后产生新版本", style="rounded,dashed", fillcolor="white", color="#AE812C", width=2.6];
+  qpp [label="preflight_qpp.py\n检索前预测\n独立训练，暂不门控", style="rounded,dashed", fillcolor="white", color="#AE812C", width=2.6];
+  q -> control;
+  control -> rag [label="BASE：q₀ 不变"];
+  control -> action [label="改变查询"];
+  action -> rag [label="q₀ 保留，q₁ 用于检索"];
+  rag -> check [label="结果"];
+  check -> end [label="充分 / 预算 / 无进展"];
+  check -> control [label="允许继续：反馈回流", color="#2464A0", constraint=false];
+  mem -> action [style=dashed, label="REUSE 才传入"];
+  qpp -> control [style=dashed, label="待验证后接入", color="#AE812C"];
+}

@@ -16,6 +16,9 @@ dependencies = []
 growrag = "growrag.cli:main"
 
 [project.optional-dependencies]
+qpp = [
+  "scikit-learn>=1.5,<2",
+]
 experiments = [
   "numpy>=1.26,<3",
   "pandas>=2.2,<3",
