@@ -1,10 +1,14 @@
 # GitHub 设置说明
 
-远端仓库已经由项目负责人创建并核实为空：
+远端仓库已经由项目负责人创建，现已包含代码与研究笔记：
 
 `https://github.com/Keep-Passionate/growRag.git`
 
-本地 `origin` 已指向该地址。2026-08-22 已通过现有 Git 凭据完成首次推送，远端 `main` 正在跟踪本地 `main`。GitHub 连接器安装请求未获界面确认，但不再阻塞当前仓库同步。
+本地 `origin` 已指向该地址。2026-08-22 完成首次推送；2026-09-06 通过现有 Git 凭据将新代码推送到 `codex/hotpot-pilot-v1`，本地该分支跟踪远端同名分支，没有自动合并 `main`。无需额外连接器即可完成这次版本控制，也没有安装插件或导出凭据。
+
+实际运行代码提交为 `3d58c39`；随后 `09d3a22` 修复干净检出的手写 CLI 样例漏提交。第一次 CI 的失败是真实缺文件，不是模型实验失败；已用干净 Git 文件导出复现并精准放行该公共样例。数据、运行日志和密钥仍保持忽略。
+
+`09d3a22` 的 [GitHub CI](https://github.com/Keep-Passionate/growRag/actions/runs/34012633506) 已核实成功，覆盖 Python 3.11/3.12。
 
 仓库内已经提供 `.github/workflows/ci.yml`；连接并推送远端后会自动在 Python 3.11/3.12 上运行测试、代码检查和 CLI 冒烟测试。
 
@@ -20,14 +24,14 @@
 后续同步使用：
 
 ```powershell
-git push -u origin main
+git push -u origin codex/hotpot-pilot-v1
 ```
 
 如以后安装 GitHub CLI，也可以：
 
 ```powershell
 gh auth login
-git push -u origin main
+git push -u origin codex/hotpot-pilot-v1
 ```
 
 不要 force push。后续推送前先正常 fetch/pull，避免覆盖用户从网页或其他机器提交的内容。

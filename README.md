@@ -8,7 +8,9 @@ GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在�
 
 2026-09-05 重新评估：RRM、ReFormeR 和新近论文已覆盖许多拟议机制，correct→wrong 诊断也已有先行工作。建议先研究“同一证据缺口下，何时历史查询修复优于无历史 FRESH”，用小型冻结记忆与配对实验验证后再扩展完整系统；这是待讨论建议，不是已取得结果。当前代码仍是脚手架，本轮只更新研究材料。
 
-2026-09-06 最新：已接通 train 数据划分、本地句级 BM25、固定 prompt 的 gap、真实模型三分支、来源经验提取与冻结、逐题分层反馈和费用审计。**这是小型研究执行器，不是已证明有效的可信控制器。** 首轮冻结 8 个来源题＋8 个开发题；实时结果另行记录，原 mock 演示不能当研究结果。文档层后置，Token Plan 个人版不用于实验脚本。
+2026-09-06 最新：已接通 train 数据划分、本地句级 BM25、固定 prompt 的 gap、真实模型三分支、来源经验提取与冻结、逐题分层反馈和费用审计。**这是小型研究执行器，不是已证明有效的可信控制器。** 首轮冻结 8 个来源题＋8 个开发题；真实结果如下，原 mock 演示不能当研究结果。文档层后置，Token Plan 个人版不用于实验脚本。
+
+真实试跑已完成：78 次 API，估算 0.0148676 元；8 道目标题 BASE 答对 3 题、FRESH 与 REUSE 均答对 6 题，**没有观察到记忆优于 FRESH**。生成 2 条候选经验；逐题发现了引用和答案不一致等问题。详见 [真实结果与下一步](knowledge/experiments/2026-09-06_首轮真实Hotpot试跑_结果与下一步.md)。本地 336 项测试通过，代码在 [开发分支](https://github.com/Keep-Passionate/growRag/tree/codex/hotpot-pilot-v1)，未自动合并 main。
 
 先读 [最小骨架使用说明](docs/minimal_experiment_quickstart.md)，完整讨论见 [双层起步与分层反馈实施记录](knowledge/decisions/2026-09-06_HotpotQA_双层起步与分层反馈_实施记录.md)。
 
@@ -127,4 +129,4 @@ python -m ruff format --check src tests scripts
 
 - `data/`、`runs/` 和 `external/` 的大文件不提交 Git。
 - `archive/` 只跟踪说明文件，不提交旧代码、PDF 或历史运行产物。
-- GitHub 远端仓库已创建并完成首次推送，本地 `main` 正在跟踪 `origin/main`。见 [GITHUB_SETUP.md](GITHUB_SETUP.md)。
+- GitHub 已同步 `codex/hotpot-pilot-v1` 开发分支，保留 `main` 不自动合并。只提交代码、手写示例、知识笔记和脱敏汇总。见 [GITHUB_SETUP.md](GITHUB_SETUP.md)。
