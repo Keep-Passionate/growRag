@@ -11,6 +11,9 @@
 
 Verification: 695 local tests pass (62 added), lint and format checks pass;
 offline probes leave the original result/library hashes and 145 API audit files unchanged.
+Clean-export tests (695) and CLI checks also pass. Feature commit `6c5628a` is
+pushed and the remote SHA verified; main is untouched. Remote CI remains unverified
+while GitHub API queries are rate-limited; no CI-passed release tag is claimed.
 
 ## 0.4.1 — 2026-09-07
 

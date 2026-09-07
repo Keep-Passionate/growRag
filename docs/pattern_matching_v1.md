@@ -68,3 +68,5 @@
 QPP门控、小模型训练、在线可靠度/EMA、多轮修复和文档层继续后置。旧RAG内部不改，旧实验不重跑，下一批收费调用不包含在本轮零费用诊断内。
 
 图的编辑源在 `figures/2026-09-07_pattern_routing/architecture.dot` 和 `.svg`；这是沟通用逻辑图，不是已经完成实验验证的论文终稿。
+
+版本凭证：功能提交 `6c5628a` 已推送 `codex/query-card-actions-v1`，main未改；本地与干净Git导出均695项通过，静态/格式/CLI通过。GitHub API查询限流，暂未核对这一版的远端CI终态；不冒称已通过。
