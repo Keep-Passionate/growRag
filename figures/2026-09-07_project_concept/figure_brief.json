@@ -1,0 +1,15 @@
+{
+  "figure_goal": "让读者理解外置查询修复闭环，以及记忆相对无记忆现场修复的配对收益。",
+  "paper_claim": "展示待验证的研究设计，不声称完整系统已实现或已有性能优势。",
+  "figure_type": "algorithm-workflow",
+  "mode": "image",
+  "panels": [
+    {"name": "architecture", "content": "原问题、外置决策、独立RAG、证据观察、有限修复、停止和离线记忆验证"},
+    {"name": "paired_attribution", "content": "共同起点，BASE/FRESH/REUSE独立分支，突出REUSE−FRESH，分开效果与成本"}
+  ],
+  "must_keep_labels": ["原问题 q0", "BASE", "FRESH", "REUSE", "规划总览", "REUSE − FRESH"],
+  "data": {"not_applicable": true, "sources": ["docs/GrowRAG_项目构思与文献脉络_2026-09-07.md", "docs/query_comparison_v1.md", "knowledge/CURRENT_PROJECT_MEMORY.md"]},
+  "style_constraints": ["中文简短标签", "白底", "短语不拥挤", "实线表示运行数据流，虚线表示跨题验证和记忆更新", "显式区分规划与实测"],
+  "output_formats": ["dot", "svg", "png"],
+  "verification_checklist": ["实测数值不在概念图中虚构", "历史答案不直通回答器", "停止检索不等于充分回答", "三分支不共享新增证据", "主配对在同阶段同预算下成立", "中文标签无溢出且可读"]
+}

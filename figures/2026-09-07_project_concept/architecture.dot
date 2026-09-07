@@ -1,0 +1,28 @@
+digraph GrowRAG {
+  graph [rankdir=TB, bgcolor="white", pad="0.4", nodesep="0.45", ranksep="0.45", fontname="Microsoft YaHei", fontsize=22, fontcolor="#18334D", labelloc=t, label="GrowRAG：外置查询层与有限修复闭环\n规划总览 · 非全部已实现"];
+  node [shape=box, style="rounded,filled", fillcolor="#F3F7FC", color="#95ABC0", fontname="Microsoft YaHei", fontsize=15, fontcolor="#19364F", width=4.4, height=0.65, margin="0.23,0.17"];
+  edge [color="#60788E", arrowsize=0.75, fontname="Microsoft YaHei", fontsize=12, fontcolor="#425F76"];
+  question [label="原问题 q0\n始终保留，最终回答它", fillcolor="#DFEAF8"];
+  controller [label="① 外置决策层\n原样 BASE / 现场 FRESH / 历史 REUSE", width=5.5, fillcolor="#DEEFE9"];
+  memory [label="跨题经验卡\n操作＋前提＋来源＋验证记录", fillcolor="#FFF0D4"];
+  rag [label="② 原有 RAG\n检索＋回答；不改内部模型与索引", width=5.5];
+  observation [label="③ 观察本题证据\n已支持什么？还缺什么？有无冲突？", width=5.5, fillcolor="#DEEFE9"];
+  repair [label="尚有明确缺口且预算允许\n只修未解决部分，再回到①", fillcolor="#FFF0D4"];
+  stop [label="④ 停止检查\n充分 / 无进展 / 重复 / 预算耗尽", width=5.5];
+  answer [label="证据充分 → 回答 q0\n仍不足或冲突 → 限定回答或弃答", width=5.5, fillcolor="#DFEAF8"];
+  episode [label="单题记录 QueryEpisode\n动作、证据出处、变化与成本"];
+  validate [label="离线验证与版本化\n源成功仅候选；独立题配对后再评价", width=5.5, fillcolor="#FFF0D4"];
+  question -> controller;
+  {rank=same; memory; controller;}
+  memory -> controller [label="仅提供查询操作", color="#B58D3C"];
+  controller -> rag [label="q0 ＋ 本轮检索 query"];
+  rag -> observation [label="实际文档与答案"];
+  observation -> stop;
+  stop -> answer;
+  {rank=same; repair; stop;}
+  stop -> repair [constraint=false];
+  repair -> controller [constraint=false, color="#B58D3C"];
+  observation -> episode [style=dashed, label="追加记录"];
+  episode -> validate [style=dashed];
+  validate -> memory [style=dashed, color="#B58D3C", constraint=false, label="下一冻结批次"];
+}

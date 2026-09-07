@@ -1,0 +1,21 @@
+digraph Paired {
+  graph [rankdir=TB, bgcolor="white", pad="0.4", nodesep="0.4", ranksep="0.55", fontname="Microsoft YaHei", fontsize=22, fontcolor="#18334D", labelloc=t, label="经验到底带来了多少额外收益？\n离线配对实验 · 非线上每题跑三遍"];
+  node [shape=box, style="rounded,filled", fillcolor="#F3F7FC", color="#95ABC0", fontname="Microsoft YaHei", fontsize=15, fontcolor="#19364F", width=3.9, margin="0.23,0.2"];
+  edge [color="#60788E", arrowsize=0.75, fontname="Microsoft YaHei", fontsize=12];
+  common [label="同一道原问题 · 同一个决策起点\nPRE：首次检索前；或 POST：共享首检状态\n两种阶段分别比较，不混在一起", width=8.2, fillcolor="#DFEAF8"];
+  base [label="BASE\n不改写、不用历史"];
+  fresh [label="FRESH\n现场改写，不看历史", fillcolor="#DEEFE9"];
+  reuse [label="REUSE\n同样改写器＋选中的历史", fillcolor="#FFF0D4"];
+  {rank=same; base; fresh; reuse;}
+  common -> base; common -> fresh; common -> reuse;
+  runbase [label="独立运行与记录\n不接收其他分支结果"];
+  runfresh [label="独立运行与记录\n相同修复预算", fillcolor="#DEEFE9"];
+  runreuse [label="独立运行与记录\n相同修复预算", fillcolor="#FFF0D4"];
+  base -> runbase; fresh -> runfresh; reuse -> runreuse;
+  {rank=same; runbase; runfresh; runreuse;}
+  evaluate [label="运行结束后，才使用参考答案与支持标注\n分别算：答案质量 / 证据增量 / 正确变错 / 成本", width=9.8];
+  runbase -> evaluate; runfresh -> evaluate; runreuse -> evaluate;
+  main [label="主对照：REUSE − FRESH\n比现场修复多出的收益，才归入记忆增量", width=9.8, fillcolor="#DEEFE9", color="#428B72", penwidth=2];
+  other [label="辅助：FRESH − BASE ＝ 现场修复收益\n辅助：REUSE − BASE ＝ 整个方案收益\n同分但更省 token，也可另报效率优势", width=9.8];
+  evaluate -> main; main -> other;
+}
