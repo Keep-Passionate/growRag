@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.0 — 2026-09-07
+
+- Add a conservative, query-only two-name age-pattern candidate matcher.
+- Bind provisional declared scope to every compiled-view field and matcher version.
+- Keep CANDIDATE separate from trusted REUSE; unknown, same-source and stale scope bypass.
+- Add an offline diagnostic CLI separating handwritten and exposed development questions.
+- Add editable Chinese architecture logic figure and implementation/limitations notes.
+- No API calls, model training, lifecycle promotion, or change to the prior live pilot.
+
+Verification: 695 local tests pass (62 added), lint and format checks pass;
+offline probes leave the original result/library hashes and 145 API audit files unchanged.
+
 ## 0.4.1 — 2026-09-07
 
 - Distinguish no-memory skips, execution failures, abstentions and unscored outputs.

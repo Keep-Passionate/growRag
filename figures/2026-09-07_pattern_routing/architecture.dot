@@ -1,0 +1,23 @@
+digraph GrowRAG {
+  graph [rankdir=TB, bgcolor="white", pad="0.30", nodesep="0.50", ranksep="0.42", fontname="Microsoft YaHei", fontsize=21, label="GrowRAG：经验候选层 ＋ 独立 RAG", labelloc=t];
+  node [shape=box, style="rounded,filled", fillcolor="#F2F6FA", color="#718297", fontname="Microsoft YaHei", fontsize=14, margin="0.25,0.17", width=4.3, height=0.85];
+  edge [fontname="Microsoft YaHei", fontsize=12, color="#53677B", arrowsize=0.7];
+  q [label="新问题 q\n始终保留原始问法", fillcolor="#EAF2FC", color="#2B6BAC"];
+  library [label="冻结经验库\n来源 ＋ 动作 ＋ 显式适用范围"];
+  match [label="前置层：识别模式、核对候选\n检查来源隔离、卡片版本和声明范围", fillcolor="#EAF2FC", color="#2B6BAC", width=6.0];
+  base [label="无卡 / 不匹配 / 不明确\nBASE：使用原查询", fillcolor="#EDF6F0", color="#508569"];
+  candidate [label="匹配到候选\n可进入 REUSE 改写对照实验", style="rounded,filled,dashed", fillcolor="#FFF4E4", color="#BB873C"];
+  rag [label="原有 RAG（不改内部）\n检索器 ＋ 回答器", fillcolor="#EEEEEE", color="#6B7076", width=6.0];
+  result [label="回答原始问题 q\n记录证据、结果与费用", fillcolor="#EDF6F0", color="#508569", width=6.0];
+  note [shape=plaintext, style="", width=8.5, label="蓝色：本轮先做规则匹配；橙色：候选不等于可信。\n自动真实路由、QPP、训练、多轮与文档层尚未接入。", fontsize=12, fontcolor="#5B6671"];
+  {rank=same; q; library;}
+  {rank=same; base; candidate;}
+  q -> match;
+  library -> match [label="只读；新经验留到下一批"];
+  match -> base [label="绕过经验"];
+  match -> candidate [label="先验证适用性"];
+  base -> rag [label="原查询"];
+  candidate -> rag [label="原问题 ＋ 改写查询", style=dashed];
+  rag -> result;
+  result -> note [style=invis];
+}
