@@ -13,6 +13,8 @@
 
 2026-09-08 最新入口：
 
+- [后续对齐：两条主线、六种经验卡与新的精读顺序](decisions/2026-09-08_两条主线对齐_经验卡六种表示与精读顺序.md)：以表示/适用性为核心，低成本选择配套；有限修复作为场景，不再四方向平铺。首轮不启动新实验。
+- [两条主线聚焦 12 篇 RDF](../zotero/curated/2026-09-08_memory_cards/README.md)：旧文献重组，先 ReFormeR→ReMe→ExpeL；已导入旧包可不重复导入。
 - [四个研究方向、QPP 成本与阅读路线](decisions/2026-09-08_记忆AgenticRAG研究方向_QPP与阅读路线.md)：词汇/意图/描述三种现象，新增 ReformIR、RAQG-QPP/TOIS 等强近邻；候选生成与选择分离，创新待证。本轮只做研究规划。
 - [30 篇整合包与新增 8 篇 RDF](../zotero/curated/2026-09-08_directions/README.md)：二选一导入，四个方向及逐篇导读，区分主会/Findings/Industry/workshop/期刊/预印本。
 

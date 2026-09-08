@@ -1,0 +1,445 @@
+[
+  {
+    "slug": "reformer",
+    "title": "ReFormeR: Learning and Applying Explicit Query Reformulation Patterns",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Amin",
+        "family": "Bigdeli"
+      },
+      {
+        "given": "Mert",
+        "family": "Incesu"
+      },
+      {
+        "given": "Negar",
+        "family": "Arabzadeh"
+      },
+      {
+        "given": "Charles L. A.",
+        "family": "Clarke"
+      },
+      {
+        "given": "Ebrahim",
+        "family": "Bagheri"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "48th European Conference on Information Retrieval (ECIR 2026)",
+    "doi": "10.1007/978-3-032-21300-6_30",
+    "url": "https://doi.org/10.1007/978-3-032-21300-6_30",
+    "source_rdf": "zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf",
+    "verification_source": "https://doi.org/10.1007/978-3-032-21300-6_30",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "reme",
+    "title": "Remember Me, Refine Me: A Dynamic Procedural Memory Framework for Experience-Driven Agent Evolution",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Zouying",
+        "family": "Cao"
+      },
+      {
+        "given": "Jiaji",
+        "family": "Deng"
+      },
+      {
+        "given": "Li",
+        "family": "Yu"
+      },
+      {
+        "given": "Weikang",
+        "family": "Zhou"
+      },
+      {
+        "given": "Zhaoyang",
+        "family": "Liu"
+      },
+      {
+        "given": "Bolin",
+        "family": "Ding"
+      },
+      {
+        "given": "Hai",
+        "family": "Zhao"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Findings of the Association for Computational Linguistics: ACL 2026",
+    "doi": "10.18653/v1/2026.findings-acl.829",
+    "url": "https://aclanthology.org/2026.findings-acl.829/",
+    "source_rdf": "zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf",
+    "verification_source": "https://aclanthology.org/2026.findings-acl.829/",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "expel",
+    "title": "ExpeL: LLM Agents Are Experiential Learners",
+    "year": 2024,
+    "type": "conferencePaper",
+    "authors": [
+      {
+        "given": "Andrew",
+        "family": "Zhao"
+      },
+      {
+        "given": "Daniel",
+        "family": "Huang"
+      },
+      {
+        "given": "Quentin",
+        "family": "Xu"
+      },
+      {
+        "given": "Matthieu",
+        "family": "Lin"
+      },
+      {
+        "given": "Yong-Jin",
+        "family": "Liu"
+      },
+      {
+        "given": "Gao",
+        "family": "Huang"
+      }
+    ],
+    "venue": "Proceedings of the AAAI Conference on Artificial Intelligence",
+    "volume": "38",
+    "issue": "17",
+    "pages": "19632–19642",
+    "doi": "10.1609/aaai.v38i17.29936",
+    "url": "https://ojs.aaai.org/index.php/AAAI/article/view/29936",
+    "verification_source": "https://ojs.aaai.org/index.php/AAAI/article/view/29936",
+    "verification_date": "2026-09-08",
+    "source_rdf": "zotero/current/GrowRAG_核心精读包_合并更新_2026-08-14.rdf"
+  },
+  {
+    "slug": "s2g_rag",
+    "title": "S2G-RAG: Structured Sufficiency and Gap Judging for Iterative Retrieval-Augmented QA",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Minghan",
+        "family": "Li"
+      },
+      {
+        "given": "Junjie",
+        "family": "Zou"
+      },
+      {
+        "given": "Xinxuan",
+        "family": "Lv"
+      },
+      {
+        "given": "Chao",
+        "family": "Zhang"
+      },
+      {
+        "given": "Guodong",
+        "family": "Zhou"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of ACL 2026 (Volume 1: Long Papers)",
+    "doi": "10.18653/v1/2026.acl-long.1185",
+    "url": "https://aclanthology.org/2026.acl-long.1185/",
+    "source_rdf": "zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf",
+    "verification_source": "https://aclanthology.org/2026.acl-long.1185/",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "rrm",
+    "title": "RRM: Experience-Driven Reflective Retrieval Memory for Long-Horizon Multimodal Reasoning",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Jingxiang",
+        "family": "Fan"
+      },
+      {
+        "given": "Junbao",
+        "family": "Zhuo"
+      },
+      {
+        "given": "Bochao",
+        "family": "Zou"
+      }
+    ],
+    "type": "preprint",
+    "venue": "arXiv",
+    "doi": null,
+    "url": "https://arxiv.org/abs/2607.28156",
+    "source_rdf": "zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf",
+    "verification_source": "https://arxiv.org/abs/2607.28156",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "qcr",
+    "title": "Beyond Retrieval: Query-Conditioned Reuse of Long-Horizon Agent Trajectories",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Yifei",
+        "family": "Li"
+      },
+      {
+        "given": "Heng",
+        "family": "Wang"
+      },
+      {
+        "given": "Lingling",
+        "family": "Zhang"
+      },
+      {
+        "given": "Muye",
+        "family": "Huang"
+      },
+      {
+        "given": "Xinyu",
+        "family": "Zhang"
+      },
+      {
+        "given": "Jiashuai",
+        "family": "Liu"
+      },
+      {
+        "given": "Hang",
+        "family": "Yan"
+      },
+      {
+        "given": "Rongman",
+        "family": "Xu"
+      }
+    ],
+    "type": "preprint",
+    "venue": "arXiv",
+    "doi": null,
+    "url": "https://arxiv.org/abs/2608.12847",
+    "source_rdf": "zotero/current/GrowRAG_已覆盖方向与研究缺口_2026-08-19.rdf",
+    "verification_source": "https://arxiv.org/abs/2608.12847",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "qpp_variant",
+    "title": "Can QPP Choose the Right Query Variant? Evaluating Query Variant Selection for RAG Pipelines",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Negar",
+        "family": "Arabzadeh"
+      },
+      {
+        "given": "Andrew",
+        "family": "Drozdov"
+      },
+      {
+        "given": "Michael",
+        "family": "Bendersky"
+      },
+      {
+        "given": "Matei",
+        "family": "Zaharia"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+    "doi": "10.1145/3805712.3808571",
+    "url": "https://doi.org/10.1145/3805712.3808571",
+    "source_rdf": "zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf",
+    "verification_source": "https://doi.org/10.1145/3805712.3808571",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "reformir",
+    "title": "When More Reformulations Hurt: Avoiding Drift using Ranker Feedback",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Venktesh",
+        "family": "V"
+      },
+      {
+        "given": "Mandeep",
+        "family": "Rathee"
+      },
+      {
+        "given": "Avishek",
+        "family": "Anand"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+    "doi": "10.1145/3805712.3809721",
+    "url": "https://doi.org/10.1145/3805712.3809721",
+    "volume": null,
+    "issue": null,
+    "pages": "1778-1788",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          7,
+          19
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.1145/3805712.3809721",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "raqg_qpp",
+    "title": "RAQG-QPP: Query Performance Prediction with Retrieved Query Variants and Retrieval-Augmented Query Generation",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Fangzheng",
+        "family": "Tian"
+      },
+      {
+        "given": "Debasis",
+        "family": "Ganguly"
+      },
+      {
+        "given": "Craig",
+        "family": "MacDonald"
+      }
+    ],
+    "type": "journalArticle",
+    "venue": "ACM Transactions on Information Systems",
+    "doi": "10.1145/3815198",
+    "url": "https://doi.org/10.1145/3815198",
+    "volume": "44",
+    "issue": "6",
+    "pages": "1-28",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          7,
+          31
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.1145/3815198",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "awm",
+    "title": "Agent Workflow Memory",
+    "year": "2025",
+    "authors": [
+      {
+        "given": "Zora Zhiruo",
+        "family": "Wang"
+      },
+      {
+        "given": "Jiayuan",
+        "family": "Mao"
+      },
+      {
+        "given": "Daniel",
+        "family": "Fried"
+      },
+      {
+        "given": "Graham",
+        "family": "Neubig"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of the 42nd International Conference on Machine Learning",
+    "doi": null,
+    "url": "https://proceedings.mlr.press/v267/wang25bx.html",
+    "source_rdf": "zotero/current/GrowRAG_核心精读包_合并更新_2026-08-14.rdf",
+    "verification_source": "https://proceedings.mlr.press/v267/wang25bx.html",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "gam_rag",
+    "title": "GAM-RAG: Gain-Adaptive Memory for Evolving Retrieval in Retrieval-Augmented Generation",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Yifan",
+        "family": "Wang"
+      },
+      {
+        "given": "Mingxuan",
+        "family": "Jiang"
+      },
+      {
+        "given": "Zhihao",
+        "family": "Sun"
+      },
+      {
+        "given": "Yixin",
+        "family": "Cao"
+      },
+      {
+        "given": "Yicun",
+        "family": "Liu"
+      },
+      {
+        "given": "Keyang",
+        "family": "Chen"
+      },
+      {
+        "given": "Guangnan",
+        "family": "Ye"
+      },
+      {
+        "given": "Hongfeng",
+        "family": "Chai"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)",
+    "doi": null,
+    "url": "https://icml.cc/virtual/2026/poster/65843",
+    "source_rdf": "zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf",
+    "verification_source": "https://icml.cc/virtual/2026/poster/65843",
+    "verification_date": "2026-09-05"
+  },
+  {
+    "slug": "sufficient_context",
+    "title": "Sufficient Context: A New Lens on Retrieval Augmented Generation Systems",
+    "year": "2025",
+    "authors": [
+      {
+        "given": "Hailey",
+        "family": "Joren"
+      },
+      {
+        "given": "Jianyi",
+        "family": "Zhang"
+      },
+      {
+        "given": "Chun-Sung",
+        "family": "Ferng"
+      },
+      {
+        "given": "Da-Cheng",
+        "family": "Juan"
+      },
+      {
+        "given": "Ankur",
+        "family": "Taly"
+      },
+      {
+        "given": "Cyrus",
+        "family": "Rashtchian"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "The Thirteenth International Conference on Learning Representations",
+    "doi": null,
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html",
+    "source_rdf": "zotero/curated/GrowRAG_逐句精读与直接近邻_精选20篇_2026-09-05.rdf",
+    "verification_source": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html",
+    "verification_date": "2026-09-05"
+  }
+]

@@ -1,0 +1,740 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rdf:RDF xmlns:bib="http://purl.org/net/biblio#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:z="http://www.zotero.org/namespaces/export#">
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:reformer">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReFormeR: Learning and Applying Explicit Query Reformulation Patterns</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Amin</foaf:givenName>
+            <foaf:surname>Bigdeli</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Mert</foaf:givenName>
+            <foaf:surname>Incesu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Negar</foaf:givenName>
+            <foaf:surname>Arabzadeh</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Charles L. A.</foaf:givenName>
+            <foaf:surname>Clarke</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Ebrahim</foaf:givenName>
+            <foaf:surname>Bagheri</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1007/978-3-032-21300-6_30</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>48th European Conference on Information Retrieval (ECIR 2026)</dc:title>
+        <dc:identifier>DOI 10.1007/978-3-032-21300-6_30</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>查询操作的直接近邻；ECIR 2026 正式论文，不标成 SIGIR</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>精读顺序/01</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:reformer:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:reformer:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/01&lt;/h3&gt;&lt;p&gt;查询操作的直接近邻；ECIR 2026 正式论文，不标成 SIGIR&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §2、§3.1 和模式表：高效改写对怎样变成紧凑模式，新问题如何根据检索上下文选择？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;已经有模式抽象与上下文选择。拟检验最少条件的决策价值，不能只增加动作字段。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2604.01417v1"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:reme">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Remember Me, Refine Me: A Dynamic Procedural Memory Framework for Experience-Driven Agent Evolution</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zouying</foaf:givenName>
+            <foaf:surname>Cao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jiaji</foaf:givenName>
+            <foaf:surname>Deng</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Li</foaf:givenName>
+            <foaf:surname>Yu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Weikang</foaf:givenName>
+            <foaf:surname>Zhou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zhaoyang</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Bolin</foaf:givenName>
+            <foaf:surname>Ding</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hai</foaf:givenName>
+            <foaf:surname>Zhao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/2026.findings-acl.829/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2026.findings-acl.829</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>经验卡与适用性的直接近邻；Findings ACL 2026，不是主会长文</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>精读顺序/02</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:reme:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:reme:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/02&lt;/h3&gt;&lt;p&gt;经验卡与适用性的直接近邻；Findings ACL 2026，不是主会长文&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §3.2–3.4、§4.3–4.4：使用场景、经验、关键词、置信度、工具如何支持检索与适配？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;已比较关键点和轨迹、不同检索键，并报告修复及新错误；不是只有相似度。我们需进一步控制同源、同预算和 FRESH 对照。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2512.10696v2"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:expel">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ExpeL: LLM Agents Are Experiential Learners</dc:title>
+    <dc:date>2024</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Andrew</foaf:givenName>
+            <foaf:surname>Zhao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Daniel</foaf:givenName>
+            <foaf:surname>Huang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Quentin</foaf:givenName>
+            <foaf:surname>Xu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Matthieu</foaf:givenName>
+            <foaf:surname>Lin</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yong-Jin</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Gao</foaf:givenName>
+            <foaf:surname>Huang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://ojs.aaai.org/index.php/AAAI/article/view/29936</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the AAAI Conference on Artificial Intelligence</dc:title>
+        <dc:identifier>DOI 10.1609/aaai.v38i17.29936</dc:identifier>
+        <prism:volume>38</prism:volume>
+        <prism:number>17</prism:number>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>19632–19642</bib:pages>
+    <dc:description>跨题经验基础；AAAI 2024 正式论文</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>精读顺序/03</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:expel:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:expel:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/03&lt;/h3&gt;&lt;p&gt;跨题经验基础；AAAI 2024 正式论文&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §4、消融与 HotpotQA insight 示例：成功轨迹和通用规则分别提供什么，规则怎样从经历中形成？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;已有具体与抽象并存、成败比较、规则维护及迁移；双表示不新。借其思想定义强参照，不复制历史答案。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2308.10144"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-08；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:s2g_rag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>S2G-RAG: Structured Sufficiency and Gap Judging for Iterative Retrieval-Augmented QA</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Minghan</foaf:givenName>
+            <foaf:surname>Li</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Junjie</foaf:givenName>
+            <foaf:surname>Zou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Xinxuan</foaf:givenName>
+            <foaf:surname>Lv</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Chao</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Guodong</foaf:givenName>
+            <foaf:surname>Zhou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/2026.acl-long.1185/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of ACL 2026 (Volume 1: Long Papers)</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2026.acl-long.1185</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>核心问题的当前状态表示基础；ACL 2026 主会长文</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>精读顺序/04</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:s2g_rag:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:s2g_rag:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/04&lt;/h3&gt;&lt;p&gt;核心问题的当前状态表示基础；ACL 2026 主会长文&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §3：sufficient、category/target/slot/description 与句子编号式证据提取如何控制下一次检索？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;这是单题累计证据和缺口，不是长期跨题经验卡；其小型 judge 经过训练。我们要研究状态何时可抽象成可迁移条件。&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2026.acl-long.1185.pdf"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:rrm">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>RRM: Experience-Driven Reflective Retrieval Memory for Long-Horizon Multimodal Reasoning</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jingxiang</foaf:givenName>
+            <foaf:surname>Fan</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Junbao</foaf:givenName>
+            <foaf:surname>Zhuo</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Bochao</foaf:givenName>
+            <foaf:surname>Zou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://arxiv.org/abs/2607.28156</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>arXiv</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>必须排重的经验适用性近邻；截至本轮仅确认 arXiv 预印本</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>精读顺序/05</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:rrm:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:rrm:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/05&lt;/h3&gt;&lt;p&gt;必须排重的经验适用性近邻；截至本轮仅确认 arXiv 预印本&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 procedural record、reflective retrieval control、OQR 消融：何时允许历史指导查询，失败经验如何区别对待？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;已有适用条件、证据需求、查询级复用和维护；把这些字段搬到文本 RAG 不自动构成创新。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2607.28156v1"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:qcr">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Beyond Retrieval: Query-Conditioned Reuse of Long-Horizon Agent Trajectories</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yifei</foaf:givenName>
+            <foaf:surname>Li</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Heng</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Lingling</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Muye</foaf:givenName>
+            <foaf:surname>Huang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Xinyu</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jiashuai</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hang</foaf:givenName>
+            <foaf:surname>Yan</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Rongman</foaf:givenName>
+            <foaf:surname>Xu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://arxiv.org/abs/2608.12847</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>arXiv</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>必须排重的表示近邻；截至本轮仅确认 arXiv 预印本</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>精读顺序/06</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:qcr:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:qcr:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/06&lt;/h3&gt;&lt;p&gt;必须排重的表示近邻；截至本轮仅确认 arXiv 预印本&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §4.2 与附录 D：不变操作、当前对象重取、适用条件、核查四类信息如何组成新题笔记？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;已有同来源、等篇幅摘要等表示对照，并未声称四字段普遍最优。不能把通用条件卡说成首次。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2608.12847v1"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:qpp_variant">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Can QPP Choose the Right Query Variant? Evaluating Query Variant Selection for RAG Pipelines</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Negar</foaf:givenName>
+            <foaf:surname>Arabzadeh</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Andrew</foaf:givenName>
+            <foaf:surname>Drozdov</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Michael</foaf:givenName>
+            <foaf:surname>Bendersky</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Matei</foaf:givenName>
+            <foaf:surname>Zaharia</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3805712.3808571</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title>
+        <dc:identifier>DOI 10.1145/3805712.3808571</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>低成本候选选择基础；SIGIR 2026 正式论文</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>02 配套问题｜经验辅助的低成本选择</dc:subject>
+    <dc:subject>精读顺序/07</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:qpp_variant:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:qpp_variant:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/07&lt;/h3&gt;&lt;p&gt;低成本候选选择基础；SIGIR 2026 正式论文&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §3–5：如何选同题查询变体，为什么检索预测与最终 RAG 效果不相同？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;已有 Pre/Post QPP 与选择评价；QSD 已使用历史近邻表现。候选生成及预测也应计费。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2604.22661v1"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:reformir">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>When More Reformulations Hurt: Avoiding Drift using Ranker Feedback</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Venktesh</foaf:givenName>
+            <foaf:surname>V</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Mandeep</foaf:givenName>
+            <foaf:surname>Rathee</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Avishek</foaf:givenName>
+            <foaf:surname>Anand</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3805712.3809721</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title>
+        <dc:identifier>DOI 10.1145/3805712.3809721</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>1778-1788</bib:pages>
+    <dc:description>漂移与预算的强近邻；SIGIR 2026 正式论文</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>02 配套问题｜经验辅助的低成本选择</dc:subject>
+    <dc:subject>精读顺序/08</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:reformir:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:reformir:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/08&lt;/h3&gt;&lt;p&gt;漂移与预算的强近邻；SIGIR 2026 正式论文&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §3、算法与预算实验：原问题锚定的排序反馈怎样控制多改写的漂移与昂贵重排？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;不是纯检索前方法；已有预算控制。与 ReFormeR 是两篇不同论文。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2605.00560v1"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-08；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:raqg_qpp">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>RAQG-QPP: Query Performance Prediction with Retrieved Query Variants and Retrieval-Augmented Query Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Fangzheng</foaf:givenName>
+            <foaf:surname>Tian</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Debasis</foaf:givenName>
+            <foaf:surname>Ganguly</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Craig</foaf:givenName>
+            <foaf:surname>MacDonald</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3815198</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>ACM Transactions on Information Systems</dc:title>
+        <dc:identifier>DOI 10.1145/3815198</dc:identifier>
+        <prism:volume>44</prism:volume>
+        <prism:number>6</prism:number>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>1-28</bib:pages>
+    <dc:description>历史查询辅助预测的直接近邻；ACM TOIS 2026 正式期刊</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>02 配套问题｜经验辅助的低成本选择</dc:subject>
+    <dc:subject>精读顺序/09</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:raqg_qpp:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:raqg_qpp:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;精读顺序/09&lt;/h3&gt;&lt;p&gt;历史查询辅助预测的直接近邻；ACM TOIS 2026 正式期刊&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读方法与 §7：历史查询变体如何辅助生成及 QPP，词形不匹配与意图漂移怎样区分？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;历史查询加 QPP 已有覆盖。我们必须证明操作条件或使用反馈带来额外选择信息。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2604.27244v1"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-08；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:awm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Agent Workflow Memory</dc:title>
+    <dc:date>2025</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zora Zhiruo</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jiayuan</foaf:givenName>
+            <foaf:surname>Mao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Daniel</foaf:givenName>
+            <foaf:surname>Fried</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Graham</foaf:givenName>
+            <foaf:surname>Neubig</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://proceedings.mlr.press/v267/wang25bx.html</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 42nd International Conference on Machine Learning</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>在 ExpeL 后按需插读；ICML 2025 正式论文</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>按需插读</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:awm:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:awm:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;按需插读&lt;/h3&gt;&lt;p&gt;在 ExpeL 后按需插读；ICML 2025 正式论文&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;读 §2.2–2.3 与工作流样例：目标、状态描述、理由与动作怎样变成带变量的步骤？&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;已有跨任务、网站与领域泛化；论文设置不能笼统写成通用 top-k 相似度卡片路由。我们的对象是查询操作。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2409.07429"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:gam_rag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>GAM-RAG: Gain-Adaptive Memory for Evolving Retrieval in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yifan</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Mingxuan</foaf:givenName>
+            <foaf:surname>Jiang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zhihao</foaf:givenName>
+            <foaf:surname>Sun</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yixin</foaf:givenName>
+            <foaf:surname>Cao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yicun</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Keyang</foaf:givenName>
+            <foaf:surname>Chen</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Guangnan</foaf:givenName>
+            <foaf:surname>Ye</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hongfeng</foaf:givenName>
+            <foaf:surname>Chai</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://icml.cc/virtual/2026/poster/65843</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>在 S2G 后读 §3；ICML 2026，官方状态沿已核验记录</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>按需插读</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:gam_rag:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:gam_rag:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;按需插读&lt;/h3&gt;&lt;p&gt;在 S2G 后读 §3；ICML 2026，官方状态沿已核验记录&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;区分句子节点的 task/time 记忆向量、不确定性和当前匹配，理解反馈控制更新强度。&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;不是自然语言经验卡；已有当前匹配与可靠性处理。Kalman-inspired gain 也不等于 REUSE−FRESH 的答案收益。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2603.01783v1"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:memory-cards:20260908:sufficient_context">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Sufficient Context: A New Lens on Retrieval Augmented Generation Systems</dc:title>
+    <dc:date>2025</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hailey</foaf:givenName>
+            <foaf:surname>Joren</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jianyi</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Chun-Sung</foaf:givenName>
+            <foaf:surname>Ferng</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Da-Cheng</foaf:givenName>
+            <foaf:surname>Juan</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Ankur</foaf:givenName>
+            <foaf:surname>Taly</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Cyrus</foaf:givenName>
+            <foaf:surname>Rashtchian</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>The Thirteenth International Conference on Learning Representations</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>在 S2G 前按需补概念；ICLR 2025 正式论文</dc:description>
+    <dc:subject>GrowRAG/两条主线与经验表示</dc:subject>
+    <dc:subject>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:subject>
+    <dc:subject>按需插读</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:memory-cards:20260908:sufficient_context:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:sufficient_context:note">
+    <rdf:value>&lt;div&gt;&lt;h3&gt;按需插读&lt;/h3&gt;&lt;p&gt;在 S2G 前按需补概念；ICLR 2025 正式论文&lt;/p&gt;&lt;h3&gt;怎么读&lt;/h3&gt;&lt;p&gt;先理解给定上下文是否足以回答，再考虑当前缺口如何表达；区分相关与充分。&lt;/p&gt;&lt;h3&gt;已有覆盖与边界&lt;/h3&gt;&lt;p&gt;充分性不能自动证明某张历史卡值得复用，判断器本身也会犯错。&lt;/p&gt;&lt;p&gt;&lt;a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html"&gt;方法阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;这是 AI 辅助导读与选题建议，不是论文原摘要或用户已读声明。元数据沿用日期：2026-09-05；本次导读：2026-09-08。方法链接可能为作者公开版本，不表示逐字核对最终正式 PDF。预印本不等于未投稿；未统计引用次数；无 PDF 附件。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <bib:Memo rdf:about="urn:growrag:memory-cards:20260908:overview">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;两条主线与新的阅读顺序&lt;/h2&gt;&lt;p&gt;核心：经验怎样记才能判断适用；配套：怎样借助经验低成本选择。有限修复循环是使用场景，不另列第三研究方向；长期更新后置。&lt;/p&gt;&lt;p&gt;先读 ReFormeR → ReMe → ExpeL，再 S2G → RRM → QCR，最后 QPP → ReformIR → RAQG-QPP。AWM、GAM、Sufficient Context 按需插读。&lt;/p&gt;&lt;p&gt;12篇是旧推荐重组，10篇已审稿（含ECIR与Findings）、2篇预印本，不是12篇新发现。已导入旧包可仅按新导读阅读，不需要重复导入。不要删除旧条目或批注。RDF结构验证不等于Zotero界面导入测试。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <z:Collection rdf:about="urn:growrag:memory-cards:20260908:collection">
+    <dc:title>GrowRAG｜两条主线聚焦12篇｜2026-09-08后续</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:overview" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:representation" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:selection" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:memory-cards:20260908:representation">
+    <dc:title>01 核心问题｜经验表示与适用性（含当前状态基础）</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:reformer" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:reme" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:expel" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:s2g_rag" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:rrm" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:qcr" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:awm" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:gam_rag" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:sufficient_context" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:memory-cards:20260908:selection">
+    <dc:title>02 配套问题｜经验辅助的低成本选择</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:qpp_variant" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:reformir" />
+    <dcterms:hasPart rdf:resource="urn:growrag:memory-cards:20260908:raqg_qpp" />
+  </z:Collection>
+</rdf:RDF>

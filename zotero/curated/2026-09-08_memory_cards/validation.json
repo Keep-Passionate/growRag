@@ -1,0 +1,15 @@
+{
+  "file": "GrowRAG_两条主线_经验表示与低成本选择_12篇.rdf",
+  "papers": 12,
+  "notes": 13,
+  "collections": 3,
+  "types": {
+    "conferencePaper": 9,
+    "preprint": 2,
+    "journalArticle": 1
+  },
+  "dangling_relations": 0,
+  "sha256": "1b666198a8a7d70b4163b45d1ded619603ca626a001a05d09bfebfd6cbbea11f",
+  "zotero_client_import_tested": false,
+  "pdf_attachments": 0
+}
