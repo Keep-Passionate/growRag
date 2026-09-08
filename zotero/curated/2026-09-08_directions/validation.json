@@ -1,0 +1,31 @@
+[
+  {
+    "file": "GrowRAG_四个研究方向_精选30篇_2026-09-08.rdf",
+    "items": 30,
+    "notes": 31,
+    "collections": 5,
+    "types": {
+      "conferencePaper": 22,
+      "journalArticle": 2,
+      "preprint": 6
+    },
+    "dangling_relations": 0,
+    "sha256": "1efedc0fd9b49f0e989a60916002d9001b5a55cd7b6025e6494a6553efc19323",
+    "zotero_client_import_tested": false,
+    "pdf_attachments": 0
+  },
+  {
+    "file": "GrowRAG_本轮新增8篇_2026-09-08.rdf",
+    "items": 8,
+    "notes": 9,
+    "collections": 4,
+    "types": {
+      "conferencePaper": 6,
+      "journalArticle": 2
+    },
+    "dangling_relations": 0,
+    "sha256": "7fbbf8a2b989e4b7f3d53414bfd77367f70e4555acd64b1ff3e520123966b309",
+    "zotero_client_import_tested": false,
+    "pdf_attachments": 0
+  }
+]

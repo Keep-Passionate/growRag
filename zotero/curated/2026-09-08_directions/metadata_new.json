@@ -1,0 +1,324 @@
+[
+  {
+    "slug": "rag_qpp_tois",
+    "title": "Adaptive Query Performance Prediction for Retrieval-Augmented Generation: Bridging Retrieval Quality and Generation Relevance",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Aparajita",
+        "family": "Sinha"
+      },
+      {
+        "given": "Kunal",
+        "family": "Chakma"
+      }
+    ],
+    "type": "journalArticle",
+    "venue": "ACM Transactions on Information Systems",
+    "doi": "10.1145/3827605",
+    "url": "https://doi.org/10.1145/3827605",
+    "volume": "44",
+    "issue": "6",
+    "pages": "1-56",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          7,
+          31
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.1145/3827605",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "raqg_qpp",
+    "title": "RAQG-QPP: Query Performance Prediction with Retrieved Query Variants and Retrieval-Augmented Query Generation",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Fangzheng",
+        "family": "Tian"
+      },
+      {
+        "given": "Debasis",
+        "family": "Ganguly"
+      },
+      {
+        "given": "Craig",
+        "family": "MacDonald"
+      }
+    ],
+    "type": "journalArticle",
+    "venue": "ACM Transactions on Information Systems",
+    "doi": "10.1145/3815198",
+    "url": "https://doi.org/10.1145/3815198",
+    "volume": "44",
+    "issue": "6",
+    "pages": "1-28",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          7,
+          31
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.1145/3815198",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "q2ei",
+    "title": "Q2EI: Query-to-Entity Inference for Semantic Condensation in Domain-Specific Retrieval",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Yixuan",
+        "family": "Sun"
+      },
+      {
+        "given": "Zhenqin",
+        "family": "Xu"
+      },
+      {
+        "given": "HanFeng",
+        "family": "Zhai"
+      },
+      {
+        "given": "Zishu",
+        "family": "Yu"
+      },
+      {
+        "given": "Xiaohui",
+        "family": "Peng"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Findings of the Association for Computational Linguistics: ACL 2026",
+    "doi": "10.18653/v1/2026.findings-acl.1791",
+    "url": "https://doi.org/10.18653/v1/2026.findings-acl.1791",
+    "volume": null,
+    "issue": null,
+    "pages": "35943-35958",
+    "published": {
+      "date-parts": [
+        [
+          2026
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.18653/v1/2026.findings-acl.1791",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "smr",
+    "title": "From Token to Action: State Machine Reasoning to Mitigate Overthinking in Information Retrieval",
+    "year": "2025",
+    "authors": [
+      {
+        "given": "Dohyeon",
+        "family": "Lee"
+      },
+      {
+        "given": "Yeonseok",
+        "family": "Jeong"
+      },
+      {
+        "given": "Seung-won",
+        "family": "Hwang"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Findings of the Association for Computational Linguistics: EMNLP 2025",
+    "doi": "10.18653/v1/2025.findings-emnlp.371",
+    "url": "https://doi.org/10.18653/v1/2025.findings-emnlp.371",
+    "volume": null,
+    "issue": null,
+    "pages": "7048-7064",
+    "published": {
+      "date-parts": [
+        [
+          2025
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.18653/v1/2025.findings-emnlp.371",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "recap",
+    "title": "RECAP: REwriting Conversations for Intent Understanding in Agentic Planning",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Kushan",
+        "family": "Mitra"
+      },
+      {
+        "given": "Dan",
+        "family": "Zhang"
+      },
+      {
+        "given": "Hannah",
+        "family": "Kim"
+      },
+      {
+        "given": "Estevam",
+        "family": "Hruschka"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Findings of the Association for Computational Linguistics: EACL 2026",
+    "doi": "10.18653/v1/2026.findings-eacl.105",
+    "url": "https://doi.org/10.18653/v1/2026.findings-eacl.105",
+    "volume": null,
+    "issue": null,
+    "pages": "2015-2033",
+    "published": {
+      "date-parts": [
+        [
+          2026
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.18653/v1/2026.findings-eacl.105",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "reformir",
+    "title": "When More Reformulations Hurt: Avoiding Drift using Ranker Feedback",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Venktesh",
+        "family": "V"
+      },
+      {
+        "given": "Mandeep",
+        "family": "Rathee"
+      },
+      {
+        "given": "Avishek",
+        "family": "Anand"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+    "doi": "10.1145/3805712.3809721",
+    "url": "https://doi.org/10.1145/3805712.3809721",
+    "volume": null,
+    "issue": null,
+    "pages": "1778-1788",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          7,
+          19
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.1145/3805712.3809721",
+    "verification_date": "2026-09-08"
+  },
+  {
+    "slug": "wewrite",
+    "title": "When & How to Write for Personalized Demand-aware Query Rewriting in Video Search",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Cheng",
+        "family": "Cheng"
+      },
+      {
+        "given": "Chenxing",
+        "family": "Wang"
+      },
+      {
+        "given": "Aolin",
+        "family": "Li"
+      },
+      {
+        "given": "Haijun",
+        "family": "Wu"
+      },
+      {
+        "given": "Huiyun",
+        "family": "Hu"
+      },
+      {
+        "given": "Juyuan",
+        "family": "Wang"
+      },
+      {
+        "given": "Dongliang",
+        "family": "Liao"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+    "doi": "10.1145/3805712.3808395",
+    "url": "https://doi.org/10.1145/3805712.3808395",
+    "volume": null,
+    "issue": null,
+    "pages": "4528-4533",
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          7,
+          19
+        ]
+      ]
+    },
+    "source_rdf": null,
+    "verification_source": "https://api.crossref.org/works/10.1145/3805712.3808395",
+    "verification_date": "2026-09-08",
+    "verification_note": "SIGIR 2026 Industry Track classification separately verified by parent-agent primary-source audit; Crossref proceedings title itself does not distinguish tracks."
+  },
+  {
+    "slug": "right_track",
+    "title": "Am I on the Right Track? What Can Predicted Query Performance Tell Us about the Search Behaviour of Agentic RAG",
+    "year": "2026",
+    "authors": [
+      {
+        "given": "Fangzheng",
+        "family": "Tian"
+      },
+      {
+        "given": "Jinyuan",
+        "family": "Fang"
+      },
+      {
+        "given": "Debasis",
+        "family": "Ganguly"
+      },
+      {
+        "given": "Zaiqiao",
+        "family": "Meng"
+      },
+      {
+        "given": "Craig",
+        "family": "Macdonald"
+      }
+    ],
+    "type": "conferencePaper",
+    "venue": "Proceedings of the Workshop on Information Retrieval's Role in RAG Systems (IR-RAG 2025)",
+    "doi": null,
+    "url": "https://ceur-ws.org/Vol-4199/paper3.pdf",
+    "volume": "4199",
+    "pages": "22-41",
+    "source_rdf": null,
+    "verification_source": "https://ceur-ws.org/Vol-4199/",
+    "verification_date": "2026-09-08",
+    "verification_note": "Reviewed workshop, not SIGIR main conference. Workshop event 17 July 2025; preprint arXiv:2507.10411 submitted 14 July 2025. CEUR volume explicitly published 26 April 2026, so publication year is 2026; authors and title also verified at https://arxiv.org/abs/2507.10411."
+  }
+]

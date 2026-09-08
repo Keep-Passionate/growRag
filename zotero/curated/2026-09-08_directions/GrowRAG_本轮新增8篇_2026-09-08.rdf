@@ -1,0 +1,470 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rdf:RDF xmlns:bib="http://purl.org/net/biblio#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:z="http://www.zotero.org/namespaces/export#">
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:reformir">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>When More Reformulations Hurt: Avoiding Drift using Ranker Feedback</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Venktesh</foaf:givenName>
+            <foaf:surname>V</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Mandeep</foaf:givenName>
+            <foaf:surname>Rathee</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Avishek</foaf:givenName>
+            <foaf:surname>Anand</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3805712.3809721</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title>
+        <dc:identifier>DOI 10.1145/3805712.3809721</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>1778-1788</bib:pages>
+    <dc:description>SIGIR 2026 主会完整研究论文; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/方向必读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dc:subject>本轮顺序/02</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:reformir:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:reformir:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;01｜ReformIR / When More Reformulations Hurt&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;方向必读；方向一｜经验辅助的低成本查询选择&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;SIGIR 2026 主会完整研究论文&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;用原查询锚定的排序反馈和轻量替代模型，在多改写检索结果中控制预算和漂移。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;多候选、预算与防漂移已被直接覆盖。应比较历史条件/反馈是否在未逐条执行完整 RAG 时另有帮助。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;反馈、surrogate、查询权重与预算实验&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;我们的提升来自历史，还是一个已有的更好排序器？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3805712.3809721"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.1145/3805712.3809721"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2605.00560v1"&gt;补充原文或作者资料&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:raqg_qpp">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>RAQG-QPP: Query Performance Prediction with Retrieved Query Variants and Retrieval-Augmented Query Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Fangzheng</foaf:givenName>
+            <foaf:surname>Tian</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Debasis</foaf:givenName>
+            <foaf:surname>Ganguly</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Craig</foaf:givenName>
+            <foaf:surname>MacDonald</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3815198</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>ACM Transactions on Information Systems</dc:title>
+        <dc:identifier>DOI 10.1145/3815198</dc:identifier>
+        <prism:volume>44</prism:volume>
+        <prism:number>6</prism:number>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>1-28</bib:pages>
+    <dc:description>ACM TOIS 2026，信息检索重要顶级期刊; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/方向必读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dc:subject>方向二｜保留适用边界的紧凑经验</dc:subject>
+    <dc:subject>本轮顺序/03</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:raqg_qpp:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:raqg_qpp:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;02｜RAQG-QPP（TOIS）&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;方向必读；方向一｜经验辅助的低成本查询选择 / 方向二｜保留适用边界的紧凑经验&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;ACM TOIS 2026，信息检索重要顶级期刊&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;检索历史查询，必要时以它们为示例生成新变体，改善 QPP；定向读意图保真但词形不适合语料的案例。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;历史查询＋QPP 已有直接工作，也有跨语料评价。它主要评价预测质量，不等于跨题修复卡的 REUSE−FRESH。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;§3–4、§7.3；§7.4 跨语料评价&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;意思相同的两种表达，为什么检索结果仍会相差很大？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3815198"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.1145/3815198"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://eprints.gla.ac.uk/385540/"&gt;补充原文或作者资料&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:rag_qpp_tois">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>Adaptive Query Performance Prediction for Retrieval-Augmented Generation: Bridging Retrieval Quality and Generation Relevance</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Aparajita</foaf:givenName>
+            <foaf:surname>Sinha</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Kunal</foaf:givenName>
+            <foaf:surname>Chakma</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3827605</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>ACM Transactions on Information Systems</dc:title>
+        <dc:identifier>DOI 10.1145/3827605</dc:identifier>
+        <prism:volume>44</prism:volume>
+        <prism:number>6</prism:number>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>1-56</bib:pages>
+    <dc:description>ACM TOIS 2026，信息检索重要顶级期刊; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/选读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dc:subject>方向四｜证据驱动的有限修复循环</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:rag_qpp_tois:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:rag_qpp_tois:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;03｜RAG-QPP（TOIS）&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;选读；方向一｜经验辅助的低成本查询选择 / 方向四｜证据驱动的有限修复循环&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;ACM TOIS 2026，信息检索重要顶级期刊&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;利用检索后的语义、词汇与分数分布特征预测检索质量，再调整检索深度；适配黑盒生成器。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;此篇不是检索前免费预测。当前已核出版社登记摘要和作者仓库，未宣称完成 56 页全文精读。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;全文可取得后优先读特征定义、标签与自适应深度实验&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;预测 MRR 与预测历史经验额外答案收益，标签有什么不同？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3827605"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.1145/3827605"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://github.com/APARAJITA1997/RAG_QPP_JH_2026"&gt;补充原文或作者资料&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:q2ei">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Q2EI: Query-to-Entity Inference for Semantic Condensation in Domain-Specific Retrieval</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yixuan</foaf:givenName>
+            <foaf:surname>Sun</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zhenqin</foaf:givenName>
+            <foaf:surname>Xu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>HanFeng</foaf:givenName>
+            <foaf:surname>Zhai</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zishu</foaf:givenName>
+            <foaf:surname>Yu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Xiaohui</foaf:givenName>
+            <foaf:surname>Peng</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.18653/v1/2026.findings-acl.1791</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2026.findings-acl.1791</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>35943-35958</bib:pages>
+    <dc:description>Findings of ACL 2026，正式审稿; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/选读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:q2ei:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:q2ei:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;04｜Q2EI&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;选读；方向一｜经验辅助的低成本查询选择&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;Findings of ACL 2026，正式审稿&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;把领域中的通俗描述压缩成实体导向的查询，提示我们改写也可以做减法，而不只是补词。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;实体推断可能错误；领域检索改进不能自动证明长期经验复用有益。此轮以正式摘要与结果讨论为定向核验。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;实体推断、语义压缩及实体对齐/未对齐案例&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;为什么仅保留关键实体可能比一大段扩写更有效？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.18653/v1/2026.findings-acl.1791"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.18653/v1/2026.findings-acl.1791"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:smr">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>From Token to Action: State Machine Reasoning to Mitigate Overthinking in Information Retrieval</dc:title>
+    <dc:date>2025</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Dohyeon</foaf:givenName>
+            <foaf:surname>Lee</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yeonseok</foaf:givenName>
+            <foaf:surname>Jeong</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Seung-won</foaf:givenName>
+            <foaf:surname>Hwang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.18653/v1/2025.findings-emnlp.371</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Findings of the Association for Computational Linguistics: EMNLP 2025</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2025.findings-emnlp.371</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>7048-7064</bib:pages>
+    <dc:description>Findings of EMNLP 2025，正式审稿; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/选读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dc:subject>方向四｜证据驱动的有限修复循环</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:smr:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:smr:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;05｜SMR / From Token to Action&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;选读；方向一｜经验辅助的低成本查询选择 / 方向四｜证据驱动的有限修复循环&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;Findings of EMNLP 2025，正式审稿&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;用 REFINE、RERANK、STOP 离散动作管理检索推理，检查冗余、token 成本和意图对齐。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;状态机＋有限停止＋漂移检查已有方法；其 Judge 对齐分数不构成严格语义保真证明。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;动作策略、意图漂移分析及成本对照&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;停止减少的是无效动作，还是误删了本来能解决问题的步骤？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.18653/v1/2025.findings-emnlp.371"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.18653/v1/2025.findings-emnlp.371"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:recap">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>RECAP: REwriting Conversations for Intent Understanding in Agentic Planning</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Kushan</foaf:givenName>
+            <foaf:surname>Mitra</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Dan</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hannah</foaf:givenName>
+            <foaf:surname>Kim</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Estevam</foaf:givenName>
+            <foaf:surname>Hruschka</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.18653/v1/2026.findings-eacl.105</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Findings of the Association for Computational Linguistics: EACL 2026</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2026.findings-eacl.105</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>2015-2033</bib:pages>
+    <dc:description>Findings of EACL 2026，正式审稿; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/选读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:recap:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:recap:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;06｜RECAP&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;选读；方向一｜经验辅助的低成本查询选择&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;Findings of EACL 2026，正式审稿&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;从多轮对话澄清用户当前目标，研究歧义、含糊和变化中的意图。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;对话中用户真的改变意图，不等于我们的改写器误改了固定 q0；它是规划基准，不是开放域 RAG 主测试集。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;意图问题分类、数据构成和规划效用评价&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;缺少用户选择时，系统能补词，还是必须先澄清？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.18653/v1/2026.findings-eacl.105"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.18653/v1/2026.findings-eacl.105"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:wewrite">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>When &amp; How to Write for Personalized Demand-aware Query Rewriting in Video Search</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Cheng</foaf:givenName>
+            <foaf:surname>Cheng</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Chenxing</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Aolin</foaf:givenName>
+            <foaf:surname>Li</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Haijun</foaf:givenName>
+            <foaf:surname>Wu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Huiyun</foaf:givenName>
+            <foaf:surname>Hu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Juyuan</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Dongliang</foaf:givenName>
+            <foaf:surname>Liao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3805712.3808395</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title>
+        <dc:identifier>DOI 10.1145/3805712.3808395</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>4528-4533</bib:pages>
+    <dc:description>SIGIR 2026 Industry Track; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/选读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dc:subject>方向二｜保留适用边界的紧凑经验</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:wewrite:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:wewrite:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;07｜WeWrite / When &amp;amp; How to Write&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;选读；方向一｜经验辅助的低成本查询选择 / 方向二｜保留适用边界的紧凑经验&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;SIGIR 2026 Industry Track&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;在个性化视频搜索中先判断是否需要改写，再处理历史偏好、当前需求和索引词汇的对齐。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;when/how 和防止历史诱发漂移并非首次；用户兴趣历史与我们的程序性修复经验不是同一种记忆。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;何时/如何改写、历史干扰与索引对齐；使用 v2 七作者版&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;哪些历史事实只能作为用户偏好，不能成为新问题的确定前提？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3805712.3808395"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.1145/3805712.3808395"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2602.17667v2"&gt;补充原文或作者资料&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;SIGIR 2026 Industry Track classification separately verified by parent-agent primary-source audit; Crossref proceedings title itself does not distinguish tracks.&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:reading:20260908:right_track">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Am I on the Right Track? What Can Predicted Query Performance Tell Us about the Search Behaviour of Agentic RAG</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Fangzheng</foaf:givenName>
+            <foaf:surname>Tian</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jinyuan</foaf:givenName>
+            <foaf:surname>Fang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Debasis</foaf:givenName>
+            <foaf:surname>Ganguly</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zaiqiao</foaf:givenName>
+            <foaf:surname>Meng</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Craig</foaf:givenName>
+            <foaf:surname>Macdonald</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://ceur-ws.org/Vol-4199/paper3.pdf</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the Workshop on Information Retrieval's Role in RAG Systems (IR-RAG 2025)</dc:title>
+        <prism:volume>4199</prism:volume>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>22-41</bib:pages>
+    <dc:description>IR-RAG@SIGIR 2025 Workshop；CEUR 2026 出版，非 SIGIR 主会; AI 中文导读见子笔记。元数据核验日期 2026-09-08</dc:description>
+    <dc:subject>GrowRAG/研究方向2026-09-08</dc:subject>
+    <dc:subject>阅读/选读</dc:subject>
+    <dc:subject>方向一｜经验辅助的低成本查询选择</dc:subject>
+    <dc:subject>方向四｜证据驱动的有限修复循环</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:reading:20260908:right_track:guide" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:right_track:guide">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;08｜Am I on the Right Track?&lt;/h2&gt;&lt;h3&gt;阅读级别与方向&lt;/h3&gt;&lt;p&gt;选读；方向一｜经验辅助的低成本查询选择 / 方向四｜证据驱动的有限修复循环&lt;/p&gt;&lt;h3&gt;正式发表状态&lt;/h3&gt;&lt;p&gt;IR-RAG@SIGIR 2025 Workshop；CEUR 2026 出版，非 SIGIR 主会&lt;/p&gt;&lt;h3&gt;做了什么；要学什么&lt;/h3&gt;&lt;p&gt;分析 Agentic RAG 各轮搜索的 QPP、轮数与最终答案关系，理解搜索过程信号。&lt;/p&gt;&lt;h3&gt;没有据此证明什么；与我们的重合边界&lt;/h3&gt;&lt;p&gt;这是分析性工作，不能表述为已证明可靠的 QPP 停止控制器；正文正式出版年份与活动年份分开。&lt;/p&gt;&lt;h3&gt;精读位置&lt;/h3&gt;&lt;p&gt;§3–5 与附录的漂移/成功案例&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;某轮 QPP 高，是说明搜得好，还是说明可以停止并答对？&lt;/p&gt;&lt;p&gt;以上是 AI 辅助导读，不是论文原摘要，不代表用户已经读过。候选创新尚未证明。未计量引用次数，不作虚构高引排名。&lt;/p&gt;&lt;p&gt;&lt;a href="https://ceur-ws.org/Vol-4199/paper3.pdf"&gt;论文入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://ceur-ws.org/Vol-4199/"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2507.10411v1"&gt;补充原文或作者资料&lt;/a&gt;&lt;/p&gt;&lt;p&gt;元数据核验日期：2026-09-08；导读整理：2026-09-08。历史日期原样保留，不表示全部论文今天逐句重读。&lt;/p&gt;&lt;p&gt;Reviewed workshop, not SIGIR main conference. Workshop event 17 July 2025; preprint arXiv:2507.10411 submitted 14 July 2025. CEUR volume explicitly published 26 April 2026, so publication year is 2026; authors and title also verified at https://arxiv.org/abs/2507.10411.&lt;/p&gt;&lt;p&gt;仅确认预印本不等于未投稿或已被拒；不含 PDF，不直接写入 Zotero。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <bib:Memo rdf:about="urn:growrag:reading:20260908:本轮新增8篇:overview">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;00｜阅读导航&lt;/h2&gt;&lt;p&gt;这是研究选题包，不要求逐篇全部精读。方向一、二优先；三是可独立研究的备选；四先作支撑模块。先读 QPP → ReformIR → RAQG-QPP → ReFormeR → RRM → QCR，再决定是否转向长期记忆。&lt;/p&gt;&lt;p&gt;有基础再按此顺序读；术语不熟先补 Query Rewriting、ReAct、Self-RAG。完整包与新增包二选一导入；不同组中的同一文献共享条目。不要覆盖或删除原有批注。&lt;/p&gt;&lt;p&gt;我们要检验的是历史相对现场修复的额外价值，不把少调用、永不用记忆或更高预测分数自动称作成功。两篇 TOIS 已确认正式期刊；Findings/Industry/Workshop 分开标注。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <z:Collection rdf:about="urn:growrag:reading:20260908:本轮新增8篇:collection">
+    <dc:title>GrowRAG｜本轮新增8篇｜2026-09-08</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:本轮新增8篇:overview" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:本轮新增8篇:group:A" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:本轮新增8篇:group:B" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:本轮新增8篇:group:D" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:reading:20260908:本轮新增8篇:group:A">
+    <dc:title>方向一｜经验辅助的低成本查询选择</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:reformir" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:raqg_qpp" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:rag_qpp_tois" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:q2ei" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:smr" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:recap" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:wewrite" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:right_track" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:reading:20260908:本轮新增8篇:group:B">
+    <dc:title>方向二｜保留适用边界的紧凑经验</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:raqg_qpp" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:wewrite" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:reading:20260908:本轮新增8篇:group:D">
+    <dc:title>方向四｜证据驱动的有限修复循环</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:rag_qpp_tois" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:smr" />
+    <dcterms:hasPart rdf:resource="urn:growrag:reading:20260908:right_track" />
+  </z:Collection>
+</rdf:RDF>
