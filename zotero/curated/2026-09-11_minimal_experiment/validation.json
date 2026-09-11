@@ -1,0 +1,66 @@
+{
+  "built_date": "2026-09-11",
+  "scope": "Offline Zotero bibliography/readme assets only; not runtime code or experiments",
+  "files": [
+    {
+      "file": "GrowRAG_最小表示选择实验_完整17篇_2026-09-11.rdf",
+      "papers": 17,
+      "paper_child_notes": 17,
+      "notes_including_overview": 18,
+      "collections": 6,
+      "types": {
+        "conferencePaper": 14,
+        "preprint": 2,
+        "journalArticle": 1
+      },
+      "sha256": "ddf3c13bb8425da4301135d16163b2017ab07b5876c4884062897fb18c72acea",
+      "duplicate_ids": 0,
+      "duplicate_dois": 0,
+      "duplicate_titles": 0,
+      "dangling_relations": 0,
+      "author_order_doi_url_metadata_roundtrip": "passed",
+      "child_note_html_parse": "passed",
+      "zotero_client_import_tested": false,
+      "pdf_attachments": 0
+    },
+    {
+      "file": "GrowRAG_相对09-08聚焦包_补充5篇_2026-09-11.rdf",
+      "papers": 5,
+      "paper_child_notes": 5,
+      "notes_including_overview": 6,
+      "collections": 3,
+      "types": {
+        "conferencePaper": 5
+      },
+      "sha256": "16a0756edfa0223d8089c9db0c2fbe77767ca2064df1957f71e6a720b3cdccd2",
+      "duplicate_ids": 0,
+      "duplicate_dois": 0,
+      "duplicate_titles": 0,
+      "dangling_relations": 0,
+      "author_order_doi_url_metadata_roundtrip": "passed",
+      "child_note_html_parse": "passed",
+      "zotero_client_import_tested": false,
+      "pdf_attachments": 0
+    }
+  ],
+  "original_12_metadata_preserved_exactly": true,
+  "increment_relative_to": "2026-09-08_memory_cards (12 papers), not all historical recommendations",
+  "increment_papers": [
+    "hotpotqa",
+    "adaptive_rag",
+    "decomprc",
+    "docbench",
+    "doclaynet"
+  ],
+  "increment_count": 5,
+  "new_metadata_official_sources_checked_date": "2026-09-11",
+  "all_17_full_texts_rechecked_today": false,
+  "network_checks_in_build": false,
+  "per_paper_markdown_notes": 17,
+  "publication_caveats": [
+    "DocBench: workshop",
+    "ReMe: Findings",
+    "RRM/QCR: preprint status retained from prior verification"
+  ],
+  "zotero_client_import_tested": false
+}

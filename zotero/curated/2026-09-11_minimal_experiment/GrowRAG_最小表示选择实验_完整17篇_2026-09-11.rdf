@@ -1,0 +1,1093 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rdf:RDF xmlns:bib="http://purl.org/net/biblio#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:z="http://www.zotero.org/namespaces/export#">
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:reformer">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ReFormeR: Learning and Applying Explicit Query Reformulation Patterns</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Amin</foaf:givenName>
+            <foaf:surname>Bigdeli</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Mert</foaf:givenName>
+            <foaf:surname>Incesu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Negar</foaf:givenName>
+            <foaf:surname>Arabzadeh</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Charles L. A.</foaf:givenName>
+            <foaf:surname>Clarke</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Ebrahim</foaf:givenName>
+            <foaf:surname>Bagheri</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1007/978-3-032-21300-6_30</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>48th European Conference on Information Retrieval (ECIR 2026)</dc:title>
+        <dc:identifier>DOI 10.1007/978-3-032-21300-6_30</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>先把研究对象看清：从有效查询改写对得到可复用模式，再为新问题选择模式。它连接方向一的选择与方向二的表示。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>01 最小实验前先读｜方法与数据4篇</dc:subject>
+    <dc:subject>已审稿：ECIR 2026 正式会议论文；信息检索领域重要会议</dc:subject>
+    <dc:subject>阅读顺序/01</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:reformer:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:reformer:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;ReFormeR｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 01；01 最小实验前先读｜方法与数据4篇。先把研究对象看清：从有效查询改写对得到可复用模式，再为新问题选择模式。它连接方向一的选择与方向二的表示。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：ECIR 2026 正式会议论文；信息检索领域重要会议&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;顺着一个查询对读模式提取、模式库和基于当前上下文的模式选择。分清成功来源、模式内容和执行后的查询；注意选择使用初始检索上下文，不是完全无检索的前置判断。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴查询对、改写模式和当前实体重新绑定；为 M1 具体改写对、M3 动作模板提供参照。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;成功改写抽象为模式并选择复用已被覆盖，不能包装为我们的新意。本文的机制与任务设置不能直接替代我们固定来源/候选/执行器、只改选择端表示的局部对照。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;先做受启发的同源表示控制，不称为完整 ReFormeR 复现；若后续比较完整方法，另对齐底座、语料、检索预算及执行协议。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;模式究竟保留了哪些选择线索？删掉历史问题或上下文后，选择错误发生在哪一类新题？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1007/978-3-032-21300-6_30"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2604.01417v1"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1007/978-3-032-21300-6_30"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:awm">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Agent Workflow Memory</dc:title>
+    <dc:date>2025</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zora Zhiruo</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jiayuan</foaf:givenName>
+            <foaf:surname>Mao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Daniel</foaf:givenName>
+            <foaf:surname>Fried</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Graham</foaf:givenName>
+            <foaf:surname>Neubig</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://proceedings.mlr.press/v267/wang25bx.html</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 42nd International Conference on Machine Learning</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>本轮优先学如何对比记忆表示，以及历史流程不适合当前状态时如何偏离它。先读相关小节，不要求先掌握全部网页代理系统。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>01 最小实验前先读｜方法与数据4篇</dc:subject>
+    <dc:subject>已审稿：ICML 2025，机器学习顶会</dc:subject>
+    <dc:subject>阅读顺序/02</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:awm:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:awm:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;AWM｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 02；01 最小实验前先读｜方法与数据4篇。本轮优先学如何对比记忆表示，以及历史流程不适合当前状态时如何偏离它。先读相关小节，不要求先掌握全部网页代理系统。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：ICML 2025，机器学习顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;重点 §4 的表示实验以及 §3.2.1 偏离既有流程的讨论，再回看 §2 的流程抽象。追踪状态、操作、变量化、自然语言/程序表示各承担什么作用。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴具体到抽象的表示控制，以及更多上下文不一定更好这一实验问题。M3 可参考变量化操作，但不要复制旧任务实体。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;记忆表示比较、工作流抽象和跨任务复用并非空白。网页交互工作流不是我们查询修复卡的完整基线；论文已有结果不预先决定 HotpotQA 上哪种记法更好。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;固定候选来源和规范动作，再比较选择器读 M1/M2/M3/M5 的效果；避免同时改写器和选择器都变化，无法归因。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;哪些状态内容是当前决策所需，哪些只增加长度？何时应该不按历史流程执行？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://proceedings.mlr.press/v267/wang25bx.html"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2409.07429"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://proceedings.mlr.press/v267/wang25bx.html"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:reme">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Remember Me, Refine Me: A Dynamic Procedural Memory Framework for Experience-Driven Agent Evolution</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zouying</foaf:givenName>
+            <foaf:surname>Cao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jiaji</foaf:givenName>
+            <foaf:surname>Deng</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Li</foaf:givenName>
+            <foaf:surname>Yu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Weikang</foaf:givenName>
+            <foaf:surname>Zhou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zhaoyang</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Bolin</foaf:givenName>
+            <foaf:surname>Ding</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hai</foaf:givenName>
+            <foaf:surname>Zhao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/2026.findings-acl.829/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Findings of the Association for Computational Linguistics: ACL 2026</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2026.findings-acl.829</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>学习经验卡如何组织场景、内容、关键词、置信度和工具，以及经验获取、检索、适配之间的区别。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>01 最小实验前先读｜方法与数据4篇</dc:subject>
+    <dc:subject>已审稿：Findings ACL 2026；不是 ACL 主会长文</dc:subject>
+    <dc:subject>阅读顺序/03</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:reme:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:reme:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;ReMe｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 03；01 最小实验前先读｜方法与数据4篇。学习经验卡如何组织场景、内容、关键词、置信度和工具，以及经验获取、检索、适配之间的区别。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：Findings ACL 2026；不是 ACL 主会长文&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读方法中的经验字段、场景索引与当前任务适配，再读表示/索引消融及错误分析。对照轨迹、关键经验和场景索引各提供多少信息。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴场景与操作分开存，以及按当前任务适配记忆；可给强摘要 M2 和带条件 M5 提供参照。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;条件化经验、压缩、使用效果维护及有害经验分析已有覆盖，不能声称前人只按问题相似度。其代理任务的维护反馈不自动等于单张卡在新查询上相对 FRESH 的额外收益。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;首轮固定经验池，不同时加入动态淘汰。M2 必须是合理强摘要，可以包含条件；不可故意给摘要少信息后宣称结构化更优。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;哪些信息应该用于召回，哪些用于最终选择？一张历史成功卡为什么仍可能不适合新题？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2026.findings-acl.829/"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2512.10696v2"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2026.findings-acl.829/"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:hotpotqa">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering</dc:title>
+    <dc:date>2018</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zhilin</foaf:givenName>
+            <foaf:surname>Yang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Peng</foaf:givenName>
+            <foaf:surname>Qi</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Saizheng</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yoshua</foaf:givenName>
+            <foaf:surname>Bengio</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>William</foaf:givenName>
+            <foaf:surname>Cohen</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Ruslan</foaf:givenName>
+            <foaf:surname>Salakhutdinov</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Christopher D.</foaf:givenName>
+            <foaf:surname>Manning</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/D18-1259/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing</dc:title>
+        <dc:identifier>DOI 10.18653/v1/D18-1259</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>2369–2380</bib:pages>
+    <dc:description>在跑实验前读懂一道题包含什么、哪些是金标、哪些可以给模型，以及答案指标与证据指标为何要分开。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>01 最小实验前先读｜方法与数据4篇</dc:subject>
+    <dc:subject>已审稿：EMNLP 2018，NLP 顶会；数据集基础论文</dc:subject>
+    <dc:subject>阅读顺序/04</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:hotpotqa:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:hotpotqa:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;HotpotQA｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 04；01 最小实验前先读｜方法与数据4篇。在跑实验前读懂一道题包含什么、哪些是金标、哪些可以给模型，以及答案指标与证据指标为何要分开。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：EMNLP 2018，NLP 顶会；数据集基础论文&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;重点数据构造、distractor/fullwiki 设置、bridge/comparison、supporting facts 和官方 EM/F1/Joint 指标；结合官方 README 看 JSON。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴题目与证据的分层评价，用 bridge/comparison 作结果分层；它们不是 PDF 元数据结构题。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;训练集含主要为单跳的 train-easy；不能把所有题都称为严格必需多跳。原论文人工抽样的推理细类不是逐题官方字段。type/level 在隐藏 test 不提供，不能当正式路由输入。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;只用适配来源形成经验；开发错误可分析，但冻结评价题不能反过来更新卡片。明确小语料诊断与 fullwiki 不同，不把诊断分数作为官方榜单可比结果。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;答对但支持事实没找全，究竟是修复成功、知识猜中，还是证据评价遗漏？需要保留哪些真实轨迹才能判别？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-11；中文导读更新：2026-09-11。官方书目页、作者原文数据分析、官方仓库数据字段；旧包已有，本次不是历史首次推荐。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/D18-1259/"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://github.com/hotpotqa/hotpot#json-format"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/D18-1259/"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:rrm">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>RRM: Experience-Driven Reflective Retrieval Memory for Long-Horizon Multimodal Reasoning</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jingxiang</foaf:givenName>
+            <foaf:surname>Fan</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Junbao</foaf:givenName>
+            <foaf:surname>Zhuo</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Bochao</foaf:givenName>
+            <foaf:surname>Zou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://arxiv.org/abs/2607.28156</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>arXiv</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>创新排重必读。它与查询级经验复用、适用条件、现场修复及维护十分接近，不因是预印本而忽略。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>02 创新排重与经验基础｜3篇</dc:subject>
+    <dc:subject>预印本：沿用 2026-09-05 的核验；未确认正式会议/期刊，不等于未投稿</dc:subject>
+    <dc:subject>阅读顺序/05</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:rrm:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:rrm:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;RRM｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 05；02 创新排重与经验基础｜3篇。创新排重必读。它与查询级经验复用、适用条件、现场修复及维护十分接近，不因是预印本而忽略。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;预印本：沿用 2026-09-05 的核验；未确认正式会议/期刊，不等于未投稿&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;区分本题在线查询修复与跨题经验，逐项看 applicability conditions、证据要求、检索策略、不希望的行为、查询调整及来源过滤。读包含现场修复与经验模块的对照。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴程序性信息而非历史答案的复用；学习适用条件需要结合当前可观测状态，而不是只比较题面相似度。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;适用条件、query-only 复用与维护已经存在，不能重复作为新贡献。它的多模态长时推理设置不直接回答我们固定查询修复候选时，最小哪些字段决定是否值得执行。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;把条件相关设计标为 RRM 启发的控制组，不称完整复现；本文已有现场修复增量分析，不能声称 REUSE−FRESH 的思想此前完全没有。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;一个条件来自观察、模型推断，还是独立反馈验证？历史成功说明动作能成功，但说明它比这题 FRESH 更好吗？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/abs/2607.28156"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2607.28156v1"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/abs/2607.28156"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:qcr">
+    <z:itemType>preprint</z:itemType>
+    <dc:title>Beyond Retrieval: Query-Conditioned Reuse of Long-Horizon Agent Trajectories</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yifei</foaf:givenName>
+            <foaf:surname>Li</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Heng</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Lingling</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Muye</foaf:givenName>
+            <foaf:surname>Huang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Xinyu</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jiashuai</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hang</foaf:givenName>
+            <foaf:surname>Yan</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Rongman</foaf:givenName>
+            <foaf:surname>Xu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://arxiv.org/abs/2608.12847</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>arXiv</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>创新排重必读。已有同来源轨迹、通用摘要和目标条件化表示的对照，直接限制我们能够提出的新意。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>02 创新排重与经验基础｜3篇</dc:subject>
+    <dc:subject>预印本：沿用 2026-09-05 的核验；未确认正式会议/期刊，不等于未投稿</dc:subject>
+    <dc:subject>阅读顺序/06</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:qcr:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:qcr:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;QCR｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 06；02 创新排重与经验基础｜3篇。创新排重必读。已有同来源轨迹、通用摘要和目标条件化表示的对照，直接限制我们能够提出的新意。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;预印本：沿用 2026-09-05 的核验；未确认正式会议/期刊，不等于未投稿&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读不变操作、当前变量重新获取、适用/拒绝条件与核查项；特别看如何控制检索候选、摘要预算和在线写笔记成本。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴固定源经验、目标绑定、适用条件和验证步骤；这些组成可以给 M5 条件卡提供参照。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;不能声称首次比较具体轨迹和抽象条件卡。其目标条件化笔记用于所选轨迹的复用；我们的 E1 应明确只改变选择端所读信息，并让被选动作执行内容保持相同，差异是否有价值尚待证据。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;若生成目标条件化卡，所有表示必须有相同目标可见信息，记录写卡成本；PRE 不读取金标或尚不存在的检索缺口。不能让一组先看更多目标信息。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;提升来自表示、增加的信息、目标适配，还是额外推理预算？怎样把这些因素拆开？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/abs/2608.12847"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2608.12847v1"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/abs/2608.12847"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:expel">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>ExpeL: LLM Agents Are Experiential Learners</dc:title>
+    <dc:date>2024</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Andrew</foaf:givenName>
+            <foaf:surname>Zhao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Daniel</foaf:givenName>
+            <foaf:surname>Huang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Quentin</foaf:givenName>
+            <foaf:surname>Xu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Matthieu</foaf:givenName>
+            <foaf:surname>Lin</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yong-Jin</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Gao</foaf:givenName>
+            <foaf:surname>Huang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://ojs.aaai.org/index.php/AAAI/article/view/29936</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the AAAI Conference on Artificial Intelligence</dc:title>
+        <dc:identifier>DOI 10.1609/aaai.v38i17.29936</dc:identifier>
+        <prism:volume>38</prism:volume>
+        <prism:number>17</prism:number>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>19632–19642</bib:pages>
+    <dc:description>重要补充：理解具体成功轨迹与抽象洞见如何互补；其 HotpotQA 任务有利于建立记忆代理与当前 RAG 实验的联系。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>02 创新排重与经验基础｜3篇</dc:subject>
+    <dc:subject>已审稿：AAAI 2024，人工智能顶会</dc:subject>
+    <dc:subject>阅读顺序/07</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:expel:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:expel:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;ExpeL｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 07；02 创新排重与经验基础｜3篇。重要补充：理解具体成功轨迹与抽象洞见如何互补；其 HotpotQA 任务有利于建立记忆代理与当前 RAG 实验的联系。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：AAAI 2024，人工智能顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;看成功/失败经验如何产生洞见，洞见如何增删调整，以及检索轨迹示例与洞见各自的消融。再联系 HotpotQA 的实际输入输出。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴具体记录与摘要并存的控制思想；了解反馈不仅能来自题面相似度，也能来自历史尝试差异。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;具体加抽象、经验提炼与跨任务迁移都不是我们的独创。其完整代理执行和更新机制不能被一个摘要卡对照替代。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;M1/M2 是经验信息的局部控制，不能直接命名为 ExpeL 复现结果；首轮不启用反复抽象更新，防止表示效果与更新漂移混在一起。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;具体轨迹提供的必要细节能否用少量条件保留？省下的 token 是否以误用增加为代价？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-08；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://ojs.aaai.org/index.php/AAAI/article/view/29936"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2308.10144"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://ojs.aaai.org/index.php/AAAI/article/view/29936"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:qpp_variant">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Can QPP Choose the Right Query Variant? Evaluating Query Variant Selection for RAG Pipelines</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Negar</foaf:givenName>
+            <foaf:surname>Arabzadeh</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Andrew</foaf:givenName>
+            <foaf:surname>Drozdov</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Michael</foaf:givenName>
+            <foaf:surname>Bendersky</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Matei</foaf:givenName>
+            <foaf:surname>Zaharia</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3805712.3808571</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title>
+        <dc:identifier>DOI 10.1145/3805712.3808571</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>首轮表示对照之后，增强方向一的低成本选择器；学清查询效果预测与最终回答效用的差别。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>03 后续选择器增强｜QPP相关3篇</dc:subject>
+    <dc:subject>已审稿：SIGIR 2026，信息检索顶会</dc:subject>
+    <dc:subject>阅读顺序/08</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:qpp_variant:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:qpp_variant:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;QPP Query Variant Selection｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 08；03 后续选择器增强｜QPP相关3篇。首轮表示对照之后，增强方向一的低成本选择器；学清查询效果预测与最终回答效用的差别。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：SIGIR 2026，信息检索顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读查询变体生成、不同 QPP 特征、选查询方式、检索评价与答案评价；特别区分检索前特征和需要检索结果的特征。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴用便宜信号选择候选、少跑昂贵完整 RAG 的思路；生成更多查询文本不等于没有成本。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;QPP 预测检索表现，不自动预测单条历史经验相对 FRESH 的额外收益。小规模 TREC-RAG 设置不能替代大规模跨题经验迁移证据。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;首轮冻结选择器，避免同时换表示和 QPP；后续在同一候选池比较 QPP、经验信息、两者结合，完整记录预检索与后检索成本。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;预测检索更好的查询是否真的回答更好？在什么错误类型上经验条件补足 QPP？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3805712.3808571"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2604.22661v1"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3805712.3808571"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:reformir">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>When More Reformulations Hurt: Avoiding Drift using Ranker Feedback</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Venktesh</foaf:givenName>
+            <foaf:surname>V</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Mandeep</foaf:givenName>
+            <foaf:surname>Rathee</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Avishek</foaf:givenName>
+            <foaf:surname>Anand</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3805712.3809721</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval</dc:title>
+        <dc:identifier>DOI 10.1145/3805712.3809721</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>1778-1788</bib:pages>
+    <dc:description>理解更多改写为什么会伤害原问题，以及原问题锚定反馈怎样帮助预算分配。注意它不是 ReFormeR。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>03 后续选择器增强｜QPP相关3篇</dc:subject>
+    <dc:subject>已审稿：SIGIR 2026，信息检索顶会</dc:subject>
+    <dc:subject>阅读顺序/09</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:reformir:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:reformir:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;ReformIR｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 09；03 后续选择器增强｜QPP相关3篇。理解更多改写为什么会伤害原问题，以及原问题锚定反馈怎样帮助预算分配。注意它不是 ReFormeR。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：SIGIR 2026，信息检索顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读原问题锚定的 ranker feedback、合并候选与昂贵重排的预算分配；在流程里标出哪些检索已经执行。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴意图漂移诊断和成本分账，区分生成查询、检索、重排、回答各阶段开销。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;该方法已经支付候选检索成本，不能称完全无检索的前置选择。它主要处理查询重构和排序反馈，不直接验证我们历史卡片字段在固定执行器下的选择价值。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;后续可加入原问题约束信号；首轮不同时改重排器或索引。比较经验增量时仍需 FRESH，而不只比较不改写 BASE。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;高检索分数是否来自偏离原问题的主题？哪些历史条件能提醒当前比较对象或属性不能被替换？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-08；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3805712.3809721"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2605.00560v1"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.1145/3805712.3809721"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:raqg_qpp">
+    <z:itemType>journalArticle</z:itemType>
+    <dc:title>RAQG-QPP: Query Performance Prediction with Retrieved Query Variants and Retrieval-Augmented Query Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Fangzheng</foaf:givenName>
+            <foaf:surname>Tian</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Debasis</foaf:givenName>
+            <foaf:surname>Ganguly</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Craig</foaf:givenName>
+            <foaf:surname>MacDonald</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3815198</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>ACM Transactions on Information Systems</dc:title>
+        <dc:identifier>DOI 10.1145/3815198</dc:identifier>
+        <prism:volume>44</prism:volume>
+        <prism:number>6</prism:number>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>1-28</bib:pages>
+    <dc:description>确认历史查询与 QPP 已结合到什么程度，避免把历史查询辅助预测本身包装为新意。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>03 后续选择器增强｜QPP相关3篇</dc:subject>
+    <dc:subject>已审稿：ACM TOIS 2026，信息检索领域重要顶刊</dc:subject>
+    <dc:subject>阅读顺序/10</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:raqg_qpp:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:raqg_qpp:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;RAQG-QPP｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 10；03 后续选择器增强｜QPP相关3篇。确认历史查询与 QPP 已结合到什么程度，避免把历史查询辅助预测本身包装为新意。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：ACM TOIS 2026，信息检索领域重要顶刊&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;区分检索到的历史查询变体、生成的变体以及它们在 QPP 中的作用；读生成与预测管线和跨集合评价。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴历史查询变体提供额外预测信号，而不是必须先执行所有完整 RAG 的成本思路。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;历史变体与检索增强查询生成已存在；我们必须具体证明条件表示在固定候选动作中减少误选，不能仅声称把 memory 和 QPP 拼起来。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;放在首轮同源表示结果之后；先看哪些错误可由条件解释，再决定是否值得增加 QPP/历史排序反馈特征。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;已有查询变体信号没有捕捉到的是对象绑定、任务属性、约束还是其他因素？需要配对实例而非口头假设。&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-08；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3815198"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2604.27244v1"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://api.crossref.org/works/10.1145/3815198"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:sufficient_context">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Sufficient Context: A New Lens on Retrieval Augmented Generation Systems</dc:title>
+    <dc:date>2025</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hailey</foaf:givenName>
+            <foaf:surname>Joren</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jianyi</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Chun-Sung</foaf:givenName>
+            <foaf:surname>Ferng</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Da-Cheng</foaf:givenName>
+            <foaf:surname>Juan</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Ankur</foaf:givenName>
+            <foaf:surname>Taly</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Cyrus</foaf:givenName>
+            <foaf:surname>Rashtchian</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>The Thirteenth International Conference on Learning Representations</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>有限修复循环的判断基础，先分清证据足够与答案正确并非同一个标签。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>04 有限修复循环后置｜3篇</dc:subject>
+    <dc:subject>已审稿：ICLR 2025，机器学习顶会</dc:subject>
+    <dc:subject>阅读顺序/11</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:sufficient_context:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:sufficient_context:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;Sufficient Context｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 11；04 有限修复循环后置｜3篇。有限修复循环的判断基础，先分清证据足够与答案正确并非同一个标签。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：ICLR 2025，机器学习顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读 sufficient context 的定义、判定方法与答案正确性之间的关系；关注充分但答错、不充分却答对等情形。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴证据层与答案层分开分析，避免把任何一次答对都永久记成可靠经验。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;充分性判定本身可能出错，不是数学正确性证明，也不是使用经验必然带来额外收益的证据。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;后置到 POST 有限修复；首轮 PRE 不读取目标题的未来缺口。若后续使用 judge，冻结提示词只是控制变量，必须校验其错误。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;证据增加后答案没变，是收益为零还是读者没用好？必须分开看两层指标。&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://proceedings.iclr.cc/paper_files/paper/2025/hash/33dffa2e3d2ab74a783d1a8c292f66d9-Abstract-Conference.html"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:s2g_rag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>S2G-RAG: Structured Sufficiency and Gap Judging for Iterative Retrieval-Augmented QA</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Minghan</foaf:givenName>
+            <foaf:surname>Li</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Junjie</foaf:givenName>
+            <foaf:surname>Zou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Xinxuan</foaf:givenName>
+            <foaf:surname>Lv</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Chao</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Guodong</foaf:givenName>
+            <foaf:surname>Zhou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/2026.acl-long.1185/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of ACL 2026 (Volume 1: Long Papers)</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2026.acl-long.1185</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>有限修复循环和 M4 状态卡的后续参照；它提供当前题的结构化充分性/缺口，不等于长期经验卡。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>04 有限修复循环后置｜3篇</dc:subject>
+    <dc:subject>已审稿：ACL 2026 主会长文，NLP 顶会</dc:subject>
+    <dc:subject>阅读顺序/12</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:s2g_rag:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:s2g_rag:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;S2G-RAG｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 12；04 有限修复循环后置｜3篇。有限修复循环和 M4 状态卡的后续参照；它提供当前题的结构化充分性/缺口，不等于长期经验卡。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：ACL 2026 主会长文，NLP 顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读结构化 gap、充分性判断、下一步 query、累计证据及轮数停止。分清抽取句子标识再映射原文与自由生成新事实。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴先说明缺什么，再执行针对性修复；记录当前可观测证据状态而非让经验强行制造缺口。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;实体/属性/关系等缺口表达已存在；不是所有语义改写都由结构缺失触发。该工作主要是本题迭代，不可直接等同跨题长期卡表示。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;第一轮 E1 不扩成完整递归系统；M4 和有限修复在后续单独做。所有组共享相同证据和修复预算。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;缺口是当前检索实际观察到的，还是历史题留下的？达到轮数上限与真正证据充分应如何分别记录？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2026.acl-long.1185/"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2026.acl-long.1185/"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2026.acl-long.1185/"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:gam_rag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>GAM-RAG: Gain-Adaptive Memory for Evolving Retrieval in Retrieval-Augmented Generation</dc:title>
+    <dc:date>2026</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yifan</foaf:givenName>
+            <foaf:surname>Wang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Mingxuan</foaf:givenName>
+            <foaf:surname>Jiang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zhihao</foaf:givenName>
+            <foaf:surname>Sun</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yixin</foaf:givenName>
+            <foaf:surname>Cao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Yicun</foaf:givenName>
+            <foaf:surname>Liu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Keyang</foaf:givenName>
+            <foaf:surname>Chen</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Guangnan</foaf:givenName>
+            <foaf:surname>Ye</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hongfeng</foaf:givenName>
+            <foaf:surname>Chai</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://icml.cc/virtual/2026/poster/65843</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 43rd International Conference on Machine Learning (ICML 2026)</dc:title>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <dc:description>理解记忆更新力度与不确定性；先学习方法，再决定将来是否借鉴到卡片维护，不作为当前表示优劣的直接答案。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>04 有限修复循环后置｜3篇</dc:subject>
+    <dc:subject>已审稿：ICML 2026，机器学习顶会；沿用先前官方记录核验</dc:subject>
+    <dc:subject>阅读顺序/13</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:gam_rag:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:gam_rag:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;GAM-RAG｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 13；04 有限修复循环后置｜3篇。理解记忆更新力度与不确定性；先学习方法，再决定将来是否借鉴到卡片维护，不作为当前表示优劣的直接答案。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：ICML 2026，机器学习顶会；沿用先前官方记录核验&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;重点 §3 中句子级任务/时间向量记忆、当前匹配、不确定性及更新系数。区分该文 gain 系数和我们 REUSE−FRESH 的经验额外收益。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴历史状态、当前相关性和更新不确定性分别处理；不要把连续置信更新想成简单保留 top-k。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;它修改检索语料的记忆表示，非查询侧自然语言经验卡；已有可靠性/当前匹配机制，不能声称前人从不区分这些因素。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;首轮冻结经验池和可靠性，暂不合并动态更新；否则表示和生命周期两个因素无法分清。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;任务相关性、证据可靠性与更新力度为何不应合成一个未经校验的万能分数？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-05；中文导读更新：2026-09-11。沿用先前书目快照与核验来源，本次未重新逐字核查该论文全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://icml.cc/virtual/2026/poster/65843"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://arxiv.org/html/2603.01783v1"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://icml.cc/virtual/2026/poster/65843"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:adaptive_rag">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity</dc:title>
+    <dc:date>2024</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Soyeong</foaf:givenName>
+            <foaf:surname>Jeong</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jinheon</foaf:givenName>
+            <foaf:surname>Baek</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Sukmin</foaf:givenName>
+            <foaf:surname>Cho</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Sung Ju</foaf:givenName>
+            <foaf:surname>Hwang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Jong</foaf:givenName>
+            <foaf:surname>Park</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/2024.naacl-long.389/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2024.naacl-long.389</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>7036–7050</bib:pages>
+    <dc:description>当讨论识别问题类型后路由时按需读；区分选择无检索/单次/迭代流程，与在同一流程中选择某条历史修复经验。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>05 结构分支按需读｜4篇</dc:subject>
+    <dc:subject>已审稿：NAACL 2024 主会长文，NLP 顶会</dc:subject>
+    <dc:subject>阅读顺序/14</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:adaptive_rag:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:adaptive_rag:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;Adaptive-RAG｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 14；05 结构分支按需读｜4篇。当讨论识别问题类型后路由时按需读；区分选择无检索/单次/迭代流程，与在同一流程中选择某条历史修复经验。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：NAACL 2024 主会长文，NLP 顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读复杂度分类器、基于实际模型结果及数据归纳偏置构造标签、成本与效果权衡。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴便宜分类器选择处理方式，而不是对每题都运行最复杂方案；后续可训练小模型，首轮不要求训练控制器。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;基于问题特性自适应路由已有工作；复杂度标签不等于文档元数据类型，也不等于历史经验是否适用。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;未来结构分支可比较静态规则、类型路由与经验辅助路由；所有组应有同样的结构检索工具，避免把新增工具收益算给记忆。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;当前需要的是便宜的流程选择，还是同一题型内部的操作选择？为什么复杂题也可能不值得用现有经验？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-11；中文导读更新：2026-09-11。官方书目页与摘要；作者姓名沿用 ACL 官方结构化元数据 Jong Park，PDF 首页显示 Jong C. Park。未以本次日期声称逐字重核全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2024.naacl-long.389/"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2024.naacl-long.389/"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2024.naacl-long.389/"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:decomprc">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>Multi-hop Reading Comprehension through Question Decomposition and Rescoring</dc:title>
+    <dc:date>2019</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Sewon</foaf:givenName>
+            <foaf:surname>Min</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Victor</foaf:givenName>
+            <foaf:surname>Zhong</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Luke</foaf:givenName>
+            <foaf:surname>Zettlemoyer</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hannaneh</foaf:givenName>
+            <foaf:surname>Hajishirzi</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/P19-1613/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics</dc:title>
+        <dc:identifier>DOI 10.18653/v1/P19-1613</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>6097–6109</bib:pages>
+    <dc:description>针对按问题结构设计改写/分解的直接参照，也是静态类型策略的候选基线来源。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>05 结构分支按需读｜4篇</dc:subject>
+    <dc:subject>已审稿：ACL 2019 主会，NLP 顶会</dc:subject>
+    <dc:subject>阅读顺序/15</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:decomprc:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:decomprc:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;DecompRC｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 15；05 结构分支按需读｜4篇。针对按问题结构设计改写/分解的直接参照，也是静态类型策略的候选基线来源。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：ACL 2019 主会，NLP 顶会&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;看作者实现中的 bridging、intersection、comparison、one-hop 候选分解，以及如何组合单跳结果和重评分；不是只用一个题型标签直接决定最终答案。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴不同推理结构需要不同查询操作；明确 Hotpot 的推理结构与文档页码/布局结构不是同一概念。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;按题型设计分解与选择早已有工作，不能单独作为 GrowRAG 新意。它不直接验证历史卡表示对选择端的额外帮助。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;后续比较静态分解模式和经验选择时固定模式集合与底座；首轮只登记可复用动作，不扩成完整分解系统。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;同样是比较题，比较年龄与比较任职时长需要保留的字段有什么不同？经验条件能否纠正静态类型策略的误用？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-11；中文导读更新：2026-09-11。官方书目页、摘要、作者仓库所述分解类别与重评分；未声称逐字核对全文。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/P19-1613/"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://github.com/shmsw25/DecompRC"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/P19-1613/"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:docbench">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>DocBench: A Benchmark for Evaluating LLM-based Document Reading Systems</dc:title>
+    <dc:date>2025</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Anni</foaf:givenName>
+            <foaf:surname>Zou</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Wenhao</foaf:givenName>
+            <foaf:surname>Yu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hongming</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Kaixin</foaf:givenName>
+            <foaf:surname>Ma</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Deng</foaf:givenName>
+            <foaf:surname>Cai</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Zhuosheng</foaf:givenName>
+            <foaf:surname>Zhang</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Hai</foaf:givenName>
+            <foaf:surname>Zhao</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Dong</foaf:givenName>
+            <foaf:surname>Yu</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://aclanthology.org/2025.knowledgenlp-1.29/</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 4th International Workshop on Knowledge-Augmented Methods for Natural Language Processing</dc:title>
+        <dc:identifier>DOI 10.18653/v1/2025.knowledgenlp-1.29</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>359–373</bib:pages>
+    <dc:description>结构性/全局性文档问题的后续诊断数据参照；不取代本轮 Hotpot 跨题最小实验。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>05 结构分支按需读｜4篇</dc:subject>
+    <dc:subject>已审稿：KnowledgeNLP 2025 workshop；不是 ACL 主会或顶刊</dc:subject>
+    <dc:subject>阅读顺序/16</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:docbench:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:docbench:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;DocBench｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 16；05 结构分支按需读｜4篇。结构性/全局性文档问题的后续诊断数据参照；不取代本轮 Hotpot 跨题最小实验。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：KnowledgeNLP 2025 workshop；不是 ACL 主会或顶刊&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读 text-only、multimodal、meta-data、unanswerable 四类，以及 PDF 输入、金标答案和评估。作者仓库介绍 229 个文档、1102 道问题。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴按输入证据形态分层评价；元数据题可能要求页码、字数或作者信息，而不仅是语义相似段落。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;这是文档阅读评测，不是记忆学习方法；不能用基准类别金标直接充当真实问题路由能力，也不能由某类少量得分证明跨文档迁移。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;若后续引入，按文档划分经验来源和评价，检查同文档泄漏；区分 query 改写失败与底座解析时已丢失结构信息。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;问题能否从文本检索回答，还是必须访问页面/图表/元数据？记忆提供的是操作建议还是非法补充了答案？&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-11；中文导读更新：2026-09-11。官方书目页确认 workshop 正式发表；方法/数据说明阅读作者 arXiv v1 和官方仓库，不声称逐字核对最终正式 PDF。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2025.knowledgenlp-1.29/"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://github.com/Anni-Zou/DocBench"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://aclanthology.org/2025.knowledgenlp-1.29/"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <rdf:Description rdf:about="urn:growrag:minimal-experiment:20260911:doclaynet">
+    <z:itemType>conferencePaper</z:itemType>
+    <dc:title>DocLayNet: A Large Human-Annotated Dataset for Document-Layout Segmentation</dc:title>
+    <dc:date>2022</dc:date>
+    <bib:authors>
+      <rdf:Seq>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Birgit</foaf:givenName>
+            <foaf:surname>Pfitzmann</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Christoph</foaf:givenName>
+            <foaf:surname>Auer</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Michele</foaf:givenName>
+            <foaf:surname>Dolfi</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Ahmed S.</foaf:givenName>
+            <foaf:surname>Nassar</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+        <rdf:li>
+          <foaf:Person>
+            <foaf:givenName>Peter</foaf:givenName>
+            <foaf:surname>Staar</foaf:surname>
+          </foaf:Person>
+        </rdf:li>
+      </rdf:Seq>
+    </bib:authors>
+    <dc:identifier>
+      <dcterms:URI>
+        <rdf:value>https://doi.org/10.1145/3534678.3539043</rdf:value>
+      </dcterms:URI>
+    </dc:identifier>
+    <dcterms:isPartOf>
+      <bib:Journal>
+        <dc:title>Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining</dc:title>
+        <dc:identifier>DOI 10.1145/3534678.3539043</dc:identifier>
+      </bib:Journal>
+    </dcterms:isPartOf>
+    <bib:pages>3743–3751</bib:pages>
+    <dc:description>自建 DocLayNet-MetaQA 时的数据来源与权限边界参考。正式条目标题用 Segmentation，作者 arXiv/仓库也有 Analysis 名称。</dc:description>
+    <dc:subject>GrowRAG/最小表示选择实验/2026-09-11</dc:subject>
+    <dc:subject>05 结构分支按需读｜4篇</dc:subject>
+    <dc:subject>已审稿：KDD 2022，数据挖掘顶会；布局分割数据论文，不是原生 QA 基准</dc:subject>
+    <dc:subject>阅读顺序/17</dc:subject>
+    <dcterms:isReferencedBy rdf:resource="urn:growrag:minimal-experiment:20260911:doclaynet:note" />
+  </rdf:Description>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:doclaynet:note">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;DocLayNet｜2026-09-11 导读&lt;/h2&gt;&lt;h3&gt;阅读用途与优先级&lt;/h3&gt;&lt;p&gt;顺序 17；05 结构分支按需读｜4篇。自建 DocLayNet-MetaQA 时的数据来源与权限边界参考。正式条目标题用 Segmentation，作者 arXiv/仓库也有 Analysis 名称。&lt;/p&gt;&lt;h3&gt;发表层级&lt;/h3&gt;&lt;p&gt;已审稿：KDD 2022，数据挖掘顶会；布局分割数据论文，不是原生 QA 基准&lt;/p&gt;&lt;h3&gt;重点读哪里&lt;/h3&gt;&lt;p&gt;读页面级布局框、11 类标签、官方划分与 Extra JSON：page_no、num_pages、原文件名、文本单元及坐标。&lt;/p&gt;&lt;h3&gt;借鉴什么&lt;/h3&gt;&lt;p&gt;借鉴由可核查布局标注构造结构任务；Gold 可以来自标签或确定性统计，但必须定义预测时允许访问的字段。&lt;/p&gt;&lt;h3&gt;已有覆盖与尚不能替代的实验&lt;/h3&gt;&lt;p&gt;原数据没有现成自然语言 QA；自建 MetaQA 要明确派生身份。单页资产不保证整本文档覆盖；num_pages 可作元数据金标，但不能由抽样页最大页码猜整本统计。&lt;/p&gt;&lt;h3&gt;对本轮最小实验的约束&lt;/h3&gt;&lt;p&gt;结构工具/索引必须对所有基线开放；禁止只给我们的组金标框或元数据。把文档完整性与标签泄漏检查放在未来数据协议，而非首轮编码。&lt;/p&gt;&lt;h3&gt;读完应能回答&lt;/h3&gt;&lt;p&gt;一个总页数或表格计数问题的答案是否在允许输入里可获得？如果不可见，改写不能创造它。&lt;/p&gt;&lt;h3&gt;全包实验定义&lt;/h3&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;h3&gt;核验范围与使用说明&lt;/h3&gt;&lt;p&gt;元数据核验日期：2026-09-11；中文导读更新：2026-09-11。出版社正式标题为 Segmentation；作者 arXiv/仓库标题为 Analysis。采用出版社作者姓名写法；官方仓库 BibTeX DOI 有截短，采用出版社完整 DOI。另查官方仓库页面级数据与 Extra JSON。 导读由 AI 辅助整理，不是论文原摘要，也不是用户已读声明。预印本不等于未投稿；未统计引用数；无 PDF 附件；未向 Zotero 客户端导入。&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3534678.3539043"&gt;正式/书目入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://github.com/DS4SD/DocLayNet#extra-json-files"&gt;方法与数据阅读入口&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="https://doi.org/10.1145/3534678.3539043"&gt;元数据核验来源&lt;/a&gt;&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <bib:Memo rdf:about="urn:growrag:minimal-experiment:20260911:overview:full">
+    <rdf:value>&lt;div&gt;&lt;h2&gt;本次阅读包用途&lt;/h2&gt;&lt;p&gt;方向一是主任务：怎样选到值得执行的改写；方向二是配套：经验必须保留哪些适用信息。阅读集合是用途分类，不是新增研究方向。首轮做 E1（只改变选择器所读经验表示，同源候选、选择器、当前问题和被选动作的规范执行保持一致）与 E3（REUSE−FRESH 归因）。E2 是固定已选来源后改变执行端所读表示，后置；它不是 E3 的别名。M1/M2/M3/M5 是受论文启发的同源表示控制，不是对那些论文完整系统的复现。历史条件的推测不等于经过独立反馈验证的反例。PRE 选择不能读取目标题 gold 或未来 gap。没有生成实验分数，未证明任何表示优越。&lt;/p&gt;&lt;p&gt;先读 ReFormeR → AWM 相关小节 → ReMe → HotpotQA 数据与指标。RRM/QCR 是创新排重必读但仍按此前核验标为预印本；ExpeL 是重要补充。QPP系列、有限循环与结构分支后置，不要求读完17篇才做小实验。&lt;/p&gt;&lt;p&gt;完整包17篇＝09-08聚焦12篇＋5篇补充。增量仅相对该12篇包，不是相对全部历史第一次推荐。不要同时重复导入完整和增量包。保留原有条目和批注；结构校验不等于Zotero客户端导入测试。&lt;/p&gt;&lt;/div&gt;</rdf:value>
+  </bib:Memo>
+  <z:Collection rdf:about="urn:growrag:minimal-experiment:20260911:collection:full">
+    <dc:title>GrowRAG｜最小表示选择实验｜17篇｜2026-09-11</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:overview:full" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:collection:full:core" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:collection:full:overlap" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:collection:full:selector" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:collection:full:loop" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:collection:full:structure" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:minimal-experiment:20260911:collection:full:core">
+    <dc:title>01 最小实验前先读｜方法与数据4篇</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:reformer" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:awm" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:reme" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:hotpotqa" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:minimal-experiment:20260911:collection:full:overlap">
+    <dc:title>02 创新排重与经验基础｜3篇</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:rrm" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:qcr" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:expel" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:minimal-experiment:20260911:collection:full:selector">
+    <dc:title>03 后续选择器增强｜QPP相关3篇</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:qpp_variant" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:reformir" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:raqg_qpp" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:minimal-experiment:20260911:collection:full:loop">
+    <dc:title>04 有限修复循环后置｜3篇</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:sufficient_context" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:s2g_rag" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:gam_rag" />
+  </z:Collection>
+  <z:Collection rdf:about="urn:growrag:minimal-experiment:20260911:collection:full:structure">
+    <dc:title>05 结构分支按需读｜4篇</dc:title>
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:adaptive_rag" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:decomprc" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:docbench" />
+    <dcterms:hasPart rdf:resource="urn:growrag:minimal-experiment:20260911:doclaynet" />
+  </z:Collection>
+</rdf:RDF>

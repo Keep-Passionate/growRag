@@ -15,11 +15,13 @@
 
 ## 阅读顺序
 
+2026-09-09 补充：[两个方向编号与经验卡研究关系](../../../knowledge/decisions/2026-09-09_两方向编号澄清_经验卡与选择的研究关系.md)。保留方向一“选择”、方向二“表示”的用户编号。AWM 已在本包，将其 §2、§3.2.1、§4 从按需插读提升为必读章节：它已研究多种表示，并讨论何时偏离流程的困难。旧 RDF 内的阅读优先级以这里的最新说明为准，无需重复导入。
+
 这几天先读 **ReFormeR → ReMe → ExpeL**。
 
-之后 **S2G-RAG → RRM → QCR**，然后 **QPP Query Variant Selection → ReformIR → RAQG-QPP**。
+之后 **AWM 相关章节 → S2G-RAG → RRM → QCR**，然后 **QPP Query Variant Selection → ReformIR → RAQG-QPP**。
 
-AWM 在 ExpeL 后按需插读；GAM 的方法部分在 S2G 后读；Sufficient Context 可在 S2G 前补充分性概念。
+GAM 的方法部分在 S2G 后按需读；Sufficient Context 可在 S2G 前补充分性概念。
 
 ## 发表类别与重复导入
 

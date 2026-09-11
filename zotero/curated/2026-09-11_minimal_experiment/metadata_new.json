@@ -1,0 +1,116 @@
+[
+  {
+    "slug": "adaptive_rag",
+    "title": "Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity",
+    "year": "2024",
+    "type": "conferencePaper",
+    "authors": [
+      {"given": "Soyeong", "family": "Jeong"},
+      {"given": "Jinheon", "family": "Baek"},
+      {"given": "Sukmin", "family": "Cho"},
+      {"given": "Sung Ju", "family": "Hwang"},
+      {"given": "Jong", "family": "Park"}
+    ],
+    "venue": "Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)",
+    "publisher": "Association for Computational Linguistics",
+    "pages": "7036–7050",
+    "doi": "10.18653/v1/2024.naacl-long.389",
+    "url": "https://aclanthology.org/2024.naacl-long.389/",
+    "verification_source": "https://aclanthology.org/2024.naacl-long.389/",
+    "verification_date": "2026-09-11",
+    "verification_scope": "官方书目页与摘要；作者姓名沿用 ACL 官方结构化元数据 Jong Park，PDF 首页显示 Jong C. Park。未以本次日期声称逐字重核全文。",
+    "source_rdf": null
+  },
+  {
+    "slug": "hotpotqa",
+    "title": "HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering",
+    "year": "2018",
+    "type": "conferencePaper",
+    "authors": [
+      {"given": "Zhilin", "family": "Yang"},
+      {"given": "Peng", "family": "Qi"},
+      {"given": "Saizheng", "family": "Zhang"},
+      {"given": "Yoshua", "family": "Bengio"},
+      {"given": "William", "family": "Cohen"},
+      {"given": "Ruslan", "family": "Salakhutdinov"},
+      {"given": "Christopher D.", "family": "Manning"}
+    ],
+    "venue": "Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing",
+    "publisher": "Association for Computational Linguistics",
+    "pages": "2369–2380",
+    "doi": "10.18653/v1/D18-1259",
+    "url": "https://aclanthology.org/D18-1259/",
+    "verification_source": "https://aclanthology.org/D18-1259/",
+    "verification_date": "2026-09-11",
+    "verification_scope": "官方书目页、作者原文数据分析、官方仓库数据字段；旧包已有，本次不是历史首次推荐。",
+    "source_rdf": "zotero/current/GrowRAG_核心精读包_合并更新_2026-08-14.rdf"
+  },
+  {
+    "slug": "docbench",
+    "title": "DocBench: A Benchmark for Evaluating LLM-based Document Reading Systems",
+    "year": "2025",
+    "type": "conferencePaper",
+    "authors": [
+      {"given": "Anni", "family": "Zou"},
+      {"given": "Wenhao", "family": "Yu"},
+      {"given": "Hongming", "family": "Zhang"},
+      {"given": "Kaixin", "family": "Ma"},
+      {"given": "Deng", "family": "Cai"},
+      {"given": "Zhuosheng", "family": "Zhang"},
+      {"given": "Hai", "family": "Zhao"},
+      {"given": "Dong", "family": "Yu"}
+    ],
+    "venue": "Proceedings of the 4th International Workshop on Knowledge-Augmented Methods for Natural Language Processing",
+    "publisher": "Association for Computational Linguistics",
+    "pages": "359–373",
+    "doi": "10.18653/v1/2025.knowledgenlp-1.29",
+    "url": "https://aclanthology.org/2025.knowledgenlp-1.29/",
+    "verification_source": "https://aclanthology.org/2025.knowledgenlp-1.29/",
+    "verification_date": "2026-09-11",
+    "verification_scope": "官方书目页确认 workshop 正式发表；方法/数据说明阅读作者 arXiv v1 和官方仓库，不声称逐字核对最终正式 PDF。",
+    "source_rdf": null
+  },
+  {
+    "slug": "doclaynet",
+    "title": "DocLayNet: A Large Human-Annotated Dataset for Document-Layout Segmentation",
+    "year": "2022",
+    "type": "conferencePaper",
+    "authors": [
+      {"given": "Birgit", "family": "Pfitzmann"},
+      {"given": "Christoph", "family": "Auer"},
+      {"given": "Michele", "family": "Dolfi"},
+      {"given": "Ahmed S.", "family": "Nassar"},
+      {"given": "Peter", "family": "Staar"}
+    ],
+    "venue": "Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining",
+    "publisher": "Association for Computing Machinery",
+    "pages": "3743–3751",
+    "doi": "10.1145/3534678.3539043",
+    "url": "https://doi.org/10.1145/3534678.3539043",
+    "verification_source": "https://doi.org/10.1145/3534678.3539043",
+    "verification_date": "2026-09-11",
+    "verification_scope": "出版社正式标题为 Segmentation；作者 arXiv/仓库标题为 Analysis。采用出版社作者姓名写法；官方仓库 BibTeX DOI 有截短，采用出版社完整 DOI。另查官方仓库页面级数据与 Extra JSON。",
+    "source_rdf": null
+  },
+  {
+    "slug": "decomprc",
+    "title": "Multi-hop Reading Comprehension through Question Decomposition and Rescoring",
+    "year": "2019",
+    "type": "conferencePaper",
+    "authors": [
+      {"given": "Sewon", "family": "Min"},
+      {"given": "Victor", "family": "Zhong"},
+      {"given": "Luke", "family": "Zettlemoyer"},
+      {"given": "Hannaneh", "family": "Hajishirzi"}
+    ],
+    "venue": "Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics",
+    "publisher": "Association for Computational Linguistics",
+    "pages": "6097–6109",
+    "doi": "10.18653/v1/P19-1613",
+    "url": "https://aclanthology.org/P19-1613/",
+    "verification_source": "https://aclanthology.org/P19-1613/",
+    "verification_date": "2026-09-11",
+    "verification_scope": "官方书目页、摘要、作者仓库所述分解类别与重评分；未声称逐字核对全文。",
+    "source_rdf": null
+  }
+]

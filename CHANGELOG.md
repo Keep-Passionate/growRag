@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0 — 2026-09-11
+
+- Add immutable M1/M2/M3/M5 selection views over the same frozen PRE source.
+- Share candidate IDs and canonical body-only execution outcomes across representations.
+- Freeze and persist all choices before isolated BASE/FRESH/candidate execution.
+- Add post-hoc paired reports, missing/error retention and separate audit/path costs.
+- Add full-train manifests with exposure exclusions and frozen source/debug/check roles.
+- Add source-only admission diagnostics with a shared capped ledger; no automatic expansion.
+- Retain prior source admission and production card contracts, with no automatic trust promotion.
+
+Research boundary: model-generated multi-view construction and real target batching
+remain pending. Offline fixtures are wiring tests, not model effectiveness evidence.
+The user chose condition-minimality experiments next; QPP, training and POST remain later.
+Real source-run results and verification are recorded separately after completion.
+
 ## 0.5.0 — 2026-09-07
 
 - Add a conservative, query-only two-name age-pattern candidate matcher.
