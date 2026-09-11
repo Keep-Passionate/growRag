@@ -15,6 +15,13 @@ remain pending. Offline fixtures are wiring tests, not model effectiveness evide
 The user chose condition-minimality experiments next; QPP, training and POST remain later.
 Real source-run results and verification are recorded separately after completion.
 
+Verification: 921 local and clean-export tests pass, lint/format checks pass,
+and GitHub CI 34618648360 passes on Python 3.11/3.12 for feature commit `ab48586`.
+The frozen 64-source run completed with 198 real calls, estimated 0.0295722 CNY,
+and six source-only candidates. No target representation experiment was run.
+Read-only review found answer-dependent/inconsistent generated conditions;
+candidate trust and semantic diversity remain unverified. Original logs are retained.
+
 ## 0.5.0 — 2026-09-07
 
 - Add a conservative, query-only two-name age-pattern candidate matcher.
