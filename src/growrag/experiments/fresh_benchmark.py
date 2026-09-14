@@ -37,8 +37,8 @@ def call_totals(calls: list[dict]) -> dict:
     return result
 
 
-def summarize(rows: list[dict], planned_count: int) -> dict:
-    """Describe paired train observations; no significance or best-policy claim."""
+def _method_summaries(rows: list[dict]) -> dict:
+    """Apply identical metric/cost definitions to an explicitly supplied cohort."""
     methods = {}
     for name in VARIANTS:
         observed = [row["arms"][name] for row in rows if name in row["arms"]]
@@ -111,15 +111,36 @@ def summarize(rows: list[dict], planned_count: int) -> dict:
                 else None
             ),
         }
+    return methods
+
+
+def summarize(rows: list[dict], planned_count: int) -> dict:
+    """Retain all attempts, and separately compare only the shared scored cohort.
+
+    中文：原始 methods 保留失败和不完整题的费用；横向比较效果时使用
+    complete_case_methods，即四条路线都获得有效评分的同一批题。不能把
+    12 题的 BASE 均值与 11 题的其他方法均值直接比较。该交集不是盲测集，
+    中断导致被排除的问题与未知账单仍必须报告，不能通过筛选掩盖失败。
+    """
+    complete_rows = [
+        row
+        for row in rows
+        if all(
+            name in row["arms"] and row["arms"][name]["feedback"] is not None for name in VARIANTS
+        )
+    ]
     return {
         "schema_version": "growrag-fresh-benchmark-v1",
         "planned_questions": planned_count,
-        "completed_questions": sum(
-            len(r["arms"]) == len(VARIANTS)
-            and all(a["feedback"] is not None for a in r["arms"].values())
-            for r in rows
-        ),
-        "methods": methods,
+        "completed_questions": len(complete_rows),
+        "methods": _method_summaries(rows),
+        "complete_case_count": len(complete_rows),
+        "complete_case_question_ids": [row["question_id"] for row in complete_rows],
+        "complete_case_methods": _method_summaries(complete_rows),
+        "complete_case_notice": "Four-arm non-null scored intersection only; all methods use "
+        "the same questions for effects, paired rescues/harms, costs and latency. "
+        "Excluded partial/failed attempts remain in methods and the total budget ledger. "
+        "Complete-case cost is not total experiment spend or proof that missingness is random.",
         "no_history": True,
         "qpp_executed": False,
         "memory_updated": False,

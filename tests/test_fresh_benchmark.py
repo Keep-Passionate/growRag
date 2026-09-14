@@ -9,7 +9,12 @@ import pytest
 from growrag.experiments.api_client import ChatConfig, ChatResponse
 from growrag.experiments.budget import BudgetedChatClient, PriceLimits
 from growrag.experiments.data_protocol import role_for_question
-from growrag.experiments.fresh_benchmark import VARIANTS, call_totals, run_fresh_benchmark
+from growrag.experiments.fresh_benchmark import (
+    VARIANTS,
+    call_totals,
+    run_fresh_benchmark,
+    summarize,
+)
 from growrag.experiments.hotpot import parse_hotpot_example
 from growrag.experiments.llm_adapters import READER_PROMPT_VERSION
 from growrag.experiments.run_fresh_benchmark import (
@@ -221,3 +226,65 @@ def test_invalid_first_response_stops_before_any_next_call(tmp_path):
         run_fresh_benchmark((example,), client, tmp_path)
     assert delegate.attempts == 1
     assert (tmp_path / "observations.json").exists()
+
+
+def summary_arm(em, *, cost=0.01, seconds=1.0):
+    """Synthetic accounting fixture; never a live experiment observation."""
+    return {
+        "feedback": (
+            {"answer_em": em, "answer_f1": em, "retrieved_gold_support_recall": em}
+            if em is not None
+            else None
+        ),
+        "wall_seconds": seconds,
+        "index_build_seconds": 0.001,
+        "result": {"component_events": [{"operation": "rag.retrieve", "elapsed_seconds": 0.002}]},
+        "model_calls": [
+            {
+                "prompt_version": READER_PROMPT_VERSION,
+                "api_requests": 1,
+                "input_tokens": 10,
+                "output_tokens": 5,
+                "estimated_actual_cny": cost,
+            }
+        ],
+    }
+
+
+def test_complete_case_methods_use_same_questions_without_hiding_partial_costs():
+    complete = {"question_id": "complete", "arms": {name: summary_arm(1) for name in VARIANTS}}
+    complete["arms"]["QUERY2DOC"] = summary_arm(0)
+    partial = {"question_id": "partial", "arms": {"BASE": summary_arm(0, cost=0.05, seconds=9)}}
+    failed = {"question_id": "failed", "arms": {name: summary_arm(0) for name in VARIANTS}}
+    failed["arms"]["QUERY2DOC"] = summary_arm(None, cost=None)
+    report = summarize([complete, partial, failed], planned_count=32)
+    assert report["complete_case_count"] == report["completed_questions"] == 1
+    assert report["complete_case_question_ids"] == ["complete"]
+    cohort = report["complete_case_methods"]
+    assert all(value["scored_questions"] == 1 for value in cohort.values())
+    assert cohort["BASE"]["mean_em"] == 1
+    assert cohort["BASE"]["mean_measured_seconds"] == 1
+    assert cohort["BASE"]["cost"]["estimated_actual_cny"] == 0.01
+    assert cohort["QUERY2DOC"]["harms_vs_base"] == 1
+    # Original audit scope is deliberately preserved, not overwritten by the cohort.
+    raw = report["methods"]
+    assert raw["BASE"]["scored_questions"] == 3
+    assert raw["BASE"]["mean_em"] == pytest.approx(1 / 3)
+    assert raw["BASE"]["cost"]["estimated_actual_cny"] == pytest.approx(0.07)
+    assert raw["QUERY2DOC"]["cost"]["estimated_actual_cny"] is None
+
+
+@pytest.mark.parametrize(
+    "rows", [[], [{"question_id": "only-base", "arms": {"BASE": summary_arm(1)}}]]
+)
+def test_no_complete_four_arm_cohort_has_unknown_quality_not_zero(rows):
+    report = summarize(rows, planned_count=32)
+    assert report["complete_case_count"] == 0
+    assert report["complete_case_question_ids"] == []
+    for value in report["complete_case_methods"].values():
+        assert value["scored_questions"] == 0
+        assert value["mean_em"] is None
+        assert value["mean_f1"] is None
+        assert value["mean_support_recall"] is None
+        assert value["mean_measured_seconds"] is None
+        assert value["cost"]["api_requests"] == 0
