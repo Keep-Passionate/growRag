@@ -1,8 +1,19 @@
 # GrowRAG 当前项目记忆
 
-更新日期：2026-09-14
-状态：09-14新增强FRESH对照与Obsidian30份笔记（23篇论文）。本地983测试通过。新32题实际完整11题，第12题HTTP400中止；四法共同题EM/F1均8/11，尚不能选出更强FRESH。80次已知费0.0115346元、1次失败费未知，旧批承接后总预留0.3199766元，仍沿5元总上限，不自动重试。原64来源6候选卡未变，原8/24目标未跑；QPP选择器/参数训练未接通。此前921测试与远端CI属于旧版本，不代替本版本CI状态。
+更新日期：2026-09-16
+状态：用户已固定离线学习/在线应用，在线默认1轮、必要时最多2轮。新增prompt登记/可选消融/安全HTTP诊断，本地1057测试通过；本轮新付费调用0、参数训练0。09-14真实批次仍完整11/32，1次失败费用未知，累计保守预留0.3199766元，沿原5元总预算不重置。32题新prompt计划仅预检。新增UMEM/Trainable Graph Memory/MemRL直接先例，差值奖励、EMA、离线在线均不作首创。原6候选卡和原8/24目标不变；完整基线、累计证据Reader、学习选择器待接通。
 权威性：当前入口；旧路线 A 决策保留为历史记录，但不再代表当前主线
+
+## 2026-09-16 本轮确认、近邻与实施
+
+- 已决定架构：knowledge/decisions/2026-09-16_离线在线架构定稿与两轮预算.md。离线/在线是阶段，不强制两座物理库；在线冻结长期库、局部episode存本题状态。允许必要第二轮，不再把严格一轮当唯一目标。1/2轮分别报，POST经验与FRESH分支需共同首轮前缀及同轮数预算。
+- 直接先例：knowledge/literature/2026-09-16_离线在线与增量奖励先例核查.md。Trainable Graph Memory ΔR=with−without用REINFORCE；UMEM邻域更新增量/效率奖励用GRPO，官方ICML2026目录列有；MemRL Q+=α(r−Q)是EMA式回报更新，不是强FRESH差。RRM已有OQR递增消融，QCR差值主要用于评价。不能把RL/EMA/两阶段/差值定义作创新；同预算强FRESH下可观察条件的选择价值仍待证。
+- 用户要求prompt成为论文的可复现对照。新增prompt_registry精确导出system/input模板/hash/执行签名；旧默认四方法和原prompt字节不改。可选RRR_MINIMAL只删除详细约束提醒；RRR_QUERY_ANCHOR与原RRR相同prompt、仅拼回原q，分别是prompt消融/组合消融。显式矩阵才运行，共同题汇总不能隐藏其他臂成本。
+- 实施记录：knowledge/experiments/2026-09-16_prompt对照与基线接入计划.md。附录docs/prompts/2026-09-16_v1；计划BASE/MINIMAL/KEYWORDS32开发题、最多160请求，本轮仅零API预检。旧11已暴露题不能变回独立test，原8/24不曝光。
+- HTTP诊断只存白名单错误码与受限请求ID，正文/消息/任意header不落盘；不自动重试、不更改未知费用，不能追溯证明旧400原因。真实续跑账本机制仍需完成，禁止删锁/换目录重新给5元。
+- 当前outer_loop累计观测证据给改写/评估，但Reader仍只读当轮；无assessor时即使max_rag_calls=2也只跑一次。PRE生成器不接收证据/previousquery。正式两轮前必须接通POST状态、judge及有界累计Reader，不能用设置2替代实现。
+- 用户术语答疑：docs/GrowRAG_模型分工与轻量选择器入门_2026-09-16.md。小模型首先是CPU线性预测头而非7B；TF-IDF训练词表不看测试；动态规则配对线性模型需上下文交互，不能简单拼接学固定模式偏好。实体/原题分组验证防泄漏。description是功能说明，rule是动作，examples指向原始案例，不强制压缩全CoT。
+- 本地1057测试、src/tests/scripts静态检查和131文件格式检查通过；无本地LLM下载/部署、无租卡、无RL或选择器拟合。09-16 GitHub远端只读核验仍连接重置，成功推送前仅视为本地版本，无新远端CI结果。Obsidian共34份笔记，双链检查无断链；旧09-14快照不改。
 
 ## 2026-09-14 实际结果与下一步（优先于运行前计划）
 
@@ -557,3 +568,7 @@ Self-RAG 的 `IsREL/IsSUP` 主要启发文档相关性与回答 claim support；
 - `knowledge/literature/2026-08-24_现有Zotero阅读包_发表层级审计.md`
 - `knowledge/datasets/2026-08-19_Gold数据集与阶段规划.md`
 - `zotero/current/GrowRAG_证据闭环_REUSE与QueryTransformation_2026-08-24.rdf`
+
+## 长期备选基线池（需要时查阅，不抢占当前开发顺序）
+
+- `knowledge/literature/2026-09-16_ReFormeR备选基线池.md`：保留用户给出的ReFormeR基线译文；RM3、Rocchio、GenQR、GenQREnsemble、QA-Expand、Query2doc各配置、MUGI，按假设选取而非全跑。MUGI同时增强稀疏/稠密，GenQR原文包含训练与提示实例；每项原文和适配边界见同日先例核查。

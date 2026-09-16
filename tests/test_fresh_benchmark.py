@@ -14,6 +14,7 @@ from growrag.experiments.fresh_benchmark import (
     call_totals,
     run_fresh_benchmark,
     summarize,
+    validate_variants,
 )
 from growrag.experiments.hotpot import parse_hotpot_example
 from growrag.experiments.llm_adapters import READER_PROMPT_VERSION
@@ -288,3 +289,52 @@ def test_no_complete_four_arm_cohort_has_unknown_quality_not_zero(rows):
         assert value["mean_support_recall"] is None
         assert value["mean_measured_seconds"] is None
         assert value["cost"]["api_requests"] == 0
+
+
+@pytest.mark.parametrize(
+    "variants",
+    [
+        (),
+        ("BASE",),
+        ("RRR_KEYWORDS", "QUERY2DOC"),
+        ("BASE", "BASE"),
+        ("BASE", "UNKNOWN"),
+        ["BASE", "RRR_KEYWORDS"],
+        ("BASE", None),
+    ],
+)
+def test_matrix_requires_explicit_valid_distinct_controlled_arms(variants):
+    with pytest.raises(ValueError):
+        validate_variants(variants)
+
+
+def test_selected_prompt_matrix_is_paired_and_does_not_change_old_defaults(tmp_path):
+    example = parse_hotpot_example(
+        {
+            "_id": "fixture",
+            "question": "When was the University established?",
+            "answer": "1900",
+            "supporting_facts": [["University", 0]],
+            "context": [["University", ["The University was founded in 1900."]]],
+        },
+        dataset="synthetic-train",
+    )
+    client = BudgetedChatClient(MockDelegate(example), PriceLimits())
+    names = ("BASE", "RRR_MINIMAL", "RRR_KEYWORDS")
+    report = run_fresh_benchmark((example,), client, tmp_path, variants=names)
+    assert client.attempts == 5
+    assert set(report["complete_case_methods"]) == set(names)
+    assert report["complete_case_count"] == 1
+    assert VARIANTS == ("BASE", "SIMPLE_PARAPHRASE", "RRR_KEYWORDS", "QUERY2DOC")
+    prompts = json.loads((tmp_path / "prompt_manifest.json").read_text())
+    assert set(prompts["query_generation"]) == set(names) - {"BASE"}
+    assert all(v["system_prompt_sha256"] for v in prompts["query_generation"].values())
+
+
+def test_declared_matrix_cannot_silently_drop_observed_costs():
+    with pytest.raises(ValueError, match="hide"):
+        summarize(
+            [{"question_id": "q", "arms": {"QUERY2DOC": summary_arm(1)}}],
+            1,
+            variants=("BASE", "RRR_KEYWORDS"),
+        )

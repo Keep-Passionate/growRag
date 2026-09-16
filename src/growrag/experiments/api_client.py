@@ -12,6 +12,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -34,6 +35,8 @@ class APIRequestError(RuntimeError):
         request_id: str | None = None,
         audit_path: Path | None = None,
         transport_source: str = "live_api",
+        http_status: int | None = None,
+        provider_error_code: str | None = None,
     ) -> None:
         super().__init__(message)
         self.input_tokens = input_tokens
@@ -42,6 +45,8 @@ class APIRequestError(RuntimeError):
         self.request_id = request_id
         self.audit_path = audit_path
         self.transport_source = transport_source
+        self.http_status = http_status
+        self.provider_error_code = provider_error_code
 
 
 @dataclass(frozen=True, slots=True)
@@ -119,6 +124,98 @@ def _redact(value: object, secret: str) -> object:
     if isinstance(value, dict):
         return {_redact(key, secret): _redact(item, secret) for key, item in value.items()}
     return value
+
+
+# Exact codes only: a provider-controlled code field can also contain echoed
+# prompts, credentials or paths. Unknown codes stay unknown, not raw strings.
+_SAFE_PROVIDER_ERROR_CODES = frozenset(
+    {
+        "Arrearage",
+        "BadRequest",
+        "DataInspectionFailed",
+        "InputDataInspectionFailed",
+        "InternalError",
+        "InvalidApiKey",
+        "InvalidParameter",
+        "InvalidParameter.Unsupported",
+        "ModelNotFound",
+        "OutputDataInspectionFailed",
+        "Throttling.RateQuota",
+        "Throttling.AllocationQuota",
+        "context_length_exceeded",
+        "insufficient_quota",
+        "invalid_api_key",
+        "model_not_found",
+        "rate_limit_exceeded",
+    }
+)
+_HTTP_ERROR_BODY_LIMIT = 16_384
+_SAFE_REQUEST_ID = re.compile(
+    r"(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
+    r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|req-[0-9a-fA-F]{16,64})"
+)
+
+
+def _safe_error_request_id(value: object, secret: str) -> str | None:
+    # Intentionally narrower than arbitrary printable IDs. Missing diagnostics
+    # are preferable to persisting a provider's echoed user text or credentials.
+    if (
+        isinstance(value, str)
+        and len(value) <= 68
+        and secret.casefold() not in value.casefold()
+        and _SAFE_REQUEST_ID.fullmatch(value) is not None
+    ):
+        return value
+    return None
+
+
+def _unique_error_fields(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    result: dict[str, object] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate provider error field")
+        result[key] = value
+    return result
+
+
+def _http_error_diagnostics(error: urllib.error.HTTPError, secret: str) -> dict:
+    """Keep only bounded, allowlisted metadata; never keep the error body.
+
+    Codes are the provider's reported categories, not our diagnosis. No usage is
+    inferred from a failed HTTP response, even if its body contains usage fields.
+    This cannot recover the cause of older failures whose bodies were discarded.
+    """
+    result = {"provider_error_code": None, "request_id": None}
+    try:
+        result["request_id"] = _safe_error_request_id(
+            error.headers.get("x-request-id") if error.headers is not None else None, secret
+        )
+        raw = error.read(_HTTP_ERROR_BODY_LIMIT + 1)
+        if not isinstance(raw, bytes) or len(raw) > _HTTP_ERROR_BODY_LIMIT:
+            return result
+        data = json.loads(raw, object_pairs_hook=_unique_error_fields)
+        if not isinstance(data, dict):
+            return result
+        nested = data.get("error")
+        code = nested.get("code") if isinstance(nested, dict) else data.get("code")
+        if (
+            isinstance(code, str)
+            and code in _SAFE_PROVIDER_ERROR_CODES
+            and secret.casefold() not in code.casefold()
+        ):
+            result["provider_error_code"] = code
+        if result["request_id"] is None:
+            result["request_id"] = _safe_error_request_id(data.get("request_id"), secret)
+    except (OSError, ValueError, TypeError, RecursionError):
+        # Diagnostics must never turn a safe HTTP failure into a body/exception
+        # leak, or trigger another network attempt.
+        pass
+    finally:
+        try:
+            error.close()
+        except OSError:
+            pass
+    return result
 
 
 class LiveChatClient:
@@ -261,6 +358,7 @@ class LiveChatClient:
             event["status"] = "failed"
             event["error_type"] = "HTTPError"
             event["http_status"] = error.code
+            event.update(_http_error_diagnostics(error, api_key))
             # Do not store exception/provider error strings: they can echo secrets.
             raise self._failure(
                 f"API HTTP {error.code}; no retry or fallback", event, audit_path
@@ -286,4 +384,6 @@ class LiveChatClient:
             request_id=event.get("request_id"),
             audit_path=audit_path,
             transport_source=self.transport_source,
+            http_status=event.get("http_status"),
+            provider_error_code=event.get("provider_error_code"),
         )

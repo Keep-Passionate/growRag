@@ -16,13 +16,27 @@ from time import perf_counter
 from growrag.outer_loop import RetrieverReaderBackend, run_outer_loop
 from growrag.query_actions import RewriteDecision
 
-from .fresh_baselines import BASELINE_SPECS, baseline_generator
+from .fresh_baselines import ALL_BASELINE_SPECS, baseline_generator
 from .hotpot import HotpotExample, evaluate_layered_feedback
 from .llm_adapters import READER_PROMPT_VERSION, APIReader, _execution_kind
 from .pre_pilot import _IndexAdapter, write_json
+from .prompt_registry import prompt_identity
 from .protocol import Action, ExecutionKind
 
 VARIANTS = ("BASE", "SIMPLE_PARAPHRASE", "RRR_KEYWORDS", "QUERY2DOC")
+
+
+def validate_variants(variants: tuple[str, ...]) -> tuple[str, ...]:
+    """Explicit matrix only; historical defaults never grow with the registry."""
+    if type(variants) is not tuple or len(variants) < 2:
+        raise ValueError("variants must be an explicit tuple with BASE and at least one rewrite")
+    if any(not isinstance(name, str) for name in variants):
+        raise ValueError("variant IDs must be strings")
+    if len(set(variants)) != len(variants) or "BASE" not in variants:
+        raise ValueError("unique variants and a BASE control are required")
+    if any(name != "BASE" and name not in ALL_BASELINE_SPECS for name in variants):
+        raise ValueError("unknown baseline variant")
+    return variants
 
 
 def call_totals(calls: list[dict]) -> dict:
@@ -37,10 +51,10 @@ def call_totals(calls: list[dict]) -> dict:
     return result
 
 
-def _method_summaries(rows: list[dict]) -> dict:
+def _method_summaries(rows: list[dict], variants: tuple[str, ...]) -> dict:
     """Apply identical metric/cost definitions to an explicitly supplied cohort."""
     methods = {}
-    for name in VARIANTS:
+    for name in variants:
         observed = [row["arms"][name] for row in rows if name in row["arms"]]
         scored = [arm for arm in observed if arm["feedback"] is not None]
         paired = [
@@ -114,7 +128,9 @@ def _method_summaries(rows: list[dict]) -> dict:
     return methods
 
 
-def summarize(rows: list[dict], planned_count: int) -> dict:
+def summarize(
+    rows: list[dict], planned_count: int, *, variants: tuple[str, ...] = VARIANTS
+) -> dict:
     """Retain all attempts, and separately compare only the shared scored cohort.
 
     中文：原始 methods 保留失败和不完整题的费用；横向比较效果时使用
@@ -122,22 +138,27 @@ def summarize(rows: list[dict], planned_count: int) -> dict:
     12 题的 BASE 均值与 11 题的其他方法均值直接比较。该交集不是盲测集，
     中断导致被排除的问题与未知账单仍必须报告，不能通过筛选掩盖失败。
     """
+    variants = validate_variants(variants)
+    if any(set(row["arms"]) - set(variants) for row in rows):
+        raise ValueError("observed arms outside declared matrix; do not hide their costs")
     complete_rows = [
         row
         for row in rows
         if all(
-            name in row["arms"] and row["arms"][name]["feedback"] is not None for name in VARIANTS
+            name in row["arms"] and row["arms"][name]["feedback"] is not None for name in variants
         )
     ]
     return {
         "schema_version": "growrag-fresh-benchmark-v1",
         "planned_questions": planned_count,
         "completed_questions": len(complete_rows),
-        "methods": _method_summaries(rows),
+        "variants": variants,
+        "methods": _method_summaries(rows, variants),
         "complete_case_count": len(complete_rows),
         "complete_case_question_ids": [row["question_id"] for row in complete_rows],
-        "complete_case_methods": _method_summaries(complete_rows),
-        "complete_case_notice": "Four-arm non-null scored intersection only; all methods use "
+        "complete_case_methods": _method_summaries(complete_rows, variants),
+        "complete_case_notice": "All configured arms' non-null scored intersection only; "
+        "methods use "
         "the same questions for effects, paired rescues/harms, costs and latency. "
         "Excluded partial/failed attempts remain in methods and the total budget ledger. "
         "Complete-case cost is not total experiment spend or proof that missingness is random.",
@@ -161,7 +182,7 @@ def question_markdown(row: dict) -> str:
         "",
         f"原问题：{row['question']}",
         "",
-        "本题不调用历史记忆，不运行 QPP；四条路线独立执行，gold 只在执行后评分。",
+        "本题不调用历史记忆，不运行 QPP；配置的各路线独立执行，gold 只在执行后评分。",
         "伪文档只参与构造搜索 query，不作为回答证据。",
         "",
         "| 方法 | 实际 query | 答案 | EM | F1 | 支持召回 | API 次数 | 估算元 |",
@@ -202,9 +223,15 @@ def question_markdown(row: dict) -> str:
 
 
 def run_fresh_benchmark(
-    examples: tuple[HotpotExample, ...], client, output: Path, *, allow_real: bool = False
+    examples: tuple[HotpotExample, ...],
+    client,
+    output: Path,
+    *,
+    allow_real: bool = False,
+    variants: tuple[str, ...] = VARIANTS,
 ) -> dict:
     """No retries/resume/memory mutation. Abort further calls after any invalid arm."""
+    variants = validate_variants(variants)
     kind = _execution_kind(client)
     if kind is ExecutionKind.REAL and allow_real is not True:
         raise ValueError("real benchmark requires explicit allow_real")
@@ -215,6 +242,14 @@ def run_fresh_benchmark(
     output = Path(output)
     # A launch plan may already exist, but never append to an old question run.
     (output / "questions").mkdir(parents=True, exist_ok=False)
+    prompt_manifest = {
+        "variants": variants,
+        "query_generation": {name: prompt_identity(name) for name in variants if name != "BASE"},
+        "reader": prompt_identity("READER"),
+        "max_rag_calls_per_arm": 1,
+        "notice": "Prompt identity is reproducibility metadata, not evidence of quality.",
+    }
+    write_json(output / "prompt_manifest.json", prompt_manifest)
     rows = []
     for index, example in enumerate(examples):
         directory = output / "questions" / f"{index:03d}"
@@ -225,7 +260,7 @@ def run_fresh_benchmark(
             "arms": {},
         }
         order = sorted(
-            VARIANTS,
+            variants,
             key=lambda name: hashlib.sha256(
                 f"fresh-benchmark-v1:42:{example.question.question_id}:{name}".encode()
             ).hexdigest(),
@@ -235,7 +270,10 @@ def run_fresh_benchmark(
             {
                 "question_id": example.question.question_id,
                 "order": order,
-                "variants": {name: asdict(spec) for name, spec in BASELINE_SPECS.items()},
+                "variants": {
+                    name: asdict(ALL_BASELINE_SPECS[name]) for name in variants if name != "BASE"
+                },
+                "prompt_identity": prompt_manifest,
                 "gold_visible_to_runtime": False,
                 "top_k": 4,
                 "max_rag_calls_per_arm": 1,
@@ -251,7 +289,7 @@ def run_fresh_benchmark(
             if name == "BASE":
                 decision, generator = RewriteDecision(), None
             else:
-                spec = BASELINE_SPECS[name]
+                spec = ALL_BASELINE_SPECS[name]
                 decision = RewriteDecision(Action.FRESH, spec.form, spec.intent)
                 generator = baseline_generator(client, name)
             result = run_outer_loop(
@@ -298,7 +336,9 @@ def run_fresh_benchmark(
             if arm["feedback"] is None or client.block_reason:
                 rows.append(row)
                 write_json(output / "observations.json", rows)
-                write_json(output / "summary.json", summarize(rows, len(examples)))
+                write_json(
+                    output / "summary.json", summarize(rows, len(examples), variants=variants)
+                )
                 raise RuntimeError("baseline arm incomplete; retained audit, no retry")
         rows.append(row)
         write_json(directory / "row.json", row)
@@ -315,7 +355,7 @@ def run_fresh_benchmark(
             ),
             flush=True,
         )
-    report = summarize(rows, len(examples))
+    report = summarize(rows, len(examples), variants=variants)
     write_json(output / "observations.json", rows)
     write_json(output / "summary.json", report)
     return report
