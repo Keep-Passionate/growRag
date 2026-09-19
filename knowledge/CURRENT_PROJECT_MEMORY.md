@@ -1,8 +1,20 @@
 # GrowRAG 当前项目记忆
 
-更新日期：2026-09-16
-状态：用户已固定离线学习/在线应用，在线默认1轮、必要时最多2轮。新增prompt登记/可选消融/安全HTTP诊断，本地1057测试通过；本轮新付费调用0、参数训练0。09-14真实批次仍完整11/32，1次失败费用未知，累计保守预留0.3199766元，沿原5元总预算不重置。32题新prompt计划仅预检。新增UMEM/Trainable Graph Memory/MemRL直接先例，差值奖励、EMA、离线在线均不作首创。原6候选卡和原8/24目标不变；完整基线、累计证据Reader、学习选择器待接通。
+更新日期：2026-09-19
+状态：离线/在线与最多两轮架构定稿。09-19仅代码审计、文献/价格核查与实验交接文档；无业务代码改动、新付费调用或训练。1057通过是09-16测试记录，本轮不重复冒称。09-14真实批仍完整11/32，1次失败费用未知；累计保守预留0.3199766元，沿原5元总预算不重置。原6张PRE候选卡、原8/24目标和32题FRESH开发计划不变；新POST候选、累计Reader、比较协议、续跑与学习选择器待接通。
 权威性：当前入口；旧路线 A 决策保留为历史记录，但不再代表当前主线
+
+## 2026-09-19 架构定稿、协议断层与下一位模型交接（本轮仅规划）
+
+- 用户认可离线/在线与最多两轮，主体定稿不再扩架构；两轮有望补证据但不保证更强。QueryEpisode按单题，ExperienceCard跨题，DocumentSession后置。transient是退出本题运行上下文，不要求删除审计文件；长期保留审计不等于进入serving memory。
+- 详细字段/理由/前人边界：knowledge/decisions/2026-09-19_两层记忆定稿与可检验贡献.md。现有卡并非直接四字段name/description/rule/examples；LoopState与旧FrozenQueryEpisode未完全接通；旧episode强制BASE-first/prior-gap。结构化requirements→support-links为拟补能力，不是假装已实现。
+- 重要审计：PairedRunner已有初始+新证据累计阅读可复用，outer_loop底座Reader仍只看当轮；旧TransferObservation/CardValidation/VerificationEvent仍DIRECT/BASE对照，独立report已有REUSE−FRESH，不得把FRESH分数塞direct_score。需新比较事件，保留旧存档。
+- 主实验首轮固定BASE，共享同prefix后FRESH2/REUSE2，避免重复大矩阵并隔离记忆；最终PRE入口保留。新POST候选/清单单列，旧6张PRE候选及旧8/24不改、不伪装POST/盲测。
+- 新分期：knowledge/experiments/2026-09-19_最小实验与低成本模型交接.md；独立交接docs/NEXT_AGENT_HANDOFF_2026-09-19.md。下一位模型先TASK-01共享前缀累计Reader、TASK-02状态与配对协议、TASK-03安全续跑，均先零API验收。新实验/代码/训练本轮未执行；1057是09-16历史测试数，不是本轮新验证。
+- 加权建议：knowledge/decisions/2026-09-19_统一效用与轮数权重.md。保留统一F1−λ实测成本，训练/开发预算约束下可学λ，测试冻结；拒绝自由学习轮数质量乘数来给自己打分。裸F1/损害/覆盖/成本与必要同预算归因仍报告，不默认λ已获用户确认或已训练。
+- 共同研究张力不是“前人全没做安全”。RRM/QCR已有适用/拒绝/验证；Useful Memories不保证双层更强；S2G/Reflective已有多轮。新目标是固定规范动作下最少可观察条件的选择价值。ReFormeR POST为初检后选模式、改写前；公开核心提示实现与论文训练描述分开，暂不微调LLM。
+- 执行模型建议/最新价格：docs/GrowRAG_执行模型选择与费用_2026-09-19.md。Sol medium常规执行/high关键接口；Astra high规划。无可靠分档智力评分，不编造。API标准短上下文Sol输入4/输出20、Astra10/50美元每M；Codex信用点另账，本轮未切模型/未计账户余额。
+- 沿旧总5元预算、保守预留0.3199766与1未知失败费用；不静默重试或新建5元。仅读取项目/公开资料并写方案笔记，未读取密钥/新目标gold、未付费API、未改业务代码或推送GitHub。
 
 ## 2026-09-16 本轮确认、近邻与实施
 
