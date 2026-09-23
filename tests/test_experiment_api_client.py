@@ -115,6 +115,48 @@ def test_non_boolean_thinking_flag_rejected():
         config(enable_thinking="false")
 
 
+def test_json_object_mode_is_opt_in_audited_and_keeps_output_cap(tmp_path, monkeypatch):
+    calls = fake_provider(monkeypatch, completion())
+    client = LiveChatClient(config(json_object_mode=True), tmp_path, allow_network=True)
+    result = client.complete(
+        [{"role": "user", "content": 'Return JSON {"query":"text"}.'}],
+        trace_id="json-mode",
+        prompt_version="json-v1",
+    )
+    payload = json.loads(calls[0][0].data)
+    assert payload["response_format"] == {"type": "json_object"}
+    assert payload["max_completion_tokens"] == 512
+    event = json.loads(result.audit_path.read_text(encoding="utf-8"))
+    assert event["request"]["response_format"] == {"type": "json_object"}
+
+
+def test_json_object_mode_requires_instruction_before_network(tmp_path, monkeypatch):
+    calls = fake_provider(monkeypatch, completion())
+    with pytest.raises(ValueError, match="JSON instruction"):
+        LiveChatClient(config(json_object_mode=True), tmp_path, allow_network=True).complete(
+            messages(),
+            trace_id="invalid",
+            prompt_version="v1",
+        )
+    assert calls == [] and not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("invalid", [None, 1, "true"])
+def test_json_object_mode_rejects_implicit_truthiness(invalid):
+    with pytest.raises(ValueError, match="json_object_mode"):
+        config(json_object_mode=invalid)
+
+
+def test_default_transport_does_not_silently_enable_json_mode(tmp_path, monkeypatch):
+    calls = fake_provider(monkeypatch, completion())
+    LiveChatClient(config(), tmp_path, allow_network=True).complete(
+        messages(),
+        trace_id="unchanged",
+        prompt_version="v1",
+    )
+    assert "response_format" not in json.loads(calls[0][0].data)
+
+
 @pytest.mark.parametrize("reason", ["length", "content_filter", "tool_calls", None])
 def test_incomplete_response_is_failure_without_fake_result(tmp_path, monkeypatch, reason):
     calls = fake_provider(

@@ -60,6 +60,7 @@ class ChatConfig:
     output_limit_parameter: str = "max_completion_tokens"
     enable_thinking: bool | None = None
     temperature: float | None = None
+    json_object_mode: bool = False
 
     def __post_init__(self) -> None:
         parsed = urlsplit(self.base_url)
@@ -84,6 +85,8 @@ class ChatConfig:
             raise ValueError("unsupported output limit parameter")
         if self.enable_thinking is not None and type(self.enable_thinking) is not bool:
             raise ValueError("enable_thinking must be bool or None")
+        if type(self.json_object_mode) is not bool:
+            raise ValueError("json_object_mode must be an explicit bool")
         if self.temperature is not None and (
             isinstance(self.temperature, bool)
             or not isinstance(self.temperature, (int, float))
@@ -253,6 +256,10 @@ class LiveChatClient:
             for message in messages
         ):
             raise ValueError("messages must contain only role and text content")
+        if self.config.json_object_mode and not any(
+            "json" in message["content"].lower() for message in messages
+        ):
+            raise ValueError("JSON object mode requires a JSON instruction before sending")
         api_key = os.environ.get(self.config.key_environment_variable, "")
         if not api_key.strip():
             raise APIRequestError("configured API key is absent; no request was sent")
@@ -267,6 +274,10 @@ class LiveChatClient:
             payload["enable_thinking"] = self.config.enable_thinking
         if self.config.temperature is not None:
             payload["temperature"] = self.config.temperature
+        if self.config.json_object_mode:
+            # Syntax constraint only; schemas, evidence links and semantics still need validation.
+            # Keep the token cap for budget safety; truncated JSON remains a hard failure.
+            payload["response_format"] = {"type": "json_object"}
         body = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
         if api_key in body.decode("utf-8"):
             raise APIRequestError("credential detected in request content; no request was sent")
