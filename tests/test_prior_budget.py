@@ -87,3 +87,13 @@ def test_wrong_unit_cost_or_reservation_fails_closed(tmp_path):
     path.write_text(json.dumps(value))
     with pytest.raises(ValueError, match="reservation totals"):
         reconcile_history(tmp_path)
+
+
+def test_extra_roots_require_explicit_review_and_no_duplicates(tmp_path):
+    write_fixture(tmp_path)
+    with pytest.raises(ValueError, match="duplicate"):
+        reconcile_history(tmp_path, reviewed_extra_ledgers=(ROOT_LEDGERS[0],))
+    with pytest.raises(ValueError, match="inside runs"):
+        reconcile_history(tmp_path, reviewed_extra_ledgers=("../outside.json",))
+    with pytest.raises(TypeError):
+        reconcile_history(tmp_path, reviewed_extra_ledgers=[])

@@ -42,6 +42,9 @@ class RagReply:
     # None means the backend did not expose evidence; () means retrieved nothing.
     evidence: tuple[Evidence, ...] | None = None
     component_events: tuple[CallEvent, ...] = ()
+    # None preserves legacy backends. With cumulative reading this is ONLY the
+    # latest retrieval, while evidence is the context actually read this round.
+    retrieved_evidence: tuple[Evidence, ...] | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.answer, Answer):
@@ -60,6 +63,12 @@ class RagReply:
                 raise ValueError("duplicate evidence ID")
             if not set(self.answer.cited_evidence_ids) <= known:
                 raise ValueError("answer cites evidence outside its own RAG response")
+        if self.retrieved_evidence is not None:
+            _validate_evidence(self.retrieved_evidence, "retrieved evidence")
+            visible = {item.evidence_id: item for item in self.evidence or ()}
+            for item in self.retrieved_evidence:
+                if item.evidence_id in visible and visible[item.evidence_id] != item:
+                    raise ValueError("retrieved evidence conflicts with reader context")
 
 
 class RagBackend(Protocol):
@@ -105,8 +114,71 @@ class LoopResult:
     # Read state.rounds[-1].reply for the raw answer, not a verified-answer claim.
 
 
-Policy = Callable[[LoopState], RewriteDecision | None]
+Policy = Callable[[LoopState], RewriteDecision | None | CallResult[RewriteDecision | None]]
 Assessor = Callable[[LoopState, RagReply], Feedback | CallResult[Feedback]]
+
+
+def _validate_evidence(value: object, name: str) -> None:
+    if not isinstance(value, tuple) or not all(isinstance(item, Evidence) for item in value):
+        raise TypeError(f"{name} must be an immutable tuple of Evidence")
+    if len({item.evidence_id for item in value}) != len(value):
+        raise ValueError(f"{name} has duplicate evidence IDs")
+
+
+def _checked_prefix(
+    question: RuntimeQuestion,
+    initial_state: LoopState | None,
+    initial_events: tuple[CallEvent, ...],
+    max_rag_calls: int,
+    kind: ExecutionKind,
+) -> tuple[LoopState, set[str], list[CallEvent]]:
+    """共享首轮只能原样接续：不重跑、不重计轮数，也不借用其它题的轨迹。"""
+    state = LoopState(question) if initial_state is None else initial_state
+    if not isinstance(state, LoopState) or state.question != question:
+        raise ValueError("initial state must belong to this exact runtime question")
+    if not isinstance(state.rounds, tuple) or not all(
+        isinstance(record, RoundRecord) for record in state.rounds
+    ):
+        raise TypeError("initial rounds must be immutable RoundRecord records")
+    if len(state.rounds) > max_rag_calls:
+        raise ValueError("initial rounds exceed the total RAG call budget")
+    _validate_evidence(state.observed_evidence, "initial observed evidence")
+    if not isinstance(initial_events, tuple) or not all(
+        isinstance(event, CallEvent) for event in initial_events
+    ):
+        raise TypeError("initial events must be immutable CallEvent records")
+    if any(event.execution_kind != kind for event in initial_events):
+        raise ValueError("initial events and backend cannot mix execution provenance")
+    observed = {item.evidence_id: item for item in state.observed_evidence}
+    recorded: dict[str, Evidence] = {}
+    seen: set[str] = set()
+    components: list[CallEvent] = []
+    for index, record in enumerate(state.rounds):
+        if not isinstance(record.decision, RewriteDecision) or not isinstance(
+            record.reply, RagReply
+        ):
+            raise TypeError("initial round must contain a decision and RagReply")
+        if not isinstance(record.feedback, Feedback):
+            raise TypeError("initial round must contain Feedback")
+        identity = normalize_question(record.search_query)
+        if identity in seen:
+            raise ValueError("initial rounds contain repeated queries")
+        seen.add(identity)
+        if record.feedback.sufficient:
+            if not record.reply.answer.text.strip() or not record.reply.evidence:
+                raise ValueError("sufficient feedback requires a nonempty answer and evidence")
+            if index != len(state.rounds) - 1:
+                raise ValueError("initial rounds continued after a sufficient signal")
+        for item in (*(record.reply.evidence or ()), *(record.reply.retrieved_evidence or ())):
+            if item.evidence_id in recorded and recorded[item.evidence_id] != item:
+                raise ValueError("evidence ID changed content across initial rounds")
+            recorded[item.evidence_id] = item
+        if any(event.execution_kind != kind for event in record.reply.component_events):
+            raise ValueError("initial components and backend cannot mix execution provenance")
+        components.extend(record.reply.component_events)
+    if recorded != observed:
+        raise ValueError("initial observed evidence must match its recorded rounds")
+    return state, seen, components
 
 
 def base_then_fresh(state: LoopState) -> RewriteDecision:
@@ -206,6 +278,8 @@ def run_outer_loop(
     assessor: Assessor | None = None,
     max_rag_calls: int = 2,
     no_gain_patience: int = 1,
+    initial_state: LoopState | None = None,
+    initial_events: tuple[CallEvent, ...] = (),
 ) -> LoopResult:
     """Policy may choose a rewrite BEFORE the first RAG call.
 
@@ -221,14 +295,59 @@ def run_outer_loop(
         raise ValueError("backend must declare execution provenance")
     if generator is not None and generator.execution_kind != backend.execution_kind:
         raise ValueError("mock and real components cannot be mixed")
-    state, events, seen, stalls = LoopState(question), [], set(), 0
-    components: list[CallEvent] = []
+    state, seen, components = _checked_prefix(
+        question, initial_state, initial_events, max_rag_calls, backend.execution_kind
+    )
+    events, stalls = list(initial_events), 0
 
     def finish(reason: str) -> LoopResult:
         return LoopResult(state, reason, tuple(events), tuple(components))
 
-    for _ in range(max_rag_calls):
-        decision = policy(state)
+    if state.rounds and state.rounds[-1].feedback.sufficient:
+        return finish("sufficient_signal")
+    # 接续较长 prefix 时也不能清空已有的无增益计数，借此绕过停止条件。
+    prior_ids: set[str] = set()
+    for index, record in enumerate(state.rounds):
+        if record.reply.evidence is None:
+            return finish("evidence_unavailable")
+        current_ids = {
+            item.evidence_id
+            for item in (*record.reply.evidence, *(record.reply.retrieved_evidence or ()))
+        }
+        no_new_ids = current_ids <= prior_ids
+        prior_ids.update(current_ids)
+        if index:
+            if record.feedback.useful_gain is True:
+                stalls = 0
+            else:
+                stalls = stalls + 1 if record.feedback.useful_gain is False or no_new_ids else 0
+            if stalls >= no_gain_patience:
+                return finish(
+                    "no_gain_signal" if record.feedback.useful_gain is False else "no_new_ids"
+                )
+    # prefix 的轮数已经付费并消耗预算；max_rag_calls 是全程总数，不是新增轮数。
+    for _ in range(max_rag_calls - len(state.rounds)):
+        start = perf_counter()
+        try:
+            routed = policy(state)
+        except BackendCallError as error:
+            events.append(_event("route", backend.execution_kind, start, error))
+            return finish("route_error")
+        # 纯本地规则保留旧合同；付费路由必须返回可审计封装，不能把费用藏在裸返回值里。
+        if isinstance(routed, CallResult):
+            try:
+                _checked(routed, backend.execution_kind)
+                if routed.value is not None and not isinstance(routed.value, RewriteDecision):
+                    raise TypeError("audited policy must return RewriteDecision or None")
+            except Exception as error:
+                events.append(
+                    _event("route", backend.execution_kind, start, _call_failure(error, routed))
+                )
+                return finish("route_error")
+            events.append(_event("route", backend.execution_kind, start, routed))
+            decision = routed.value
+        else:
+            decision = routed
         if decision is None:
             return finish("policy_stop")
         if not isinstance(decision, RewriteDecision):
@@ -293,7 +412,8 @@ def run_outer_loop(
         components.extend(reply.component_events)
         observed = {item.evidence_id: item for item in state.observed_evidence}
         before_ids = set(observed)
-        for item in reply.evidence or ():
+        # 观察库存用于审计；Reader 上下文可能因上限裁剪，两者不能混作支撑证明。
+        for item in (*(reply.evidence or ()), *(reply.retrieved_evidence or ())):
             if item.evidence_id in observed and observed[item.evidence_id] != item:
                 raise ValueError("evidence ID changed content across rounds")
             observed[item.evidence_id] = item
@@ -365,6 +485,17 @@ class RetrieverReaderBackend:
         self.retriever, self.reader, self.top_k = retriever, reader, top_k
         self.execution_kind = retriever.execution_kind
 
+    def _reader_context(
+        self, request: RagRequest, evidence: tuple[Evidence, ...]
+    ) -> tuple[Evidence, ...]:
+        return evidence
+
+    def _latest_evidence(self, evidence: tuple[Evidence, ...]) -> tuple[Evidence, ...] | None:
+        return None  # Keep the old, non-cumulative response contract unchanged.
+
+    def _accept_reply(self, reply: RagReply) -> None:
+        pass
+
     def run(self, request: RagRequest) -> CallResult[RagReply]:
         calls: list[CallEvent] = []
         start = perf_counter()
@@ -380,6 +511,7 @@ class RetrieverReaderBackend:
                 raise ValueError("retriever exceeded its top_k contract")
             if len({item.evidence_id for item in retrieved.value}) != len(retrieved.value):
                 raise ValueError("retriever returned duplicate evidence IDs")
+            reader_context = self._reader_context(request, retrieved.value)
         except Exception as error:
             failure = _call_failure(error, retrieved)
             calls.append(_event("rag.retrieve", self.execution_kind, start, failure))
@@ -388,19 +520,24 @@ class RetrieverReaderBackend:
         start = perf_counter()
         answered = None
         try:
-            answered = self.reader.answer(request.question, retrieved.value)
+            answered = self.reader.answer(request.question, reader_context)
             _checked(answered, self.execution_kind)
             # Validate the actual reader-visible evidence before accepting the
             # answer. A malformed response still consumed its reported cost.
-            reply = RagReply(answered.value, retrieved.value)
+            reply = RagReply(
+                answered.value,
+                reader_context,
+                retrieved_evidence=self._latest_evidence(retrieved.value),
+            )
         except Exception as error:
             failure = _call_failure(error, answered)
             calls.append(_event("rag.answer", self.execution_kind, start, failure))
             raise RagCallFailure(failure, tuple(calls)) from None
         calls.append(_event("rag.answer", self.execution_kind, start, answered))
+        self._accept_reply(reply)
 
         return CallResult(
-            RagReply(reply.answer, reply.evidence, tuple(calls)),
+            RagReply(reply.answer, reply.evidence, tuple(calls), reply.retrieved_evidence),
             usage=_sum_usage((retrieved.usage, answered.usage)),
             provider=answered.provider,
             model=answered.model,
@@ -408,3 +545,64 @@ class RetrieverReaderBackend:
             audit_path=answered.audit_path,
             transport_source="composed_rag",
         )
+
+
+class CumulativeRetrieverReaderBackend(RetrieverReaderBackend):
+    """Bounded current-question context, never a cross-question memory store.
+
+    Construct a NEW backend for each branch, passing that branch's immutable
+    shared prefix evidence. The retriever and reader may be reusable components;
+    this mutable evidence container must not be shared between branches.
+    """
+
+    def __init__(
+        self,
+        retriever: Retriever,
+        reader: Reader,
+        *,
+        question: RuntimeQuestion,
+        initial_evidence: tuple[Evidence, ...] = (),
+        top_k: int = 4,
+        max_evidence: int = 8,
+    ) -> None:
+        super().__init__(retriever, reader, top_k=top_k)
+        if not isinstance(question, RuntimeQuestion):
+            raise TypeError("cumulative backend requires a bound RuntimeQuestion")
+        if type(max_evidence) is not int or max_evidence < 1:
+            raise ValueError("max_evidence must be a positive integer")
+        _validate_evidence(initial_evidence, "initial reader evidence")
+        if len(initial_evidence) > max_evidence:
+            raise ValueError("initial reader evidence exceeds max_evidence")
+        self.question, self.max_evidence = question, max_evidence
+        self._evidence = initial_evidence
+        # 被裁掉的证据仍在本题 ID 登记中，避免以后用相同 ID 偷换内容。
+        self._known = {item.evidence_id: item for item in initial_evidence}
+
+    def run(self, request: RagRequest) -> CallResult[RagReply]:
+        if not isinstance(request, RagRequest) or request.question != self.question:
+            raise BackendCallError(
+                "cumulative backend cannot be reused across questions",
+                usage=Usage(0, 0, 0),
+                provider="local",
+                transport_source="local_compute",
+            )
+        return super().run(request)
+
+    def _reader_context(
+        self, request: RagRequest, evidence: tuple[Evidence, ...]
+    ) -> tuple[Evidence, ...]:
+        for item in evidence:
+            if item.evidence_id in self._known and self._known[item.evidence_id] != item:
+                raise ValueError("evidence ID changed content across rounds")
+        # 新证据优先、同 ID 确定性去重，再截断。上限只约束真正送给 Reader 的内容。
+        merged = {item.evidence_id: item for item in evidence}
+        for item in self._evidence:
+            merged.setdefault(item.evidence_id, item)
+        return tuple(merged.values())[: self.max_evidence]
+
+    def _latest_evidence(self, evidence: tuple[Evidence, ...]) -> tuple[Evidence, ...]:
+        return evidence
+
+    def _accept_reply(self, reply: RagReply) -> None:
+        self._evidence = reply.evidence or ()
+        self._known.update((item.evidence_id, item) for item in reply.retrieved_evidence or ())

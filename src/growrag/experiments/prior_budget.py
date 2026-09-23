@@ -28,7 +28,7 @@ def _number(value: object) -> float:
     return float(value)
 
 
-def reconcile_history(runs: Path) -> dict:
+def reconcile_history(runs: Path, *, reviewed_extra_ledgers: tuple[str, ...] = ()) -> dict:
     """Consume root call ledgers, not aggregate copies or cumulative checkpoints.
 
     Scan live audit folders to detect omitted runs/requests. Only the one known
@@ -38,8 +38,15 @@ def reconcile_history(runs: Path) -> dict:
     runs = Path(runs).resolve()
     roots, calls, seen_traces, seen_audits = [], [], set(), set()
     accounted_paths = set()
-    for relative in ROOT_LEDGERS:
-        path = runs / relative
+    if not isinstance(reviewed_extra_ledgers, tuple):
+        raise TypeError("additional roots must be explicitly reviewed as a tuple")
+    relative_roots = (*ROOT_LEDGERS, *reviewed_extra_ledgers)
+    if len(set(relative_roots)) != len(relative_roots):
+        raise ValueError("duplicate historical ledger root")
+    for relative in relative_roots:
+        path = (runs / relative).resolve()
+        if not path.is_relative_to(runs):
+            raise ValueError("historical ledger must remain inside runs")
         raw = path.read_bytes()
         ledger = json.loads(raw)
         rows = ledger.get("calls", [])
