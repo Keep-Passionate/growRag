@@ -43,6 +43,7 @@ class FakeClient:
                 "input_tokens": 10,
                 "output_tokens": 3,
                 "api_requests": 0,
+                "audit_path": f"synthetic-not-written/{trace_id}.json",
             }
         )
         if prompt_version == runner.READER_VERSION:
@@ -97,7 +98,7 @@ class FakeClient:
             10,
             3,
             0,
-            Path("synthetic-not-written"),
+            Path(f"synthetic-not-written/{trace_id}.json"),
             "mock",
         )
 
@@ -287,6 +288,34 @@ def test_summary_counts_an_interrupted_question_even_without_a_finished_report()
     summary = runner.summarize([], planned=8, attempted=1)
     assert summary["started"] == 1 and summary["reported"] == 0
     assert summary["not_started"] == 7 and summary["complete"] == 0
+
+
+def test_shared_execution_reuses_answers_and_judges_but_not_billed_calls(tmp_path):
+    client = FakeClient(sufficient=True)
+    example = GuardedExample(client)
+    report = runner.run_question(example, (), client, tmp_path / "question", share_execution=True)
+    assert report["paired_execution_enabled"] is True
+    assert set(example.gold_access_calls) == {len(client.calls)}
+    assert all(row["status"] == "completed" for row in report["arms"].values())
+    # Every arm sees the same single evidence; only one real Reader/judge pair.
+    assert sum(r["prompt_version"] == runner.READER_VERSION for r in client.calls) == 1
+    assert sum(r["prompt_version"] == ASSESS_PROMPT_VERSION for r in client.calls) == 1
+    assert report["arms"]["ADAPTIVE_MEMORY2"]["replay_count"] == 2
+    assert report["arms"]["FRESH1"]["replay_count"] == 2
+    assert report["arms"]["REFLECTIVE2"]["replay_count"] == 0  # Whole prefix already shared.
+    assert len(client.calls) == 5  # Reader + judge + FRESH rewrite + two routers.
+    summary = runner.summarize([report], planned=1)
+    assert summary["reported_attempts_cost"]["estimated_actual_cny"] == pytest.approx(0.05)
+    assert summary["arms"]["FRESH1"]["shadow_path_estimated_cny"] == pytest.approx(0.03)
+    assert summary["arms"]["ADAPTIVE_MEMORY2"]["shadow_path_estimated_cny"] == pytest.approx(0.03)
+    assert summary["arms"]["REFLECTIVE2"]["shadow_path_estimated_cny"] == pytest.approx(0.02)
+
+
+def test_shadow_replay_cost_preserves_unknown_provenance():
+    row = {}
+    runner._attach_replays(row, [{"cache_hit": True, "source_audit_path": "missing"}], [])
+    assert row["replay_count"] == 1
+    assert row["replay_shadow_estimated_cny"] is None
 
 
 def test_prompt_manifest_freezes_reader_and_all_controller_prompts():

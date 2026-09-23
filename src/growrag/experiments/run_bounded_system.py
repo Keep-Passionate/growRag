@@ -116,10 +116,10 @@ def prompt_manifest() -> dict:
     return {key: {"text": text, "sha256": fingerprint(text)} for key, text in records.items()}
 
 
-def backend(example, client, initial_evidence=()):
+def backend(example, client, initial_evidence=(), *, reader=None):
     return CumulativeRetrieverReaderBackend(
         _IndexAdapter(example.candidate_context, _execution_kind(client)),
-        APIShortAnswerReader(client),
+        reader if reader is not None else APIShortAnswerReader(client),
         question=example.question,
         initial_evidence=initial_evidence,
         top_k=4,
@@ -169,14 +169,53 @@ def describe_arm(result, assessor, router, generator, calls, duration, *, shared
     }
 
 
-def run_question(example, views, client, output: Path) -> dict:
+def _attach_replays(row, records, calls):
+    """Separate zero-new-cost replay from a method's standalone shadow cost.
+
+    中文：共享不是免费模型。单独部署该方法时仍需计入来源响应的成本。
+    Use the original ledger estimate (not a second independently assumed price).
+    """
+    row["paired_execution"] = plain(records)
+    source_costs = []
+    for event in records:
+        if not event["cache_hit"]:
+            continue
+        source_path = event["source_audit_path"]
+        matching = [
+            call
+            for call in calls
+            if source_path is not None
+            and call.get("audit_path") is not None
+            and Path(call["audit_path"]) == Path(source_path)
+        ]
+        cost = matching[0].get("estimated_actual_cny") if len(matching) == 1 else None
+        source_costs.append(cost)
+    row["replay_shadow_estimated_cny"] = sum(source_costs) if None not in source_costs else None
+    row["replay_count"] = len(source_costs)
+
+
+def run_question(example, views, client, output: Path, *, share_execution=False) -> dict:
     output.mkdir(parents=True, exist_ok=False)
     q = example.question
-    prefix_assessor = APIEvidenceAssessor(client)
+    # Explicit protocol opt-in preserves all historical unshared run semantics.
+    cache, reader = None, None
+    if share_execution:
+        from growrag.paired_execution import PairedExecutionCache
+
+        cache = PairedExecutionCache(q)
+        reader = cache.reader(
+            APIShortAnswerReader(client), prompt_version=READER_VERSION, prompt_text=READER_PROMPT
+        )
+
+    def new_assessor():
+        delegate = APIEvidenceAssessor(client)
+        return cache.assessor(delegate) if cache is not None else delegate
+
+    prefix_assessor = new_assessor()
     start, clock = len(client.calls), perf_counter()
     prefix = run_outer_loop(
         q,
-        backend(example, client),
+        backend(example, client, reader=reader),
         policy=lambda _: RewriteDecision(),
         assessor=prefix_assessor,
         max_rag_calls=1,
@@ -193,6 +232,8 @@ def run_question(example, views, client, output: Path) -> dict:
             prefix, prefix_assessor, None, None, prefix_calls, perf_counter() - clock
         )
     }
+    if cache is not None:
+        _attach_replays(arms["BASE1"], cache.records, client.calls)
     write_json(output / "BASE1_execution.json", arms["BASE1"])
     results = {"BASE1": prefix}
     if arms["BASE1"]["status"] == "failed":
@@ -202,7 +243,8 @@ def run_question(example, views, client, output: Path) -> dict:
     for name in order:
         if client.block_reason:
             break
-        assessor = APIEvidenceAssessor(client)
+        cache_start = len(cache.records) if cache is not None else 0
+        assessor = new_assessor()
         generator = APIGapQueryGenerator(client, assessor)
         router, initial, reference = None, None, None
         if name == "FRESH1":
@@ -214,7 +256,7 @@ def run_question(example, views, client, output: Path) -> dict:
                     "preserve intent and improve retrieval wording",
                 )
 
-            active_backend, limit = backend(example, client), 1
+            active_backend, limit = backend(example, client, reader=reader), 1
         elif name in {"REFLECTIVE2", "S2G_GAP2"}:
             if prefix_assessor.latest is not None:
                 assessor.seed(q, prefix_assessor.latest)
@@ -223,7 +265,9 @@ def run_question(example, views, client, output: Path) -> dict:
                 generator = GapAppendQueryGenerator(assessor)
             policy = router
             initial, reference = prefix.state, prefix_ref
-            active_backend = backend(example, client, prefix.state.rounds[-1].reply.evidence or ())
+            active_backend = backend(
+                example, client, prefix.state.rounds[-1].reply.evidence or (), reader=reader
+            )
             limit = 2
         else:
             memory_enabled = name == "ADAPTIVE_MEMORY2"
@@ -235,7 +279,7 @@ def run_question(example, views, client, output: Path) -> dict:
                 allow_candidate_memory=memory_enabled,
             )
             policy = router
-            active_backend, limit = backend(example, client), 2
+            active_backend, limit = backend(example, client, reader=reader), 2
         start, clock = len(client.calls), perf_counter()
         result = run_outer_loop(
             q,
@@ -257,6 +301,8 @@ def run_question(example, views, client, output: Path) -> dict:
             perf_counter() - clock,
             shared_prefix=reference,
         )
+        if cache is not None:
+            _attach_replays(row, cache.records[cache_start:], client.calls)
         arms[name] = row
         write_json(output / f"{name}_execution.json", row)
         if row["status"] == "failed":
@@ -296,6 +342,9 @@ def run_question(example, views, client, output: Path) -> dict:
         "executed_route_order": list(results),
         "arms": arms,
         "memory_updated": False,
+        "paired_execution_enabled": share_execution,
+        "latency_notice": "Collection wall time includes experimental sharing; "
+        "not standalone deployment latency or evidence of a speedup.",
     }
     write_json(output / "report.json", report)
     write_question_markdown(report, output / "report.md")
@@ -338,6 +387,9 @@ def write_question_markdown(report: dict, path: Path) -> None:
                 f"事后gold评分：{row['feedback']}",
                 "",
                 f"本臂新增费用：{row['incremental_cost']}；共享前缀：{row['shared_prefix']}",
+                "",
+                f"同题组件回放：{row.get('replay_count', 0)}次；"
+                f"独立执行时应补回的估算费用：{row.get('replay_shadow_estimated_cny', 0)}元。",
                 "",
                 "路由、结构化缺口及改写输入见同目录JSON；模型理由不是事后gold标签。",
                 "",
@@ -396,6 +448,7 @@ def summarize(reports: list[dict], planned=8, *, attempted=None) -> dict:
                 for step in row["result"]["state"]["rounds"]
             ),
             "stop_reasons": {},
+            "replay_count": sum(row.get("replay_count", 0) for row in rows),
         }
         for row in rows:
             reason = row["result"]["stop_reason"]
@@ -406,7 +459,10 @@ def summarize(reports: list[dict], planned=8, *, attempted=None) -> dict:
             prefix = (
                 row["shared_prefix"]["cost"]["estimated_actual_cny"] if row["shared_prefix"] else 0
             )
-            costs.append(None if incremental is None or prefix is None else incremental + prefix)
+            replay = row.get("replay_shadow_estimated_cny", 0)
+            costs.append(
+                None if None in (incremental, prefix, replay) else incremental + prefix + replay
+            )
         quality["shadow_path_estimated_cny"] = sum(costs) if costs and None not in costs else None
         summary["arms"][name] = quality
     summary["adaptive_memory_minus_no_memory"] = {
