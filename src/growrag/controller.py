@@ -25,6 +25,7 @@ from .outer_loop import Feedback, LoopState, RagReply
 from .query_actions import RewriteDecision, RewriteForm
 
 ASSESS_PROMPT_VERSION = "growrag-evidence-requirements-v1"
+ASSESS_PARSER_VERSION = "growrag-evidence-assessment-parser-v2"
 ASSESS_PROMPT = """Assess whether the ORIGINAL question is answered by the current
 answer using ONLY the supplied reader_context. Split the question into 1-6 short
 necessary information requirements, preserving entity, relation, time, comparison
@@ -223,17 +224,26 @@ class APIEvidenceAssessor:
         record, content, metadata = _recorded_request(
             self, ASSESS_PROMPT, payload, ASSESS_PROMPT_VERSION, "assess_requirements"
         )
+        record["parser_version"] = ASSESS_PARSER_VERSION
         try:
             value = _json_object(content)
-            if set(value) != {
+            required = {
                 "requirements",
                 "sufficient",
                 "useful_gain",
                 "gap",
                 "next_intent",
-                "reason",
-            }:
+            }
+            if set(value) not in (required, required | {"reason"}):
                 raise ValueError("unexpected assessment fields")
+            if "reason" not in value:
+                # Keep the raw response and mark this as a LOCAL placeholder,
+                # not a fabricated model justification or a paid repair retry.
+                value["reason"] = "Explanation omitted by model; inspect requirements and gap."
+                record["normalization"] = {
+                    "reason_missing": True,
+                    "reason_origin": "local_placeholder",
+                }
             raw = value.pop("requirements")
             if not isinstance(raw, list) or any(
                 not isinstance(item, dict)

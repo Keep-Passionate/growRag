@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from growrag.controller import (
+    ASSESS_PARSER_VERSION,
     APIEvidenceAssessor,
     APIGapQueryGenerator,
     APIRoutingPolicy,
@@ -548,3 +549,53 @@ def test_contraindication_check_is_a_positive_claim_of_absence(status, expected)
     assert check["condition"] in policy.records[0]["payload"]["candidates"][0]["required_checks"]
     assert policy.records[0]["prompt_version"] == "growrag-three-way-route-v2"
     assert "conflicted means X holds" in policy.records[0]["prompt"]
+
+
+def test_missing_reason_uses_explicit_local_placeholder_without_another_call():
+    raw = asdict(assessment())
+    del raw["reason"]
+    client = Client(raw)
+    judge = APIEvidenceAssessor(client)
+    result = judge(LoopState(Q), RagReply(Answer(""), (E,)))
+    assert result.value.reason == "Explanation omitted by model; inspect requirements and gap."
+    assert result.value.sufficient is False
+    assert len(client.requests) == 1 and result.usage.api_requests == 0
+    record = judge.records[0]
+    assert record["parser_version"] == ASSESS_PARSER_VERSION
+    assert record["normalization"] == {"reason_missing": True, "reason_origin": "local_placeholder"}
+    assert "reason" not in json.loads(record["response"])
+
+
+def test_missing_reason_cannot_relax_sufficiency_or_evidence_constraints():
+    raw = asdict(assessment())
+    del raw["reason"]
+    raw["sufficient"] = True
+    client = Client(raw)
+    judge = APIEvidenceAssessor(client)
+    with pytest.raises(BackendCallError):
+        judge(LoopState(Q), RagReply(Answer("Ada", ("e1",)), (E,)))
+    assert judge.latest is None and len(client.requests) == 1
+
+
+@pytest.mark.parametrize("reason", [None, 7, True, [], {}, ""])
+def test_present_but_invalid_reason_is_not_replaced(reason):
+    raw = asdict(assessment())
+    raw["reason"] = reason
+    client = Client(raw)
+    judge = APIEvidenceAssessor(client)
+    with pytest.raises(BackendCallError):
+        judge(LoopState(Q), RagReply(Answer(""), (E,)))
+    assert "normalization" not in judge.records[0] and len(client.requests) == 1
+
+
+@pytest.mark.parametrize(
+    "field", ["requirements", "sufficient", "useful_gain", "gap", "next_intent"]
+)
+def test_only_reason_is_optional_all_core_fields_remain_required(field):
+    raw = asdict(assessment())
+    del raw[field]
+    client = Client(raw)
+    judge = APIEvidenceAssessor(client)
+    with pytest.raises(BackendCallError):
+        judge(LoopState(Q), RagReply(Answer(""), (E,)))
+    assert len(client.requests) == 1

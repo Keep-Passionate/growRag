@@ -29,6 +29,7 @@ from growrag.query_operators import RewriteForm
 
 from .api_client import ChatConfig, LiveChatClient
 from .api_preflight import read_local_bailian_settings
+from .bounded_continuation import review_unstarted
 from .budget import PriceLimits
 from .fresh_benchmark import call_totals
 from .hotpot import evaluate_layered_feedback
@@ -429,13 +430,27 @@ def main(argv=None):
     parser.add_argument("--runs-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--api-config", type=Path)
+    parser.add_argument("--continue-unstarted-from", type=Path)
     parser.add_argument("--allow-network", action="store_true")
     args = parser.parse_args(argv)
     if args.output.exists():
         raise FileExistsError("no overwrite or automatic retry")
     examples, data = load_debug(args.manifest)
     pool, source = load_candidates(args.source_dir)
-    history = reconcile_history(args.runs_root, reviewed_extra_ledgers=REVIEWED_EXTRA)
+    continuation = None
+    reviewed_roots = REVIEWED_EXTRA
+    if args.continue_unstarted_from is not None:
+        examples, continuation, ledger = review_unstarted(
+            args.continue_unstarted_from,
+            args.runs_root,
+            examples,
+            data=data,
+            source=source,
+            prompts=prompt_manifest(),
+            model=PILOT_MODEL,
+        )
+        reviewed_roots = (*reviewed_roots, ledger)
+    history = reconcile_history(args.runs_root, reviewed_extra_ledgers=reviewed_roots)
     subcap = min(3.0, 50.0 - history["prior_reserved_cny"])
     if subcap <= 0:
         raise ValueError("no conservatively available project budget")
@@ -459,6 +474,9 @@ def main(argv=None):
         "historical_budget": history,
         "prompts": prompt_manifest(),
         "local_query_builder_version": controller.GAP_APPEND_VERSION,
+        "assessment_parser_version": controller.ASSESS_PARSER_VERSION,
+        "continuation": continuation,
+        "planned_question_ids": [e.question.question_id for e in examples],
         "scope": "Original 8 debug questions; 24 check excluded; frozen candidate library. "
         "No parameter training, no automatic promotion, no test-to-memory writes.",
     }
@@ -480,7 +498,12 @@ def main(argv=None):
     ):
         raise ValueError("frozen pricing requires Beijing endpoint")
     write_json(
-        args.runs_root / "2026-09-23_bounded_system.claim.json",
+        args.runs_root
+        / (
+            "2026-09-23_bounded_system_unstarted.claim.json"
+            if continuation
+            else "2026-09-23_bounded_system.claim.json"
+        ),
         {
             "output": str(args.output.resolve()),
             "historical_sha256": fingerprint(history),
@@ -562,7 +585,10 @@ def main(argv=None):
         return 1
     finally:
         write_json(args.output / "reports.json", reports)
-        write_json(args.output / "summary.json", summarize(reports, attempted=attempted))
+        write_json(
+            args.output / "summary.json",
+            summarize(reports, planned=len(examples), attempted=attempted),
+        )
         if client is not None:
             budget = client.report()
             write_json(args.output / "final_budget.json", budget)
