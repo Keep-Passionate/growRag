@@ -15,6 +15,22 @@ from dataclasses import asdict, dataclass
 from .api_client import APIRequestError, ChatResponse, LiveChatClient
 
 
+def request_input_bytes(config, messages, *, prompt_version: str) -> int:
+    """Conservative serialized input bound, including opt-in schema instructions.
+
+    中文：服务端结构约束也可能计入输入，不能只预留自然语言提示的费用。
+    The framing allowance is added by the caller; this is not an exact tokenizer.
+    """
+    size = len(json.dumps(messages, ensure_ascii=False).encode("utf-8"))
+    if getattr(config, "json_schema_mode", False):
+        from .output_schemas import response_format_for
+
+        size += len(
+            json.dumps(response_format_for(prompt_version), ensure_ascii=False).encode("utf-8")
+        )
+    return size
+
+
 @dataclass(frozen=True)
 class PriceLimits:
     budget_cny: float = 1.0
@@ -59,7 +75,7 @@ class BudgetedChatClient:
             self.block_reason = "elapsed_time_limit"
         if self.block_reason:
             raise APIRequestError("budget client blocked after prior failure; no request sent")
-        size = len(json.dumps(messages, ensure_ascii=False).encode("utf-8"))
+        size = request_input_bytes(self.config, messages, prompt_version=prompt_version)
         if size > self.limits.max_prompt_bytes:
             self.block_reason = "prompt_size_limit"
             raise APIRequestError("prompt exceeds pilot size cap; no request sent")

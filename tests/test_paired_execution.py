@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from growrag import controller
+from growrag import controller, paired_execution
 from growrag.controller import APIEvidenceAssessor, APIGapQueryGenerator, APIRoutingPolicy
 from growrag.experiments.api_client import ChatConfig, ChatResponse
 from growrag.experiments.llm_adapters import READER_PROMPT, READER_PROMPT_VERSION, APIReader
@@ -268,3 +268,17 @@ def test_duplicates_rejected_before_reader_call_and_cache_is_not_cross_instance(
     reader(first, client).answer(Q, (E1,))
     reader(PairedExecutionCache(Q), client).answer(Q, (E1,))
     assert len(client.requests) == 2
+
+
+def test_schema_mode_and_exact_schema_hash_are_cache_identity(monkeypatch):
+    cache, client = PairedExecutionCache(Q), SyntheticClient()
+    judge = cache.assessor(APIEvidenceAssessor(client))
+    judge(LoopState(Q), reply())
+    client.config = replace(client.config, json_object_mode=False, json_schema_mode=True)
+    judge(LoopState(Q), reply())
+    assert len(client.requests) == 2
+    judge(LoopState(Q), reply())
+    assert len(client.requests) == 2 and cache.records[-1]["cache_hit"]
+    monkeypatch.setattr(paired_execution, "schema_fingerprint", lambda _: "changed-reviewed-schema")
+    judge(LoopState(Q), reply())
+    assert len(client.requests) == 3 and not cache.records[-1]["cache_hit"]

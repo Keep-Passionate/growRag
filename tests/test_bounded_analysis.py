@@ -126,6 +126,20 @@ def test_partial_unknown_cost_is_not_zero_and_no_budget_is_not_known(tmp_path):
     assert data["arms"]["BASE1"]["scores"]["answer_f1"] == {"n": 0, "mean": None}
 
 
+@pytest.mark.parametrize("replay,expected", [(0.4, 0.7), (None, None)])
+def test_component_replay_inflates_only_shadow_not_actual_bill(tmp_path, replay, expected):
+    branch = arm(cost=0.2, prefix={"cost": {"estimated_actual_cny": 0.1}})
+    branch.update(replay_count=2, replay_shadow_estimated_cny=replay)
+    data = analyze([(report("q", SHARED=branch), tmp_path)])
+    projected = data["questions"][0]["arms"]["SHARED"]
+    if expected is None:
+        assert projected["shadow_standalone_estimated_cny"] is None
+    else:
+        assert projected["shadow_standalone_estimated_cny"] == pytest.approx(expected)
+    assert projected["component_replay_count"] == 2
+    assert data["observed_unique_reported_call_cost"]["estimated_actual_cny"] == pytest.approx(0.2)
+
+
 def test_module_transitions_and_judge_gold_mismatch_are_descriptive(tmp_path):
     row = report(
         "q",

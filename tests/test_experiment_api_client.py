@@ -7,6 +7,11 @@ import urllib.error
 import pytest
 
 from growrag.experiments.api_client import APIRequestError, ChatConfig, LiveChatClient
+from growrag.experiments.output_schemas import (
+    REGISTRY_VERSION,
+    response_format_for,
+    schema_fingerprint,
+)
 
 
 def config(**changes):
@@ -155,6 +160,110 @@ def test_default_transport_does_not_silently_enable_json_mode(tmp_path, monkeypa
         prompt_version="v1",
     )
     assert "response_format" not in json.loads(calls[0][0].data)
+
+
+def test_strict_schema_is_opt_in_audited_and_needs_no_json_keyword(tmp_path, monkeypatch):
+    version = "growrag-gap-query-v2"
+    calls = fake_provider(
+        monkeypatch,
+        completion(
+            choices=[{"finish_reason": "stop", "message": {"content": '{"query":"new query"}'}}]
+        ),
+    )
+    client = LiveChatClient(config(json_schema_mode=True), tmp_path, allow_network=True)
+    result = client.complete(messages(), trace_id="strict-schema", prompt_version=version)
+    payload = json.loads(calls[0][0].data)
+    assert payload["response_format"] == response_format_for(version)
+    assert payload["max_completion_tokens"] == 512
+    event = json.loads(result.audit_path.read_text(encoding="utf-8"))
+    assert event["request"]["response_format"]["json_schema"]["strict"] is True
+    assert event["output_schema_registry_version"] == REGISTRY_VERSION
+    assert event["output_schema_sha256"] == schema_fingerprint(version)
+
+
+def test_unknown_schema_version_rejected_before_credentials_or_network(tmp_path, monkeypatch):
+    calls = fake_provider(monkeypatch, completion())
+    monkeypatch.delenv("GROWRAG_TEST_ONLY_KEY")
+    client = LiveChatClient(config(json_schema_mode=True), tmp_path, allow_network=True)
+    with pytest.raises(ValueError, match="no reviewed schema"):
+        client.complete(messages(), trace_id="unknown-schema", prompt_version="unreviewed-v99")
+    assert calls == [] and client.attempts == 0 and not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("invalid", [None, 0, 1, "true"])
+def test_json_schema_mode_rejects_implicit_truthiness(invalid):
+    with pytest.raises(ValueError, match="json_schema_mode"):
+        config(json_schema_mode=invalid)
+
+
+def test_json_schema_and_object_modes_are_mutually_exclusive():
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        config(json_schema_mode=True, json_object_mode=True)
+
+
+def test_strict_schema_http_failure_never_retries_without_schema(tmp_path, monkeypatch):
+    monkeypatch.setenv("GROWRAG_TEST_ONLY_KEY", "TEST-ONLY-NOT-A-REAL-KEY")
+    calls = []
+
+    class Opener:
+        def open(self, request, timeout):
+            calls.append(request)
+            raise urllib.error.HTTPError(request.full_url, 400, "schema unsupported", {}, None)
+
+    monkeypatch.setattr("urllib.request.build_opener", lambda *args: Opener())
+    client = LiveChatClient(config(json_schema_mode=True), tmp_path, allow_network=True)
+    with pytest.raises(APIRequestError, match="no retry or fallback"):
+        client.complete(messages(), trace_id="unsupported", prompt_version="growrag-gap-query-v2")
+    assert len(calls) == 1 and client.attempts == 1
+    assert json.loads(calls[0].data)["response_format"]["type"] == "json_schema"
+    event = json.loads(next(tmp_path.iterdir()).read_text(encoding="utf-8"))
+    assert event["status"] == "failed" and event["retry_count"] == 0
+
+
+def test_strict_schema_keeps_truncation_failure_and_actual_usage(tmp_path, monkeypatch):
+    calls = fake_provider(
+        monkeypatch,
+        completion(choices=[{"finish_reason": "length", "message": {"content": '{"query":'}}]),
+    )
+    client = LiveChatClient(config(json_schema_mode=True), tmp_path, allow_network=True)
+    with pytest.raises(APIRequestError) as caught:
+        client.complete(messages(), trace_id="truncated", prompt_version="growrag-gap-query-v2")
+    assert caught.value.api_requests == 1 and caught.value.input_tokens == 11
+    assert len(calls) == 1
+
+
+def test_strict_schema_does_not_remove_local_assessment_validation(tmp_path, monkeypatch):
+    from growrag.controller import ASSESS_PROMPT_VERSION, APIEvidenceAssessor
+    from growrag.experiments.protocol import Answer, BackendCallError, Evidence, RuntimeQuestion
+    from growrag.outer_loop import LoopState, RagReply
+
+    # Deliberately simulate a provider ignoring the constraint. Local validation
+    # still rejects malformed typed fields and retains the paid request's usage.
+    value = {
+        "requirements": [
+            {"description": "School location", "status": "supported", "evidence_ids": ["e1"]}
+        ],
+        "sufficient": True,
+        "useful_gain": [],
+        "gap": "",
+        "next_intent": "",
+        "reason": "The text names the town.",
+    }
+    calls = fake_provider(
+        monkeypatch,
+        completion(choices=[{"finish_reason": "stop", "message": {"content": json.dumps(value)}}]),
+    )
+    client = LiveChatClient(config(json_schema_mode=True), tmp_path, allow_network=True)
+    judge = APIEvidenceAssessor(client)
+    question = RuntimeQuestion("synthetic-q", "Where is Fiction School?")
+    evidence = (Evidence("e1", "Fiction School", 0, "Fiction School is in Imaginary Town."),)
+    with pytest.raises(BackendCallError, match="invalid evidence assessment") as caught:
+        judge(LoopState(question), RagReply(Answer("Imaginary Town", ("e1",)), evidence))
+    assert judge.latest is None and caught.value.usage.api_requests == 1
+    assert len(calls) == 1
+    assert json.loads(calls[0][0].data)["response_format"] == response_format_for(
+        ASSESS_PROMPT_VERSION
+    )
 
 
 @pytest.mark.parametrize("reason", ["length", "content_filter", "tool_calls", None])

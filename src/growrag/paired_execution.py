@@ -14,6 +14,7 @@ from dataclasses import asdict, dataclass, replace
 
 from . import controller
 from .controller import APIEvidenceAssessor, EvidenceAssessment
+from .experiments.output_schemas import schema_fingerprint
 from .experiments.protocol import (
     Answer,
     CallResult,
@@ -39,6 +40,7 @@ def _configuration(delegate) -> dict:
         "enable_thinking",
         "temperature",
         "json_object_mode",
+        "json_schema_mode",
     )
     result = {name: getattr(config, name, None) for name in fields}
     if any(not isinstance(result[name], str) or not result[name] for name in ("base_url", "model")):
@@ -104,12 +106,15 @@ class PairedExecutionCache:
             raise ValueError("paired execution cannot share across different questions")
 
     def _key(self, component: str, delegate, payload: dict, prompt: dict) -> str:
+        configuration = _configuration(delegate)
+        if configuration["json_schema_mode"]:
+            configuration["output_schema_sha256"] = schema_fingerprint(prompt["version"])
         return _hash(
             {
                 "schema": CACHE_VERSION,
                 "question": asdict(self.question),
                 "component": component,
-                "configuration": _configuration(delegate),
+                "configuration": configuration,
                 "prompt": prompt,
                 "payload": payload,
             }

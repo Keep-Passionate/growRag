@@ -23,7 +23,7 @@ from growrag.query_operators import RewriteForm
 
 from .api_client import ChatConfig, LiveChatClient
 from .api_preflight import read_local_bailian_settings
-from .budget import BudgetedChatClient, PriceLimits
+from .budget import BudgetedChatClient, PriceLimits, request_input_bytes
 from .data_protocol import normalize_question
 from .fresh_baselines import BASELINE_SPECS, baseline_generator
 from .fresh_benchmark import call_totals
@@ -201,7 +201,7 @@ class DurableBudgetClient(BudgetedChatClient):
 
     def complete(self, messages, *, trace_id, prompt_version):
         reserve = self._price(
-            len(json.dumps(messages, ensure_ascii=False).encode()) + 1024,
+            request_input_bytes(self.config, messages, prompt_version=prompt_version) + 1024,
             self.config.max_output_tokens,
         )
         intent = self.intent_number

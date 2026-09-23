@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 from growrag.experiments.api_client import APIRequestError, ChatResponse
-from growrag.experiments.budget import BudgetedChatClient, PriceLimits
+from growrag.experiments.budget import BudgetedChatClient, PriceLimits, request_input_bytes
 
 
 class Delegate:
@@ -74,3 +74,27 @@ def test_prompt_size_blocks_before_request():
     with pytest.raises(APIRequestError, match="size"):
         invoke(client)
     assert delegate.attempts == 0
+
+
+def test_schema_request_cost_reservation_includes_serialized_schema():
+    from growrag.controller import ASSESS_PROMPT_VERSION
+
+    messages = [{"role": "user", "content": "JSON"}]
+    delegate = Delegate()
+    original = request_input_bytes(delegate.config, messages, prompt_version=ASSESS_PROMPT_VERSION)
+    delegate.config.json_schema_mode = True
+    strict = request_input_bytes(delegate.config, messages, prompt_version=ASSESS_PROMPT_VERSION)
+    assert strict > original + 500
+    client = BudgetedChatClient(delegate, PriceLimits())
+    client.complete(messages, trace_id="schema", prompt_version=ASSESS_PROMPT_VERSION)
+    expected = ((strict + 1024) * 0.2 + 100 * 0.8) / 1_000_000
+    assert client.report()["reserved_cny"] == pytest.approx(expected)
+
+
+def test_unknown_strict_schema_rejected_before_delegate_or_reservation():
+    delegate = Delegate()
+    delegate.config.json_schema_mode = True
+    client = BudgetedChatClient(delegate, PriceLimits())
+    with pytest.raises(ValueError):
+        invoke(client)
+    assert delegate.attempts == 0 and client.reserved_cny == 0

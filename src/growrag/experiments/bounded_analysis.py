@@ -126,7 +126,8 @@ def _project_arm(name: str, row: dict, root: Path):
     if incremental:
         own = incremental["estimated_actual_cny"]
         shared = (prefix or {}).get("cost", {}).get("estimated_actual_cny", 0)
-        path_cost = own + shared if _number(own) and _number(shared) else None
+        replay = row.get("replay_shadow_estimated_cny", 0)
+        path_cost = own + shared + replay if all(map(_number, (own, shared, replay))) else None
     scored = row.get("status") == "completed" and isinstance(row.get("feedback"), dict)
     return {
         "arm": name,
@@ -156,6 +157,8 @@ def _project_arm(name: str, row: dict, root: Path):
         if prefix
         else None,
         "shadow_standalone_estimated_cny": path_cost,
+        "component_replay_count": row.get("replay_count", 0),
+        "replay_shadow_estimated_cny": row.get("replay_shadow_estimated_cny", 0),
     }
 
 

@@ -21,6 +21,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from .output_schemas import REGISTRY_VERSION, response_format_for, schema_fingerprint
+
 
 class APIRequestError(RuntimeError):
     """A failed request, with no provider body or credential in the exception."""
@@ -61,6 +63,7 @@ class ChatConfig:
     enable_thinking: bool | None = None
     temperature: float | None = None
     json_object_mode: bool = False
+    json_schema_mode: bool = False
 
     def __post_init__(self) -> None:
         parsed = urlsplit(self.base_url)
@@ -87,6 +90,10 @@ class ChatConfig:
             raise ValueError("enable_thinking must be bool or None")
         if type(self.json_object_mode) is not bool:
             raise ValueError("json_object_mode must be an explicit bool")
+        if type(self.json_schema_mode) is not bool:
+            raise ValueError("json_schema_mode must be an explicit bool")
+        if self.json_object_mode and self.json_schema_mode:
+            raise ValueError("json_object_mode and json_schema_mode are mutually exclusive")
         if self.temperature is not None and (
             isinstance(self.temperature, bool)
             or not isinstance(self.temperature, (int, float))
@@ -260,6 +267,11 @@ class LiveChatClient:
             "json" in message["content"].lower() for message in messages
         ):
             raise ValueError("JSON object mode requires a JSON instruction before sending")
+        # Exact prompt registration is checked before reading keys, creating an
+        # audit file or attempting network I/O. Never fall back to plain JSON.
+        strict_format = (
+            response_format_for(prompt_version) if self.config.json_schema_mode else None
+        )
         api_key = os.environ.get(self.config.key_environment_variable, "")
         if not api_key.strip():
             raise APIRequestError("configured API key is absent; no request was sent")
@@ -278,6 +290,10 @@ class LiveChatClient:
             # Syntax constraint only; schemas, evidence links and semantics still need validation.
             # Keep the token cap for budget safety; truncated JSON remains a hard failure.
             payload["response_format"] = {"type": "json_object"}
+        elif strict_format is not None:
+            # Schema controls shape, NOT factual correctness. Keep local parser
+            # checks and the output cap; truncated responses still fail closed.
+            payload["response_format"] = strict_format
         body = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
         if api_key in body.decode("utf-8"):
             raise APIRequestError("credential detected in request content; no request was sent")
@@ -304,6 +320,9 @@ class LiveChatClient:
             "input_tokens": None,
             "output_tokens": None,
         }
+        if strict_format is not None:
+            event["output_schema_registry_version"] = REGISTRY_VERSION
+            event["output_schema_sha256"] = schema_fingerprint(prompt_version)
         # Reserve the audit ID before sending: never charge twice for a reused ID.
         with audit_path.open("x", encoding="utf-8") as handle:
             json.dump(_redact(event, api_key), handle, ensure_ascii=False, indent=2)
