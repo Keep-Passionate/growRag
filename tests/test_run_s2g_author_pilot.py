@@ -143,8 +143,10 @@ def test_author_caps_share_one_ledger_and_restore_config(tmp_path):
     assert len(list((tmp_path / "journal").glob("*_intent.json"))) == 3
 
 
-@pytest.mark.parametrize("json_stages", [False, True])
-def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stages):
+@pytest.mark.parametrize(
+    "json_stages,schema_stages", [(False, False), (True, False), (False, True)]
+)
+def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stages, schema_stages):
     config = ChatConfig("https://example.invalid/v1", "fake", "NEVER_READ", 10)
     delegate = SimpleNamespace(config=config, transport_source="fake_test", attempts=0)
     observed = []
@@ -159,6 +161,7 @@ def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stage
     delegate.complete = complete
     client = pilot.AuthorBudgetClient(delegate, PriceLimits(), tmp_path / "journal")
     client.json_stages = json_stages
+    client.schema_stages = schema_stages
     for stage, cap in (("judge", 256), ("extract", 64), ("answer", 128)):
         client.complete_author(
             [{"role": "user", "content": "synthetic"}],
@@ -170,6 +173,7 @@ def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stage
         )
         assert client.config == config and delegate.config == config
     assert [c.json_object_mode for c in observed] == [json_stages, json_stages, False]
+    assert [c.json_schema_mode for c in observed] == [schema_stages, schema_stages, False]
     assert [c.max_output_tokens for c in observed] == [256, 64, 128]
     assert len(client.calls) == 3
 
@@ -222,7 +226,8 @@ def test_existing_claim_rejects_before_data_access(tmp_path, monkeypatch):
 
 
 @pytest.mark.skipif(not UPSTREAM.exists(), reason="author snapshot not redistributed")
-def test_v2_plan_keeps_v1_cost_and_separate_identity(tmp_path, monkeypatch):
+@pytest.mark.parametrize("schema_stages", [False, True])
+def test_v2_v3_plan_keeps_prior_cost_and_separate_identity(tmp_path, monkeypatch, schema_stages):
     observed_roots = []
 
     def history(root, *, reviewed_extra_ledgers):
@@ -247,13 +252,21 @@ def test_v2_plan_keeps_v1_cost_and_separate_identity(tmp_path, monkeypatch):
                 str(tmp_path),
                 "--output",
                 str(output),
-                "--json-stages",
+                "--schema-stages" if schema_stages else "--json-stages",
             ]
         )
         == 0
     )
     plan = json.loads((output / "plan.json").read_text())
-    assert plan["run_id"] == pilot.JSON_RUN_ID != pilot.RUN_ID
-    assert plan["decoding"]["json_object_mode"] == "judge/extract only"
-    assert observed_roots == [*pilot.HISTORY_ROOTS, f"{pilot.RUN_ID}/final_budget.json"]
-    assert plan["v2_authorization"] and not plan["official_dev_test_used"]
+    assert plan["run_id"] == (pilot.SCHEMA_RUN_ID if schema_stages else pilot.JSON_RUN_ID)
+    format_key = "json_schema_mode" if schema_stages else "json_object_mode"
+    assert plan["decoding"][format_key] == "judge/extract only"
+    expected_roots = [*pilot.HISTORY_ROOTS, f"{pilot.RUN_ID}/final_budget.json"]
+    if schema_stages:
+        expected_roots.append(f"{pilot.JSON_RUN_ID}/final_budget.json")
+        assert set(plan["output_schemas"]) == {"judge", "extract"}
+        assert plan["v3_decision"]
+    else:
+        assert plan["v2_authorization"]
+    assert observed_roots == expected_roots
+    assert not plan["official_dev_test_used"]

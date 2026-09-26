@@ -5,7 +5,7 @@
 Only basic types, arrays, enums and closed objects from the documented provider
 interface are used. Local parsers enforce bounds and cross-field constraints.
 
-Provider reference (reviewed 2026-09-23):
+Provider reference (reviewed 2026-09-23; S2G additions 2026-09-27):
 https://help.aliyun.com/zh/model-studio/qwen-structured-output
 No controller imports: the transport imports this module, so importing the
 controller here would create a circular dependency. Tests check version alignment.
@@ -17,7 +17,7 @@ import hashlib
 import json
 from copy import deepcopy
 
-REGISTRY_VERSION = "growrag-output-schemas-v1"
+REGISTRY_VERSION = "growrag-output-schemas-v2"
 
 
 def _object(properties: dict) -> dict:
@@ -81,11 +81,41 @@ _ROUTE = _object(
 _QUERY = _object({"query": _text()})
 _ANSWER = _object({"answer": _text(), "cited_evidence_ids": _array(_text())})
 
+# 作者现有 prompt 的字段/类型，不增加新的修复动作、充分性规则或长度约束。
+# 这里只修复 API 格式漂移；不能替代作者训练好的 Judge，也不能证明语义正确。
+_S2G_AUTHOR_JUDGE = _object(
+    {
+        "sufficient": {"type": "boolean"},
+        "gap_items": _array(
+            _object(
+                {
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "bridge_entity",
+                            "attribute",
+                            "relation",
+                            "evidence_span",
+                            "other",
+                        ],
+                    },
+                    "target": _text(),
+                    "slot": _text(),
+                    "description": _text(),
+                }
+            )
+        ),
+    }
+)
+_S2G_AUTHOR_EXTRACT = _object({"evidence_global_ids": _array({"type": "integer"})})
+
 _REGISTRY = {
     "growrag-evidence-requirements-v2": ("growrag_evidence_assessment_v2", _ASSESSMENT),
     "growrag-three-way-route-v2": ("growrag_three_way_route_v2", _ROUTE),
     "growrag-gap-query-v2": ("growrag_gap_query_v2", _QUERY),
     "growrag-short-supported-answer-v2": ("growrag_short_supported_answer_v2", _ANSWER),
+    "s2g-author-5d842a6-judge-api-v1": ("s2g_author_5d842a6_judge_api_v1", _S2G_AUTHOR_JUDGE),
+    "s2g-author-5d842a6-extract-api-v1": ("s2g_author_5d842a6_extract_api_v1", _S2G_AUTHOR_EXTRACT),
 }
 
 

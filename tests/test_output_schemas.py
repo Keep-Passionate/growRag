@@ -16,6 +16,7 @@ from growrag.experiments.output_schemas import (
     schema_fingerprint,
 )
 from growrag.experiments.run_bounded_system import READER_VERSION
+from growrag.experiments.s2g_author_api import PROMPT_VERSIONS as S2G_AUTHOR_VERSIONS
 
 
 def test_registry_tracks_exact_current_prompts_without_alias_fallback():
@@ -25,6 +26,8 @@ def test_registry_tracks_exact_current_prompts_without_alias_fallback():
         GAP_QUERY_PROMPT_VERSION,
         ROUTE_PROMPT_VERSION,
         READER_VERSION,
+        S2G_AUTHOR_VERSIONS["judge"],
+        S2G_AUTHOR_VERSIONS["extract"],
     }
     for version, item in manifest["schemas"].items():
         assert item["sha256"] == schema_fingerprint(version)
@@ -52,7 +55,7 @@ def check_closed_objects(node):
     elif isinstance(kind, list):
         assert kind in (["string", "null"], ["boolean", "null"])
     else:
-        assert kind in {"string", "boolean"}
+        assert kind in {"string", "boolean", "integer"}
     # No unverified provider-specific length/conditional schema keywords.
     assert set(node) <= {"type", "properties", "required", "additionalProperties", "items", "enum"}
 
@@ -103,3 +106,51 @@ def test_returned_copies_cannot_mutate_registry_and_hash_covers_full_wire_format
     manifest["schemas"][version]["response_format"]["json_schema"]["strict"] = False
     assert schema_fingerprint(version) == digest
     assert response_format_for(version)["json_schema"]["strict"] is True
+
+
+def test_s2g_author_judge_schema_matches_existing_prompt_without_new_policy():
+    schema = response_format_for(S2G_AUTHOR_VERSIONS["judge"])["json_schema"]["schema"]
+    assert schema["required"] == ["sufficient", "gap_items"]
+    assert schema["properties"]["sufficient"] == {"type": "boolean"}
+    item = schema["properties"]["gap_items"]["items"]
+    assert item["required"] == ["category", "target", "slot", "description"]
+    assert item["properties"]["category"] == {
+        "type": "string",
+        "enum": ["bridge_entity", "attribute", "relation", "evidence_span", "other"],
+    }
+    for field in ("target", "slot", "description"):
+        assert item["properties"][field] == {"type": "string"}
+    check_closed_objects(schema)
+
+
+def test_s2g_author_extractor_uses_integer_ids_without_extra_length_constraints():
+    schema = response_format_for(S2G_AUTHOR_VERSIONS["extract"])["json_schema"]["schema"]
+    assert schema["required"] == ["evidence_global_ids"]
+    assert schema["properties"] == {
+        "evidence_global_ids": {"type": "array", "items": {"type": "integer"}}
+    }
+    # 作者提示写最多 K 句，但迁移中不擅自给原解析器加 maxItems、minimum 或去重策略。
+    check_closed_objects(schema)
+
+
+def test_s2g_author_text_answer_intentionally_has_no_json_schema():
+    with pytest.raises(ValueError, match="no reviewed schema"):
+        response_format_for(S2G_AUTHOR_VERSIONS["answer"])
+
+
+def test_original_schema_versions_and_wire_fingerprints_remain_unchanged():
+    original = {
+        "growrag-evidence-requirements-v2": (
+            "16bfe9d21a2985d5e7aa98e031c6c1bd3c46c5c46b1f6cb2496c852c357c1445"
+        ),
+        "growrag-gap-query-v2": (
+            "07c68ccf775ada60c615f137487894712f8e0276b457d17b7860ad89c2a3d7e7"
+        ),
+        "growrag-short-supported-answer-v2": (
+            "529e35493017e57aa27eb7eca68c66b489368ad9c6575fbc1e605dd4f24bab10"
+        ),
+        "growrag-three-way-route-v2": (
+            "3b912bcf9dac60cd698824d555fdb1599a730fefabc3eb23f21637f2a0fcd6f0"
+        ),
+    }
+    assert {version: schema_fingerprint(version) for version in original} == original

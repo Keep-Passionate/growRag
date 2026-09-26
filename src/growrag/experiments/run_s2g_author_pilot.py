@@ -24,6 +24,7 @@ from .budget import PriceLimits
 from .fresh_benchmark import call_totals
 from .hotpot import evaluate_layered_feedback
 from .lexical_retriever import BM25SentenceRetriever
+from .output_schemas import response_format_for
 from .pre_pilot import write_json
 from .prior_budget import reconcile_history
 from .protocol import Answer, Evidence
@@ -36,6 +37,7 @@ from .s2g_author_api import PROMPT_VERSIONS, AuthorDocument, S2GAuthorAPI
 
 RUN_ID = "2026-09-27_s2g_author_api_debug8_v1"
 JSON_RUN_ID = "2026-09-27_s2g_author_api_json8_v2"
+SCHEMA_RUN_ID = "2026-09-27_s2g_author_api_schema8_v3"
 KEY_VARIABLE = "GROWRAG_S2G_AUTHOR_PILOT_KEY"
 ARMS = ("BASE1_AUTHOR_READER", "S2G_AUTHOR_API4")
 MAX_CALLS = 100
@@ -130,6 +132,7 @@ class AuthorBudgetClient(DurableBudgetClient):
     """Keep original per-stage decoding caps under ONE durable currency ledger."""
 
     json_stages = False
+    schema_stages = False
 
     def complete_author(
         self, messages, *, trace_id, prompt_version, max_output_tokens, temperature, top_p
@@ -143,6 +146,9 @@ class AuthorBudgetClient(DurableBudgetClient):
             temperature=temperature,
             top_p=top_p,
             json_object_mode=self.json_stages
+            and not self.schema_stages
+            and prompt_version in {PROMPT_VERSIONS["judge"], PROMPT_VERSIONS["extract"]},
+            json_schema_mode=self.schema_stages
             and prompt_version in {PROMPT_VERSIONS["judge"], PROMPT_VERSIONS["extract"]},
         )
         self.delegate.config = self.config
@@ -356,23 +362,31 @@ def main(argv=None):
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--api-config", type=Path)
     parser.add_argument("--allow-network", action="store_true")
-    parser.add_argument(
+    format_options = parser.add_mutually_exclusive_group()
+    format_options.add_argument(
         "--json-stages",
         action="store_true",
         help="Authorized v2: JSON mode for judge/extract, plain final answer",
     )
+    format_options.add_argument(
+        "--schema-stages",
+        action="store_true",
+        help="v3: strict author output schemas for judge/extract; plain final answer",
+    )
     args = parser.parse_args(argv)
     root, output = args.runs_root.resolve(), args.output.resolve()
-    run_id = JSON_RUN_ID if args.json_stages else RUN_ID
+    run_id = SCHEMA_RUN_ID if args.schema_stages else JSON_RUN_ID if args.json_stages else RUN_ID
     claim = root / f"{run_id}.claim.json"
     if output == root or not output.is_relative_to(root) or output.exists():
         raise ValueError("new output strictly inside runs required")
     if args.allow_network and (output.name != run_id or claim.exists()):
         raise ValueError("one-use author pilot already claimed or wrong output identity")
     examples, data = load_debug(args.manifest)
-    historical_roots = (
-        (*HISTORY_ROOTS, f"{RUN_ID}/final_budget.json") if args.json_stages else HISTORY_ROOTS
-    )
+    historical_roots = HISTORY_ROOTS
+    if args.json_stages or args.schema_stages:
+        historical_roots = (*historical_roots, f"{RUN_ID}/final_budget.json")
+    if args.schema_stages:
+        historical_roots = (*historical_roots, f"{JSON_RUN_ID}/final_budget.json")
     history = reconcile_history(root, reviewed_extra_ledgers=historical_roots)
     subcap = min(5.0, 50.0 - history["prior_reserved_cny"])
     if subcap <= 0:
@@ -399,7 +413,13 @@ def main(argv=None):
             "top_p": 1,
             "enable_thinking": False,
             "json_object_mode": "judge/extract only" if args.json_stages else False,
+            "json_schema_mode": "judge/extract only" if args.schema_stages else False,
         },
+        "output_schemas": {
+            stage: response_format_for(PROMPT_VERSIONS[stage]) for stage in ("judge", "extract")
+        }
+        if args.schema_stages
+        else {},
         "arms": ARMS,
         "max_calls": MAX_CALLS,
         "worst_case_calls": len(examples) * 11,
@@ -423,6 +443,15 @@ def main(argv=None):
         "v2_authorization": "User chose agent recommendation after v1's extractor length "
         "failure. New full eight-question protocol; v1 immutable and separately reported."
         if args.json_stages
+        else None,
+        "v3_decision": "User delegated API compatibility choice. v2 JSON was syntactically "
+        "valid but used specific instead of sufficient. Official provider documentation "
+        "confirms strict schema support; enforce only author's existing fields. "
+        "No correction of past outputs; fresh full eight-question protocol, first error stops."
+        if args.schema_stages
+        else None,
+        "schema_support_source": "https://help.aliyun.com/zh/model-studio/qwen-structured-output"
+        if args.schema_stages
         else None,
     }
     if plan["worst_case_calls"] > MAX_CALLS:
@@ -480,6 +509,7 @@ def main(argv=None):
             output / "request_journal",
         )
         client.json_stages = args.json_stages
+        client.schema_stages = args.schema_stages
         execute(examples, client, args.upstream, output, progress, run_id=run_id)
         return 1 if client.block_reason else 0
     except Exception as error:
