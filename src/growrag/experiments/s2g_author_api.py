@@ -251,7 +251,11 @@ class S2GAuthorAPI:
             "trained_author_judge_used": False,
             "retrieval_backend": "injected_document_callback_not_author_lucene",
             "backend_generation_settings": (
-                "author_per_stage_limits_via_complete_author"
+                getattr(
+                    self.client,
+                    "generation_profile",
+                    "author_per_stage_limits_via_complete_author",
+                )
                 if callable(getattr(self.client, "complete_author", None))
                 else "frozen_client_config_not_per_stage_author_limits"
             ),
@@ -296,6 +300,12 @@ class S2GAuthorAPI:
         if self.calls > 2 * self.max_turns + 2:
             raise RuntimeError("author API call ceiling exceeded")
         trace_id = f"{self.question_id}/s2g-author/{self.calls:02d}-{stage}"
+        cap_resolver = getattr(self.client, "author_output_cap", None)
+        actual_cap = (
+            cap_resolver(PROMPT_VERSIONS[stage], author_generation["max_new_tokens"])
+            if callable(cap_resolver)
+            else None
+        )
         self._emit(
             "api_request",
             stage=stage,
@@ -303,6 +313,7 @@ class S2GAuthorAPI:
             prompt_version=PROMPT_VERSIONS[stage],
             messages=messages,
             author_generation_requested=author_generation,
+            backend_max_output_tokens=actual_cap,
         )
         try:
             complete_author = getattr(self.client, "complete_author", None)

@@ -9,7 +9,7 @@ import pytest
 
 from growrag.experiments import run_s2g_author_pilot as pilot
 from growrag.experiments.api_client import ChatConfig, ChatResponse
-from growrag.experiments.budget import PriceLimits
+from growrag.experiments.budget import PriceLimits, request_input_bytes
 from growrag.experiments.hotpot import parse_hotpot_example
 from growrag.experiments.protocol import Evidence
 from growrag.experiments.s2g_author_api import PROMPT_VERSIONS
@@ -144,9 +144,12 @@ def test_author_caps_share_one_ledger_and_restore_config(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "json_stages,schema_stages", [(False, False), (True, False), (False, True)]
+    "json_stages,schema_stages,qwen_caps",
+    [(False, False, False), (True, False, False), (False, True, False), (False, True, True)],
 )
-def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stages, schema_stages):
+def test_json_mode_only_applies_to_author_structured_stages(
+    tmp_path, json_stages, schema_stages, qwen_caps
+):
     config = ChatConfig("https://example.invalid/v1", "fake", "NEVER_READ", 10)
     delegate = SimpleNamespace(config=config, transport_source="fake_test", attempts=0)
     observed = []
@@ -162,6 +165,7 @@ def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stage
     client = pilot.AuthorBudgetClient(delegate, PriceLimits(), tmp_path / "journal")
     client.json_stages = json_stages
     client.schema_stages = schema_stages
+    client.qwen_output_caps = qwen_caps
     for stage, cap in (("judge", 256), ("extract", 64), ("answer", 128)):
         client.complete_author(
             [{"role": "user", "content": "synthetic"}],
@@ -174,8 +178,27 @@ def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stage
         assert client.config == config and delegate.config == config
     assert [c.json_object_mode for c in observed] == [json_stages, json_stages, False]
     assert [c.json_schema_mode for c in observed] == [schema_stages, schema_stages, False]
-    assert [c.max_output_tokens for c in observed] == [256, 64, 128]
+    assert [c.max_output_tokens for c in observed] == (
+        [768, 128, 256] if qwen_caps else [256, 64, 128]
+    )
     assert len(client.calls) == 3
+    expected_reservation = sum(
+        (
+            (
+                request_input_bytes(
+                    c,
+                    [{"role": "user", "content": "synthetic"}],
+                    prompt_version=PROMPT_VERSIONS[stage],
+                )
+                + 1024
+            )
+            * 0.2
+            + c.max_output_tokens * 0.8
+        )
+        / 1_000_000
+        for stage, c in zip(("judge", "extract", "answer"), observed, strict=True)
+    )
+    assert client.reserved_cny == pytest.approx(expected_reservation)
 
 
 @pytest.mark.skipif(not UPSTREAM.exists(), reason="author snapshot not redistributed")
@@ -226,8 +249,8 @@ def test_existing_claim_rejects_before_data_access(tmp_path, monkeypatch):
 
 
 @pytest.mark.skipif(not UPSTREAM.exists(), reason="author snapshot not redistributed")
-@pytest.mark.parametrize("schema_stages", [False, True])
-def test_v2_v3_plan_keeps_prior_cost_and_separate_identity(tmp_path, monkeypatch, schema_stages):
+@pytest.mark.parametrize("format_option", ["--json-stages", "--schema-stages", "--qwen-capacity"])
+def test_plan_keeps_prior_cost_and_separate_identity(tmp_path, monkeypatch, format_option):
     observed_roots = []
 
     def history(root, *, reviewed_extra_ledgers):
@@ -252,21 +275,133 @@ def test_v2_v3_plan_keeps_prior_cost_and_separate_identity(tmp_path, monkeypatch
                 str(tmp_path),
                 "--output",
                 str(output),
-                "--schema-stages" if schema_stages else "--json-stages",
+                format_option,
             ]
         )
         == 0
     )
     plan = json.loads((output / "plan.json").read_text())
-    assert plan["run_id"] == (pilot.SCHEMA_RUN_ID if schema_stages else pilot.JSON_RUN_ID)
+    schema_stages = format_option != "--json-stages"
+    qwen_caps = format_option == "--qwen-capacity"
+    assert (
+        plan["run_id"]
+        == {
+            "--json-stages": pilot.JSON_RUN_ID,
+            "--schema-stages": pilot.SCHEMA_RUN_ID,
+            "--qwen-capacity": pilot.CAPACITY_RUN_ID,
+        }[format_option]
+    )
     format_key = "json_schema_mode" if schema_stages else "json_object_mode"
     assert plan["decoding"][format_key] == "judge/extract only"
     expected_roots = [*pilot.HISTORY_ROOTS, f"{pilot.RUN_ID}/final_budget.json"]
     if schema_stages:
         expected_roots.append(f"{pilot.JSON_RUN_ID}/final_budget.json")
         assert set(plan["output_schemas"]) == {"judge", "extract"}
-        assert plan["v3_decision"]
+        if qwen_caps:
+            expected_roots.append(f"{pilot.SCHEMA_RUN_ID}/final_budget.json")
+            assert plan["v4_decision"]
+        else:
+            assert plan["v3_decision"]
     else:
         assert plan["v2_authorization"]
     assert observed_roots == expected_roots
     assert not plan["official_dev_test_used"]
+    assert plan["author_requested_output_caps"] == pilot.AUTHOR_OUTPUT_CAPS
+    assert plan["decoding"]["judge_max_tokens"] == (768 if qwen_caps else 256)
+    assert plan["decoding"]["extract_max_tokens"] == (128 if qwen_caps else 64)
+    assert plan["decoding"]["answer_max_tokens"] == (256 if qwen_caps else 128)
+
+
+@pytest.mark.parametrize(
+    "version,cap",
+    [
+        ("unknown", 256),
+        (PROMPT_VERSIONS["extract"], 128),
+        (PROMPT_VERSIONS["judge"], 768),
+        (PROMPT_VERSIONS["judge"], True),
+    ],
+)
+def test_capacity_rejects_unreviewed_stage_or_requested_cap(tmp_path, version, cap):
+    config = ChatConfig("https://example.invalid/v1", "fake", "NEVER_READ", 10)
+    delegate = SimpleNamespace(config=config, transport_source="fake_test", attempts=0)
+    client = pilot.AuthorBudgetClient(delegate, PriceLimits(), tmp_path / "journal")
+    client.schema_stages = client.qwen_output_caps = True
+    with pytest.raises(ValueError):
+        client.author_output_cap(version, cap)
+    assert delegate.attempts == 0
+
+
+@pytest.mark.skipif(not UPSTREAM.exists(), reason="author snapshot not redistributed")
+def test_capacity_bridge_records_original_and_actual_caps_separately(tmp_path):
+    delegate = FakeClient()
+    delegate.config = ChatConfig("https://example.invalid/v1", "fake", "NEVER_READ", 10)
+    delegate.transport_source = "fake_test"
+    client = pilot.AuthorBudgetClient(delegate, PriceLimits(), tmp_path / "journal")
+    client.schema_stages = client.qwen_output_caps = True
+    report = pilot.execute_question(
+        example(),
+        client,
+        UPSTREAM,
+        tmp_path / "q",
+        pilot.ProgressLog(tmp_path),
+        run_id=pilot.CAPACITY_RUN_ID,
+    )
+    assert report["complete_pair"]
+    for arm in pilot.ARMS:
+        result = report["arms"][arm]["result"]
+        assert result["provenance"]["backend_generation_settings"] == client.generation_profile
+        for event in result["events"]:
+            if event["kind"] == "api_request":
+                stage = event["stage"]
+                assert (
+                    event["author_generation_requested"]["max_new_tokens"]
+                    == (pilot.AUTHOR_OUTPUT_CAPS[stage])
+                )
+                assert event["backend_max_output_tokens"] == pilot.QWEN_OUTPUT_CAPS[stage]
+                assert event["trace_id"].startswith(pilot.CAPACITY_RUN_ID)
+    assert client.config.max_output_tokens == 512  # restored default, not last stage's cap
+
+
+def test_capacity_restores_configuration_after_backend_exception(tmp_path):
+    config = ChatConfig("https://example.invalid/v1", "fake", "NEVER_READ", 10)
+    delegate = SimpleNamespace(config=config, transport_source="fake_test", attempts=0)
+
+    def fail(*args, **kwargs):
+        assert delegate.config.max_output_tokens == 768
+        raise RuntimeError("synthetic failure")
+
+    delegate.complete = fail
+    client = pilot.AuthorBudgetClient(delegate, PriceLimits(), tmp_path / "journal")
+    client.schema_stages = client.qwen_output_caps = True
+    with pytest.raises(RuntimeError, match="synthetic failure"):
+        client.complete_author(
+            [{"role": "user", "content": "synthetic"}],
+            trace_id="synthetic-failure",
+            prompt_version=PROMPT_VERSIONS["judge"],
+            max_output_tokens=256,
+            temperature=0,
+            top_p=1,
+        )
+    assert client.config == delegate.config == config
+    assert client.block_reason == "unexpected_failure"
+
+
+def test_capacity_claim_rejects_before_data_or_secret_access(tmp_path, monkeypatch):
+    (tmp_path / f"{pilot.CAPACITY_RUN_ID}.claim.json").write_text("{}")
+    monkeypatch.setattr(pilot, "load_debug", lambda _: pytest.fail("no data"))
+    monkeypatch.setattr(pilot, "read_local_bailian_settings", lambda *a: pytest.fail("no secret"))
+    with pytest.raises(ValueError, match="already claimed"):
+        pilot.main(
+            [
+                "--upstream",
+                str(UPSTREAM),
+                "--manifest",
+                "unused",
+                "--runs-root",
+                str(tmp_path),
+                "--output",
+                str(tmp_path / pilot.CAPACITY_RUN_ID),
+                "--allow-network",
+                "--qwen-capacity",
+            ]
+        )

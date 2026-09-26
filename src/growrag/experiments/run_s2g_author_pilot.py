@@ -38,6 +38,9 @@ from .s2g_author_api import PROMPT_VERSIONS, AuthorDocument, S2GAuthorAPI
 RUN_ID = "2026-09-27_s2g_author_api_debug8_v1"
 JSON_RUN_ID = "2026-09-27_s2g_author_api_json8_v2"
 SCHEMA_RUN_ID = "2026-09-27_s2g_author_api_schema8_v3"
+CAPACITY_RUN_ID = "2026-09-27_s2g_author_api_capacity8_v4"
+AUTHOR_OUTPUT_CAPS = {"judge": 256, "extract": 64, "answer": 128}
+QWEN_OUTPUT_CAPS = {"judge": 768, "extract": 128, "answer": 256}
 KEY_VARIABLE = "GROWRAG_S2G_AUTHOR_PILOT_KEY"
 ARMS = ("BASE1_AUTHOR_READER", "S2G_AUTHOR_API4")
 MAX_CALLS = 100
@@ -104,6 +107,7 @@ class ProgressLog:
                 "kind",
                 "question_id",
                 "stage",
+                "backend_max_output_tokens",
                 "round",
                 "query",
                 "verdicts",
@@ -129,20 +133,44 @@ class ProgressLog:
 
 
 class AuthorBudgetClient(DurableBudgetClient):
-    """Keep original per-stage decoding caps under ONE durable currency ledger."""
+    """One ledger; author caps by default, explicit Qwen capacity profile in v4.
+
+    中文：只改变最大输出容量，不更改原作者提示、缺口、选句或停止策略。
+    作者请求的cap与实际HTTP cap分开记录，不能把迁移设置称作原设置。
+    """
 
     json_stages = False
     schema_stages = False
+    qwen_output_caps = False
+
+    @property
+    def generation_profile(self):
+        return (
+            "qwen_capacity_v4_judge768_extract128_answer256"
+            if self.qwen_output_caps
+            else "author_per_stage_limits_via_complete_author"
+        )
+
+    def author_output_cap(self, prompt_version, requested_cap):
+        if type(requested_cap) is not int or requested_cap not in {64, 128, 256}:
+            raise ValueError("unreviewed author output cap")
+        if not self.qwen_output_caps:
+            return requested_cap
+        stage = next((k for k, v in PROMPT_VERSIONS.items() if v == prompt_version), None)
+        if stage is None or requested_cap != AUTHOR_OUTPUT_CAPS[stage]:
+            raise ValueError("Qwen capacity requires exact reviewed author stage/cap")
+        if not self.schema_stages or self.json_stages:
+            raise ValueError("Qwen capacity requires strict schema stages only")
+        return QWEN_OUTPUT_CAPS[stage]
 
     def complete_author(
         self, messages, *, trace_id, prompt_version, max_output_tokens, temperature, top_p
     ):
-        if max_output_tokens not in {64, 128, 256}:
-            raise ValueError("unreviewed author output cap")
+        actual_cap = self.author_output_cap(prompt_version, max_output_tokens)
         previous = self.config
         self.config = replace(
             previous,
-            max_output_tokens=max_output_tokens,
+            max_output_tokens=actual_cap,
             temperature=temperature,
             top_p=top_p,
             json_object_mode=self.json_stages
@@ -373,9 +401,23 @@ def main(argv=None):
         action="store_true",
         help="v3: strict author output schemas for judge/extract; plain final answer",
     )
+    format_options.add_argument(
+        "--qwen-capacity",
+        action="store_true",
+        help="v4: strict schemas with explicit Qwen output caps 768/128/256",
+    )
     args = parser.parse_args(argv)
     root, output = args.runs_root.resolve(), args.output.resolve()
-    run_id = SCHEMA_RUN_ID if args.schema_stages else JSON_RUN_ID if args.json_stages else RUN_ID
+    strict_stages = args.schema_stages or args.qwen_capacity
+    run_id = (
+        CAPACITY_RUN_ID
+        if args.qwen_capacity
+        else SCHEMA_RUN_ID
+        if args.schema_stages
+        else JSON_RUN_ID
+        if args.json_stages
+        else RUN_ID
+    )
     claim = root / f"{run_id}.claim.json"
     if output == root or not output.is_relative_to(root) or output.exists():
         raise ValueError("new output strictly inside runs required")
@@ -383,10 +425,12 @@ def main(argv=None):
         raise ValueError("one-use author pilot already claimed or wrong output identity")
     examples, data = load_debug(args.manifest)
     historical_roots = HISTORY_ROOTS
-    if args.json_stages or args.schema_stages:
+    if args.json_stages or strict_stages:
         historical_roots = (*historical_roots, f"{RUN_ID}/final_budget.json")
-    if args.schema_stages:
+    if strict_stages:
         historical_roots = (*historical_roots, f"{JSON_RUN_ID}/final_budget.json")
+    if args.qwen_capacity:
+        historical_roots = (*historical_roots, f"{SCHEMA_RUN_ID}/final_budget.json")
     history = reconcile_history(root, reviewed_extra_ledgers=historical_roots)
     subcap = min(5.0, 50.0 - history["prior_reserved_cny"])
     if subcap <= 0:
@@ -396,29 +440,38 @@ def main(argv=None):
     probe = S2GAuthorAPI(
         args.upstream, None, lambda q, k: (), gap_profile="paper_k1", remove_repeat_docs=True
     )
+    caps = QWEN_OUTPUT_CAPS if args.qwen_capacity else AUTHOR_OUTPUT_CAPS
+    generation_profile = (
+        "qwen_capacity_v4_judge768_extract128_answer256"
+        if args.qwen_capacity
+        else "author_per_stage_limits_via_complete_author"
+    )
+    author_provenance = probe.provenance
+    author_provenance["backend_generation_settings"] = generation_profile
     plan = {
         "run_id": run_id,
         "created_utc": datetime.now(UTC).isoformat(),
         "git": _git_state(),
         "data": data,
-        "author": probe.provenance,
+        "author": author_provenance,
         "source_sha256": snapshot["sha256"],
         "model": PILOT_MODEL,
-        "actual_backend_generation_settings": "author_per_stage_limits_via_complete_author",
+        "actual_backend_generation_settings": generation_profile,
+        "author_requested_output_caps": AUTHOR_OUTPUT_CAPS,
         "decoding": {
-            "judge_max_tokens": 256,
-            "extract_max_tokens": 64,
-            "answer_max_tokens": 128,
+            "judge_max_tokens": caps["judge"],
+            "extract_max_tokens": caps["extract"],
+            "answer_max_tokens": caps["answer"],
             "temperature": 0,
             "top_p": 1,
             "enable_thinking": False,
             "json_object_mode": "judge/extract only" if args.json_stages else False,
-            "json_schema_mode": "judge/extract only" if args.schema_stages else False,
+            "json_schema_mode": "judge/extract only" if strict_stages else False,
         },
         "output_schemas": {
             stage: response_format_for(PROMPT_VERSIONS[stage]) for stage in ("judge", "extract")
         }
-        if args.schema_stages
+        if strict_stages
         else {},
         "arms": ARMS,
         "max_calls": MAX_CALLS,
@@ -429,7 +482,7 @@ def main(argv=None):
         "price_input_cny_per_million": 0.2,
         "price_output_cny_per_million": 0.8,
         "price_source": "https://help.aliyun.com/zh/model-studio/qwen3-7-flash",
-        "price_checked_date": "2026-09-26",
+        "price_checked_date": "2026-09-27",
         "timeout_seconds": 1800,
         "retrieval": "Local positive-score BM25 over per-question complete documents; "
         "NOT author Pyserini/fullwiki. Upstream regex sentence fallback.",
@@ -450,8 +503,14 @@ def main(argv=None):
         "No correction of past outputs; fresh full eight-question protocol, first error stops."
         if args.schema_stages
         else None,
+        "v4_decision": "User authorized next step after v3 truncation. Only raise backend "
+        "output capacity to judge768/extract128/answer256; strict schemas and author "
+        "prompts/control unchanged. All v1-v3 fees retained. Engineering acceptance, "
+        "not a new method, independent test set, or trained-author-model reproduction."
+        if args.qwen_capacity
+        else None,
         "schema_support_source": "https://help.aliyun.com/zh/model-studio/qwen-structured-output"
-        if args.schema_stages
+        if strict_stages
         else None,
     }
     if plan["worst_case_calls"] > MAX_CALLS:
@@ -509,7 +568,8 @@ def main(argv=None):
             output / "request_journal",
         )
         client.json_stages = args.json_stages
-        client.schema_stages = args.schema_stages
+        client.schema_stages = strict_stages
+        client.qwen_output_caps = args.qwen_capacity
         execute(examples, client, args.upstream, output, progress, run_id=run_id)
         return 1 if client.block_reason else 0
     except Exception as error:
