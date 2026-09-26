@@ -143,6 +143,37 @@ def test_author_caps_share_one_ledger_and_restore_config(tmp_path):
     assert len(list((tmp_path / "journal").glob("*_intent.json"))) == 3
 
 
+@pytest.mark.parametrize("json_stages", [False, True])
+def test_json_mode_only_applies_to_author_structured_stages(tmp_path, json_stages):
+    config = ChatConfig("https://example.invalid/v1", "fake", "NEVER_READ", 10)
+    delegate = SimpleNamespace(config=config, transport_source="fake_test", attempts=0)
+    observed = []
+
+    def complete(messages, *, trace_id, prompt_version):
+        observed.append(delegate.config)
+        delegate.attempts += 1
+        return ChatResponse(
+            "synthetic", "fake", "fake", None, None, 10, 4, 0, Path("unused"), "fake_test"
+        )
+
+    delegate.complete = complete
+    client = pilot.AuthorBudgetClient(delegate, PriceLimits(), tmp_path / "journal")
+    client.json_stages = json_stages
+    for stage, cap in (("judge", 256), ("extract", 64), ("answer", 128)):
+        client.complete_author(
+            [{"role": "user", "content": "synthetic"}],
+            trace_id=f"v2-{stage}",
+            prompt_version=PROMPT_VERSIONS[stage],
+            max_output_tokens=cap,
+            temperature=0,
+            top_p=1,
+        )
+        assert client.config == config and delegate.config == config
+    assert [c.json_object_mode for c in observed] == [json_stages, json_stages, False]
+    assert [c.max_output_tokens for c in observed] == [256, 64, 128]
+    assert len(client.calls) == 3
+
+
 @pytest.mark.skipif(not UPSTREAM.exists(), reason="author snapshot not redistributed")
 def test_plan_never_reads_secret_or_calls_models(tmp_path, monkeypatch):
     monkeypatch.setattr(pilot, "load_debug", lambda _: ([example()] * 8, {"synthetic": True}))
@@ -188,3 +219,41 @@ def test_existing_claim_rejects_before_data_access(tmp_path, monkeypatch):
                 "--allow-network",
             ]
         )
+
+
+@pytest.mark.skipif(not UPSTREAM.exists(), reason="author snapshot not redistributed")
+def test_v2_plan_keeps_v1_cost_and_separate_identity(tmp_path, monkeypatch):
+    observed_roots = []
+
+    def history(root, *, reviewed_extra_ledgers):
+        observed_roots.extend(reviewed_extra_ledgers)
+        return {"prior_reserved_cny": 1}
+
+    monkeypatch.setattr(pilot, "load_debug", lambda _: ([example()] * 8, {"synthetic": True}))
+    monkeypatch.setattr(pilot, "reconcile_history", history)
+    monkeypatch.setattr(pilot, "source_snapshot", lambda *a: {"sha256": "synthetic"})
+    monkeypatch.setattr(pilot, "_git_state", lambda: {"commit": "synthetic"})
+    monkeypatch.setattr(pilot, "read_local_bailian_settings", lambda *a: pytest.fail("no keys"))
+    (tmp_path / f"{pilot.RUN_ID}.claim.json").write_text("{}")
+    output = tmp_path / "v2-plan"
+    assert (
+        pilot.main(
+            [
+                "--upstream",
+                str(UPSTREAM),
+                "--manifest",
+                "unused",
+                "--runs-root",
+                str(tmp_path),
+                "--output",
+                str(output),
+                "--json-stages",
+            ]
+        )
+        == 0
+    )
+    plan = json.loads((output / "plan.json").read_text())
+    assert plan["run_id"] == pilot.JSON_RUN_ID != pilot.RUN_ID
+    assert plan["decoding"]["json_object_mode"] == "judge/extract only"
+    assert observed_roots == [*pilot.HISTORY_ROOTS, f"{pilot.RUN_ID}/final_budget.json"]
+    assert plan["v2_authorization"] and not plan["official_dev_test_used"]

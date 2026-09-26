@@ -32,9 +32,10 @@ from .run_dualrag_pilot import source_snapshot
 from .run_fresh_continuation import HISTORY_ROOTS
 from .run_pilot import PILOT_MODEL, _git_state
 from .run_pre_opportunity import DurableBudgetClient, load_debug
-from .s2g_author_api import AuthorDocument, S2GAuthorAPI
+from .s2g_author_api import PROMPT_VERSIONS, AuthorDocument, S2GAuthorAPI
 
 RUN_ID = "2026-09-27_s2g_author_api_debug8_v1"
+JSON_RUN_ID = "2026-09-27_s2g_author_api_json8_v2"
 KEY_VARIABLE = "GROWRAG_S2G_AUTHOR_PILOT_KEY"
 ARMS = ("BASE1_AUTHOR_READER", "S2G_AUTHOR_API4")
 MAX_CALLS = 100
@@ -53,7 +54,9 @@ def validate_author_response(event):
     if not isinstance(text, str):
         raise ValueError("author response must be text")
     if stage == "answer":
-        if not re.search(r"Answer\s*:\s*\S[\s\S]*?Rationale\s*:", text, re.I):
+        # Match the pinned author's case-sensitive field delimiters exactly.
+        match = re.search(r"Answer:\s*(.*?)\s*Rationale:\s*(.*)", text, re.S)
+        if match is None or not match.group(1).strip():
             raise ValueError("author answer format missing")
         return
     if stage not in {"judge", "extract"}:
@@ -126,6 +129,8 @@ class ProgressLog:
 class AuthorBudgetClient(DurableBudgetClient):
     """Keep original per-stage decoding caps under ONE durable currency ledger."""
 
+    json_stages = False
+
     def complete_author(
         self, messages, *, trace_id, prompt_version, max_output_tokens, temperature, top_p
     ):
@@ -133,7 +138,12 @@ class AuthorBudgetClient(DurableBudgetClient):
             raise ValueError("unreviewed author output cap")
         previous = self.config
         self.config = replace(
-            previous, max_output_tokens=max_output_tokens, temperature=temperature, top_p=top_p
+            previous,
+            max_output_tokens=max_output_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            json_object_mode=self.json_stages
+            and prompt_version in {PROMPT_VERSIONS["judge"], PROMPT_VERSIONS["extract"]},
         )
         self.delegate.config = self.config
         try:
@@ -179,7 +189,7 @@ def aligned_sources(pool, sources):
     return tuple(e for e in pool if (e.title, normalize(e.text)) in selected)
 
 
-def execute_question(example, client, upstream, directory, progress):
+def execute_question(example, client, upstream, directory, progress, *, run_id=RUN_ID):
     directory.mkdir(parents=True, exist_ok=False)
     outcomes = {}
     question, pool = example.question, example.candidate_context
@@ -204,7 +214,7 @@ def execute_question(example, client, upstream, directory, progress):
         progress({"kind": "arm_start", "question_id": question.question_id})
         try:
             # Unique execution IDs distinguish BASE/S2G; the original question is unchanged.
-            trace = f"{RUN_ID}/{question.question_id}/{arm}"
+            trace = f"{run_id}/{question.question_id}/{arm}"
             if arm == ARMS[0]:
                 docs = index(question.text, 6)
                 context = adapter.scope["concat_raw_retrieved_docs"](
@@ -272,7 +282,7 @@ def execute_question(example, client, upstream, directory, progress):
     return report
 
 
-def execute(examples, client, upstream, output, progress):
+def execute(examples, client, upstream, output, progress, *, run_id=RUN_ID):
     reports = []
     started = 0
     try:
@@ -282,7 +292,12 @@ def execute(examples, client, upstream, output, progress):
             started += 1
             reports.append(
                 execute_question(
-                    example, client, upstream, output / "questions" / f"{i:03d}", progress
+                    example,
+                    client,
+                    upstream,
+                    output / "questions" / f"{i:03d}",
+                    progress,
+                    run_id=run_id,
                 )
             )
             progress(
@@ -307,6 +322,7 @@ def execute(examples, client, upstream, output, progress):
     finally:
         complete = [r for r in reports if all(r["arms"][a].get("feedback") for a in ARMS)]
         summary = {
+            "run_id": run_id,
             "planned": len(examples),
             "started": started,
             "started_without_report": started - len(reports),
@@ -340,15 +356,24 @@ def main(argv=None):
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--api-config", type=Path)
     parser.add_argument("--allow-network", action="store_true")
+    parser.add_argument(
+        "--json-stages",
+        action="store_true",
+        help="Authorized v2: JSON mode for judge/extract, plain final answer",
+    )
     args = parser.parse_args(argv)
     root, output = args.runs_root.resolve(), args.output.resolve()
-    claim = root / f"{RUN_ID}.claim.json"
+    run_id = JSON_RUN_ID if args.json_stages else RUN_ID
+    claim = root / f"{run_id}.claim.json"
     if output == root or not output.is_relative_to(root) or output.exists():
         raise ValueError("new output strictly inside runs required")
-    if args.allow_network and (output.name != RUN_ID or claim.exists()):
+    if args.allow_network and (output.name != run_id or claim.exists()):
         raise ValueError("one-use author pilot already claimed or wrong output identity")
     examples, data = load_debug(args.manifest)
-    history = reconcile_history(root, reviewed_extra_ledgers=HISTORY_ROOTS)
+    historical_roots = (
+        (*HISTORY_ROOTS, f"{RUN_ID}/final_budget.json") if args.json_stages else HISTORY_ROOTS
+    )
+    history = reconcile_history(root, reviewed_extra_ledgers=historical_roots)
     subcap = min(5.0, 50.0 - history["prior_reserved_cny"])
     if subcap <= 0:
         raise ValueError("project budget exhausted")
@@ -358,7 +383,7 @@ def main(argv=None):
         args.upstream, None, lambda q, k: (), gap_profile="paper_k1", remove_repeat_docs=True
     )
     plan = {
-        "run_id": RUN_ID,
+        "run_id": run_id,
         "created_utc": datetime.now(UTC).isoformat(),
         "git": _git_state(),
         "data": data,
@@ -373,7 +398,7 @@ def main(argv=None):
             "temperature": 0,
             "top_p": 1,
             "enable_thinking": False,
-            "json_object_mode": False,
+            "json_object_mode": "judge/extract only" if args.json_stages else False,
         },
         "arms": ARMS,
         "max_calls": MAX_CALLS,
@@ -395,6 +420,10 @@ def main(argv=None):
         "protocol_sidecar": "Original prompts/parser/control preserved; outside loop, "
         "malformed JSON fields or missing Answer/Rationale stops pilot, unscored. "
         "This is stricter than author's silent parsing fallback, not a method gain.",
+        "v2_authorization": "User chose agent recommendation after v1's extractor length "
+        "failure. New full eight-question protocol; v1 immutable and separately reported."
+        if args.json_stages
+        else None,
     }
     if plan["worst_case_calls"] > MAX_CALLS:
         raise ValueError("call envelope exceeds cap")
@@ -450,7 +479,8 @@ def main(argv=None):
             PriceLimits(budget_cny=subcap, max_elapsed_seconds=1800, max_prompt_bytes=30000),
             output / "request_journal",
         )
-        execute(examples, client, args.upstream, output, progress)
+        client.json_stages = args.json_stages
+        execute(examples, client, args.upstream, output, progress, run_id=run_id)
         return 1 if client.block_reason else 0
     except Exception as error:
         run_failed = True

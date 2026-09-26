@@ -66,7 +66,13 @@ def test_author_answer_and_rationale_format_is_accepted():
 
 @pytest.mark.parametrize(
     "content",
-    ["Answer: Northbridge", "Rationale: The evidence names Northbridge."],
+    [
+        "Answer: Northbridge",
+        "Rationale: The evidence names Northbridge.",
+        "answer: Northbridge\nrationale: A source says so.",
+        "Answer : Northbridge\nRationale : A source says so.",
+        "Answer: \nRationale: No answer present.",
+    ],
 )
 def test_missing_author_answer_fields_are_protocol_failures_not_em_zero(content):
     with pytest.raises(ValueError):
