@@ -1,5 +1,6 @@
 """Offline contracts for an adaptation; these tests assert no QA effectiveness."""
 
+import hashlib
 import json
 from dataclasses import FrozenInstanceError, asdict
 from pathlib import Path
@@ -10,8 +11,15 @@ import pytest
 from growrag.experiments.api_client import APIRequestError, ChatResponse
 from growrag.experiments.dualrag_adapter import (
     ADAPTATION_NOTES,
+    ANSWER_PROMPT,
     BASELINE_ID,
+    ENTITIES_PROMPT,
+    GUARD_VERSION,
+    GUARDED_BASELINE_ID,
+    GUARDED_PROMPT_VERSIONS,
     PROMPT_VERSIONS,
+    REASON_PROMPT,
+    SUMMARY_PROMPT,
     DualRAGAdapter,
     DualRAGLimits,
 )
@@ -100,6 +108,44 @@ def test_construction_is_offline_and_budget_envelope_is_bounded():
     assert "not the paper" in " ".join(ADAPTATION_NOTES)
 
 
+def test_guarded_v2_is_explicit_and_has_a_separate_audit_identity():
+    legacy = DualRAGAdapter(successful_client(), Retriever())
+    guarded = DualRAGAdapter(successful_client(), Retriever(), guarded_v2=True)
+
+    assert legacy.baseline_id == BASELINE_ID
+    assert legacy.guard_version is None
+    assert legacy.prompt_manifest == {
+        "baseline_id": BASELINE_ID,
+        "guarded_v2": False,
+        "guard_version": None,
+        "prompt_versions": PROMPT_VERSIONS,
+    }
+    assert guarded.baseline_id == GUARDED_BASELINE_ID
+    assert guarded.guard_version == GUARD_VERSION
+    assert guarded.prompt_manifest["prompt_versions"] == GUARDED_PROMPT_VERSIONS
+    assert guarded.prompt_manifest["guarded_v2"] is True
+    with pytest.raises(TypeError, match="bool"):
+        DualRAGAdapter(successful_client(), Retriever(), guarded_v2=1)
+
+
+def test_legacy_prompt_bytes_remain_frozen_for_old_request_replay():
+    expected = {
+        "reason": "ac506cbee6b9794760577c2a706e589f87b14acc8d6e5c2397db6bffa4cb711c",
+        "entities": "2cc7fcc35bba554b5b3d31d6d84008d426ac2e21de0227b3cd9ce3588d61da86",
+        "summarize": "5029d0d6cbc66c0fdc1c61ae2ddb00ad91611834faaaa016c5160547b3a2e858",
+        "answer": "4630c05086f395e6e9279c7835db2b1978b3c3d3f486556a50f3365585cb28d4",
+    }
+    prompts = {
+        "reason": REASON_PROMPT,
+        "entities": ENTITIES_PROMPT,
+        "summarize": SUMMARY_PROMPT,
+        "answer": ANSWER_PROMPT,
+    }
+    assert {name: hashlib.sha256(text.encode()).hexdigest() for name, text in prompts.items()} == (
+        expected
+    )
+
+
 def test_complete_question_keeps_inputs_audit_and_source_backed_summaries():
     client, retriever = successful_client(), Retriever()
     result = DualRAGAdapter(client, retriever).run(Q)
@@ -176,6 +222,68 @@ def test_zero_retrieval_stop_can_only_abstain_without_evidence():
     assert retriever.requests == []
     bad = DualRAGAdapter(Client([STOP, ANSWER]), Retriever()).run(Q)
     assert bad.status == "failed" and bad.stop_reason == "answer_error"
+
+
+def test_guarded_empty_knowledge_stop_is_overridden_without_forwarding_model_claims():
+    unsupported_stop = {
+        "information_need": "Northbridge was definitely founded in 1901.",
+        "need_retrieve": False,
+    }
+    client = Client([unsupported_stop, ENTITIES, EMPTY])
+    retriever = Retriever([()])
+
+    result = DualRAGAdapter(client, retriever, guarded_v2=True).run(Q)
+
+    assert result.status == "completed" and result.stop_reason == "no_new_evidence"
+    assert result.baseline_id == GUARDED_BASELINE_ID
+    assert retriever.requests == [("Northbridge founding date", 4)]
+    entity_input = json.loads(client.requests[1][0][1]["content"])
+    assert entity_input["information_need"] == (
+        "Retrieve evidence needed to answer the original question."
+    )
+    assert "1901" not in entity_input["information_need"]
+    guards = [step for step in result.steps if step["operation"] == "guard"]
+    assert [step["guard"] for step in guards] == ["empty_knowledge_stop_overridden"]
+    assert "gold" not in json.dumps(asdict(result)).casefold()
+
+
+def test_guarded_empty_knowledge_override_remains_bounded_across_rounds():
+    false_stop = {"information_need": "An unsupported answer fact.", "need_retrieve": False}
+    second_entities = {
+        "entities": [{"entity": "Northbridge", "queries": ["Northbridge university type"]}]
+    }
+    empty_summary = {"summary": "", "evidence_ids": []}
+    client = Client(
+        [
+            false_stop,
+            ENTITIES,
+            empty_summary,
+            false_stop,
+            second_entities,
+            empty_summary,
+            EMPTY,
+        ]
+    )
+    retriever = Retriever([(E,), (E2,)])
+
+    result = DualRAGAdapter(
+        client,
+        retriever,
+        guarded_v2=True,
+        limits=DualRAGLimits(max_rounds=2),
+    ).run(Q)
+
+    assert result.status == "completed" and result.stop_reason == "round_limit"
+    assert result.completed_rounds == 2
+    assert len(retriever.requests) == 2
+    guards = [
+        step for step in result.steps if step.get("guard") == "empty_knowledge_stop_overridden"
+    ]
+    assert len(guards) == 2
+    second_reason_input = json.loads(client.requests[3][0][1]["content"])
+    assert second_reason_input["previous_observations"] == [
+        "Retrieve evidence needed to answer the original question."
+    ]
 
 
 @pytest.mark.parametrize(
@@ -262,6 +370,111 @@ def test_query_lists_are_interleaved_before_entity_context_cap():
     assert [e["evidence_id"] for e in summary_input["evidence"]] == ["e0", "e2"]
     assert result.observed_evidence == tuple(more)
     assert result.status == "completed"
+
+
+def test_guarded_placeholder_is_removed_when_same_entity_has_a_legal_query():
+    entities = {
+        "entities": [
+            {
+                "entity": "award winner",
+                "queries": ["[Winner Name] founding date", "Northbridge founding date"],
+            }
+        ]
+    }
+    client = Client([REASON, entities, SUMMARY, ANSWER])
+    retriever = Retriever()
+
+    result = DualRAGAdapter(
+        client,
+        retriever,
+        guarded_v2=True,
+        limits=DualRAGLimits(max_rounds=1),
+    ).run(Q)
+
+    assert result.status == "completed"
+    assert retriever.requests == [("Northbridge founding date", 4)]
+    summary_input = json.loads(client.requests[2][0][1]["content"])
+    assert summary_input["queries"] == ["Northbridge founding date"]
+    blocked = [step for step in result.steps if step.get("guard") == "placeholder_query_blocked"]
+    assert [step["query"] for step in blocked] == ["[Winner Name] founding date"]
+    assert not any(step.get("guard") == "all_placeholder_queries_fallback" for step in result.steps)
+
+
+@pytest.mark.parametrize(
+    "placeholder_query",
+    [
+        "[Winner Name] biography",
+        "{entity} biography",
+        "<person> biography",
+        "$entity biography",
+    ],
+)
+def test_guarded_all_placeholder_queries_fall_back_to_original_question(
+    placeholder_query: str,
+):
+    entities = {"entities": [{"entity": "unknown slot", "queries": [placeholder_query]}]}
+    client = Client([REASON, entities, SUMMARY, ANSWER])
+    retriever = Retriever()
+
+    result = DualRAGAdapter(
+        client,
+        retriever,
+        guarded_v2=True,
+        limits=DualRAGLimits(max_rounds=1),
+    ).run(Q)
+
+    assert result.status == "completed"
+    assert retriever.requests == [(Q.text, 4)]
+    assert any(step.get("guard") == "placeholder_query_blocked" for step in result.steps)
+    assert any(step.get("guard") == "all_placeholder_queries_fallback" for step in result.steps)
+    assert placeholder_query not in {query for query, _ in retriever.requests}
+
+
+def test_guarded_real_bracketed_title_is_not_treated_as_a_placeholder():
+    entities = {"entities": [{"entity": "[REC]", "queries": ["[REC] release date"]}]}
+    client = Client([REASON, entities, SUMMARY, ANSWER])
+    retriever = Retriever()
+
+    result = DualRAGAdapter(
+        client,
+        retriever,
+        guarded_v2=True,
+        limits=DualRAGLimits(max_rounds=1),
+    ).run(Q)
+
+    assert result.status == "completed"
+    assert retriever.requests == [("[REC] release date", 4)]
+    assert not any(step["operation"] == "guard" for step in result.steps)
+
+
+def test_guarded_original_question_fallback_obeys_repeated_query_bound():
+    placeholder_entities = {
+        "entities": [{"entity": "unknown", "queries": ["{entity} founding date"]}]
+    }
+    empty_summary = {"summary": "", "evidence_ids": []}
+    client = Client(
+        [
+            REASON,
+            placeholder_entities,
+            empty_summary,
+            REASON,
+            placeholder_entities,
+            EMPTY,
+        ]
+    )
+    retriever = Retriever([(E,)])
+
+    result = DualRAGAdapter(
+        client,
+        retriever,
+        guarded_v2=True,
+        limits=DualRAGLimits(max_rounds=5),
+    ).run(Q)
+
+    assert result.status == "completed" and result.stop_reason == "repeated_queries"
+    assert result.completed_rounds == 2
+    assert retriever.requests == [(Q.text, 4)]
+    assert any(step["operation"] == "skip_repeated_query" for step in result.steps)
 
 
 def test_repeated_query_stops_without_retrieval_or_summary_retry():
