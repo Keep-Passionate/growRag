@@ -120,6 +120,22 @@ def test_non_boolean_thinking_flag_rejected():
         config(enable_thinking="false")
 
 
+@pytest.mark.parametrize("value", [0, -1, 1.1, True, "1", float("nan")])
+def test_invalid_top_p_rejected(value):
+    with pytest.raises(ValueError, match="top_p"):
+        config(top_p=value)
+
+
+def test_explicit_top_p_is_audited_without_changing_default(monkeypatch, tmp_path):
+    calls = fake_provider(monkeypatch, completion())
+    assert config().top_p is None
+    result = LiveChatClient(config(top_p=1.0), tmp_path, allow_network=True).complete(
+        messages(), trace_id="top-p", prompt_version="v1"
+    )
+    assert json.loads(calls[0][0].data)["top_p"] == 1.0
+    assert json.loads(result.audit_path.read_text())["request"]["top_p"] == 1.0
+
+
 def test_json_object_mode_is_opt_in_audited_and_keeps_output_cap(tmp_path, monkeypatch):
     calls = fake_provider(monkeypatch, completion())
     client = LiveChatClient(config(json_object_mode=True), tmp_path, allow_network=True)

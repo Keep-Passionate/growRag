@@ -64,6 +64,7 @@ class ChatConfig:
     temperature: float | None = None
     json_object_mode: bool = False
     json_schema_mode: bool = False
+    top_p: float | None = None
 
     def __post_init__(self) -> None:
         parsed = urlsplit(self.base_url)
@@ -101,6 +102,13 @@ class ChatConfig:
             or not 0 <= self.temperature <= 1
         ):
             raise ValueError("temperature must be a finite value in [0, 1] or None")
+        if self.top_p is not None and (
+            isinstance(self.top_p, bool)
+            or not isinstance(self.top_p, (int, float))
+            or not math.isfinite(self.top_p)
+            or not 0 < self.top_p <= 1
+        ):
+            raise ValueError("top_p must be a finite value in (0, 1] or None")
 
 
 @dataclass(frozen=True, slots=True)
@@ -286,6 +294,8 @@ class LiveChatClient:
             payload["enable_thinking"] = self.config.enable_thinking
         if self.config.temperature is not None:
             payload["temperature"] = self.config.temperature
+        if self.config.top_p is not None:
+            payload["top_p"] = self.config.top_p
         if self.config.json_object_mode:
             # Syntax constraint only; schemas, evidence links and semantics still need validation.
             # Keep the token cap for budget safety; truncated JSON remains a hard failure.
