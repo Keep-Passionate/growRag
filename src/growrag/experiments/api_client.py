@@ -65,6 +65,7 @@ class ChatConfig:
     json_object_mode: bool = False
     json_schema_mode: bool = False
     top_p: float | None = None
+    allow_s2g_answer_prefix_on_length: bool = False
 
     def __post_init__(self) -> None:
         parsed = urlsplit(self.base_url)
@@ -93,6 +94,8 @@ class ChatConfig:
             raise ValueError("json_object_mode must be an explicit bool")
         if type(self.json_schema_mode) is not bool:
             raise ValueError("json_schema_mode must be an explicit bool")
+        if type(self.allow_s2g_answer_prefix_on_length) is not bool:
+            raise ValueError("S2G answer length policy must be an explicit bool")
         if self.json_object_mode and self.json_schema_mode:
             raise ValueError("json_object_mode and json_schema_mode are mutually exclusive")
         if self.temperature is not None and (
@@ -371,7 +374,17 @@ class LiveChatClient:
             if not isinstance(choices, list) or len(choices) != 1:
                 raise APIRequestError("provider did not return exactly one completion")
             choice = choices[0]
-            if not isinstance(choice, dict) or choice.get("finish_reason") != "stop":
+            if not isinstance(choice, dict):
+                raise APIRequestError("provider returned an invalid completion")
+            finish_reason = choice.get("finish_reason")
+            accept_answer_prefix = (
+                self.config.allow_s2g_answer_prefix_on_length
+                and prompt_version == "s2g-author-5d842a6-answer-api-v1"
+                and not self.config.json_object_mode
+                and not self.config.json_schema_mode
+                and finish_reason == "length"
+            )
+            if finish_reason != "stop" and not accept_answer_prefix:
                 raise APIRequestError(
                     "completion was truncated, refused or did not finish normally"
                 )
@@ -381,6 +394,14 @@ class LiveChatClient:
             content = message.get("content")
             if not isinstance(content, str) or not content.strip():
                 raise APIRequestError("provider returned no usable text")
+            if accept_answer_prefix:
+                # Match the author's answer parser boundary. A capped rationale
+                # is retained verbatim, never completed, retried or called full.
+                parsed = re.search(r"Answer:\s*(.*?)\s*Rationale:\s*(.*)", content, re.S)
+                if parsed is None or not parsed.group(1).strip():
+                    raise APIRequestError("truncated answer lacks a complete answer field")
+                event["accepted_truncated_rationale"] = True
+            event["finish_reason"] = finish_reason
             event["status"] = "completed"
             return ChatResponse(
                 content=content,

@@ -55,6 +55,47 @@ def completion(**changes):
     } | changes
 
 
+@pytest.mark.parametrize(
+    "enabled,version,content,reason,accepted",
+    [
+        (True, "s2g-author-5d842a6-answer-api-v1", "Answer: X\nRationale: cut", "length", True),
+        (False, "s2g-author-5d842a6-answer-api-v1", "Answer: X\nRationale: cut", "length", False),
+        (True, "s2g-author-5d842a6-judge-api-v1", "Answer: X\nRationale: cut", "length", False),
+        (True, "other-answer", "Answer: X\nRationale: cut", "length", False),
+        (True, "s2g-author-5d842a6-answer-api-v1", "Answer: unfinished", "length", False),
+        (True, "s2g-author-5d842a6-answer-api-v1", "Answer: \nRationale: cut", "length", False),
+        (
+            True,
+            "s2g-author-5d842a6-answer-api-v1",
+            "Answer: X\nRationale: cut",
+            "content_filter",
+            False,
+        ),
+    ],
+)
+def test_author_answer_length_policy_is_narrow_and_audited(
+    tmp_path, monkeypatch, enabled, version, content, reason, accepted
+):
+    calls = fake_provider(
+        monkeypatch,
+        completion(choices=[{"finish_reason": reason, "message": {"content": content}}]),
+    )
+    client = LiveChatClient(
+        config(allow_s2g_answer_prefix_on_length=enabled), tmp_path, allow_network=True
+    )
+    if accepted:
+        result = client.complete(messages(), trace_id="author-length", prompt_version=version)
+        assert result.content == content
+        audit = json.loads(result.audit_path.read_bytes())
+        assert audit["accepted_truncated_rationale"] is True
+        assert audit["finish_reason"] == "length"
+        assert audit["response"]["choices"][0]["message"]["content"] == content
+    else:
+        with pytest.raises(APIRequestError):
+            client.complete(messages(), trace_id="author-length", prompt_version=version)
+    assert len(calls) == 1
+
+
 def test_network_disabled_even_when_key_exists(tmp_path, monkeypatch):
     calls = fake_provider(monkeypatch, completion())
     client = LiveChatClient(config(), tmp_path)

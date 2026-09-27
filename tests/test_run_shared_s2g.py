@@ -506,7 +506,7 @@ def test_v5_cannot_bypass_strict_schema_configuration(tmp_path, json_mode, schem
 
 
 def test_reviewed_v1_failed_capacity_run_remains_in_v2_budget(tmp_path, monkeypatch):
-    assert runner.PROTOCOL == "growrag-s2g-shared-qwen-capacity-v2"
+    assert runner.PROTOCOL == "growrag-s2g-shared-qwen-capacity-v3"
     directory = put_plan(
         tmp_path,
         runner.batch_identity("32_v1", 0, 32),

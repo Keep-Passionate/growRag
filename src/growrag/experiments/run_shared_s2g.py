@@ -41,8 +41,12 @@ from .run_s2g_author_pilot import (
 )
 from .s2g_author_api import PROMPT_VERSIONS, S2GAuthorAPI
 
-PROTOCOL = "growrag-s2g-shared-qwen-capacity-v2"
-REVIEWED_PROTOCOLS = {PROTOCOL, "growrag-s2g-shared-qwen-capacity-v1"}
+PROTOCOL = "growrag-s2g-shared-qwen-capacity-v3"
+REVIEWED_PROTOCOLS = {
+    PROTOCOL,
+    "growrag-s2g-shared-qwen-capacity-v1",
+    "growrag-s2g-shared-qwen-capacity-v2",
+}
 SHARED_OUTPUT_CAPS = {**QWEN_OUTPUT_CAPS, "answer": 1024}
 GENERATION_PROFILE = "qwen_capacity_v5_judge768_extract128_answer1024"
 PREFIX = "2026-09-27_s2g_shared"
@@ -383,6 +387,8 @@ def main(argv=None):
         "model": PILOT_MODEL,
         "backend_output_caps": SHARED_OUTPUT_CAPS,
         "generation_profile": GENERATION_PROFILE,
+        "answer_length_policy": "accept complete Answer field before Rationale delimiter; "
+        "preserve and flag truncated rationale; other stages remain strict",
         "max_retrieval_rounds": 4,
         "top_docs": 6,
         "gap_profile": "paper_k1",
@@ -460,6 +466,7 @@ def main(argv=None):
                     enable_thinking=False,
                     temperature=0,
                     top_p=1,
+                    allow_s2g_answer_prefix_on_length=True,
                 ),
                 output / "api_audit",
                 allow_network=True,
