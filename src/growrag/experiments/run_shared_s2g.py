@@ -106,14 +106,41 @@ def batch_identity(series: str, start: int, count: int) -> str:
     return f"{PREFIX}{series}_{start:04d}_{start + count:04d}"
 
 
-def check_no_replay(runs: Path, series: str, manifest_sha: str, question_ids: list[str]) -> None:
+def check_no_replay(
+    runs: Path,
+    series: str,
+    manifest_sha: str,
+    question_ids: list[str],
+    *,
+    continuation_of: str | None = None,
+) -> dict | None:
+    proof = None
+    if continuation_of is not None:
+        from .shared_continuation import verify_unstarted_continuation
+
+        if not continuation_of.startswith(f"{PREFIX}{series}_"):
+            raise ValueError("continuation must remain in the same frozen series")
+        proof = verify_unstarted_continuation(
+            runs,
+            continuation_of,
+            manifest_sha256=manifest_sha,
+            question_ids=question_ids,
+            generation_profile=GENERATION_PROFILE,
+            protocol=PROTOCOL,
+            model=PILOT_MODEL,
+        )
     wanted = set(question_ids)
     for path in runs.glob(f"{PREFIX}{series}_*/launch_plan.json"):
         old = json.loads(path.read_bytes())
         if old.get("manifest_sha256") != manifest_sha:
             raise ValueError("series cannot silently change dataset")
         if wanted & set(old.get("question_ids", [])):
+            if proof is not None and path.parent.name in proof.get(
+                "validated_prior_runs", [continuation_of]
+            ):
+                continue
             raise ValueError("question already claimed in this series; no automatic replay")
+    return proof
 
 
 def execute_pair(question, index, client, upstream, directory, progress, *, run_id):
@@ -345,6 +372,7 @@ def main(argv=None):
     parser.add_argument("--start", type=int, required=True)
     parser.add_argument("--count", type=int, required=True)
     parser.add_argument("--api-config", type=Path)
+    parser.add_argument("--continue-unstarted-from")
     parser.add_argument("--allow-network", action="store_true")
     args = parser.parse_args(argv)
     run_id = batch_identity(args.series, args.start, args.count)
@@ -360,7 +388,13 @@ def main(argv=None):
     ids = manifest["question_ids"][args.start : args.start + args.count]
     if len(ids) != args.count or len(set(ids)) != len(ids):
         raise ValueError("batch extends beyond frozen dataset")
-    check_no_replay(runs, args.series, args.expected_manifest_sha256, ids)
+    continuation_proof = check_no_replay(
+        runs,
+        args.series,
+        args.expected_manifest_sha256,
+        ids,
+        continuation_of=args.continue_unstarted_from,
+    )
     history = reviewed_history(runs)
     max_calls = 11 * args.count
     subcap = min(5.0, 50.0 - history["prior_reserved_cny"])
@@ -377,6 +411,8 @@ def main(argv=None):
         "run_id": run_id,
         "protocol": PROTOCOL,
         "series": args.series,
+        "continuation_of": args.continue_unstarted_from,
+        "continuation_proof": continuation_proof,
         "created_utc": datetime.now(UTC).isoformat(),
         "git": git,
         "manifest_path": str(args.manifest.resolve()),

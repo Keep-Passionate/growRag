@@ -279,6 +279,63 @@ def test_claimed_questions_and_manifest_change_cannot_replay(tmp_path):
     runner.check_no_replay(tmp_path, "500_v1", "frozen", ["q2"])
 
 
+def test_explicit_continuation_only_exempts_proven_prior_claims(tmp_path, monkeypatch):
+    from growrag.experiments import shared_continuation
+
+    parent = runner.batch_identity("500_v1", 0, 25)
+    put_plan(tmp_path, parent, manifest_sha256="frozen", question_ids=["q0", "q1"])
+    proof = {"validated_prior_runs": [parent], "question_ids": ["q1"]}
+    observed = []
+
+    def verified(*args, **kwargs):
+        observed.append(kwargs)
+        return proof
+
+    monkeypatch.setattr(shared_continuation, "verify_unstarted_continuation", verified)
+    assert (
+        runner.check_no_replay(tmp_path, "500_v1", "frozen", ["q1"], continuation_of=parent)
+        == proof
+    )
+    assert observed[0]["question_ids"] == ["q1"]
+    assert observed[0]["protocol"] == runner.PROTOCOL
+    put_plan(
+        tmp_path,
+        runner.batch_identity("500_v1", 1, 1),
+        manifest_sha256="frozen",
+        question_ids=["q1"],
+    )
+    with pytest.raises(ValueError, match="already claimed"):
+        runner.check_no_replay(tmp_path, "500_v1", "frozen", ["q1"], continuation_of=parent)
+
+
+def test_continuation_cannot_change_series(tmp_path):
+    with pytest.raises(ValueError, match="same frozen series"):
+        runner.check_no_replay(
+            tmp_path,
+            "500_v2",
+            "frozen",
+            ["q1"],
+            continuation_of=runner.batch_identity("500_v1", 0, 25),
+        )
+
+
+def test_failed_continuation_proof_cannot_release_claim(tmp_path, monkeypatch):
+    from growrag.experiments import shared_continuation
+
+    def rejected(*args, **kwargs):
+        raise ValueError("already touched")
+
+    monkeypatch.setattr(shared_continuation, "verify_unstarted_continuation", rejected)
+    with pytest.raises(ValueError, match="already touched"):
+        runner.check_no_replay(
+            tmp_path,
+            "500_v1",
+            "frozen",
+            ["q1"],
+            continuation_of=runner.batch_identity("500_v1", 0, 25),
+        )
+
+
 def test_existing_batch_claim_rejects_before_manifest_or_secret(tmp_path, monkeypatch):
     run_id = runner.batch_identity("500_v1", 0, 25)
     runner.write_json(tmp_path / f"{run_id}.claim.json", {"synthetic": True})

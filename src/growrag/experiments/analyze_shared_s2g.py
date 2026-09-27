@@ -16,6 +16,8 @@ from collections import Counter
 from pathlib import Path
 from statistics import mean
 
+from .shared_continuation import verify_unstarted_continuation
+
 ARMS = ("BASE1_AUTHOR_READER", "S2G_AUTHOR_API4")
 METRICS = ("answer_em", "answer_f1", "raw_support_recall", "retained_support_recall")
 SIGNATURE_FIELDS = (
@@ -217,6 +219,39 @@ def _diagnoses(row):
     return labels
 
 
+def _ordered_launch_paths(runs_root, series):
+    """Parents first, independent of lexical filenames; reject cycles and missing parents."""
+    records, ignored = {}, []
+    for path in sorted(runs_root.glob("*_s2g_shared*/launch_plan.json")):
+        launch, _ = _read(path)
+        if launch.get("series") != series:
+            ignored.append(path.parent.name)
+            continue
+        records[path.parent.name] = (path, launch.get("continuation_of"))
+    ordered, visiting, visited = [], set(), set()
+
+    def visit(name):
+        if name in visiting:
+            raise ValueError("continuation cycle")
+        if name in visited:
+            return
+        if name not in records:
+            raise ValueError("continuation parent is missing or belongs to another series")
+        visiting.add(name)
+        path, parent = records[name]
+        if parent is not None:
+            if not isinstance(parent, str):
+                raise ValueError("continuation_of must be exact prior run name")
+            visit(parent)
+        visiting.remove(name)
+        visited.add(name)
+        ordered.append(path)
+
+    for name in records:
+        visit(name)
+    return ordered, ignored
+
+
 def analyze_series(
     manifest_path,
     runs_root,
@@ -256,11 +291,13 @@ def analyze_series(
     if len(ids) != expected_size:
         raise ValueError("series size does not match frozen manifest")
     positions = {qid: i for i, qid in enumerate(ids)}
-    claimed, observed, calls_by_trace, owners, batches, ignored = {}, {}, {}, {}, [], []
+    claimed, observed, calls_by_trace, owners, batches = {}, {}, {}, {}, []
+    launch_paths, ignored = _ordered_launch_paths(runs_root, series)
+    continuations = []
     reference_signature = None
     costs_incomplete = []
     source_versions = set()
-    for launch_path in sorted(runs_root.glob("*_s2g_shared*/launch_plan.json")):
+    for launch_path in launch_paths:
         launch, launch_sha = _read(launch_path)
         if launch.get("series") != series:
             ignored.append(launch_path.parent.name)
@@ -293,12 +330,37 @@ def analyze_series(
             or count < 1
             or batch_ids != ids[start : start + count]
             or count != len(batch_ids)
-            or set(batch_ids) & set(claimed)
         ):
             raise ValueError("repeated question IDs or batch not matching frozen slice")
         directory, run_id = launch_path.parent, launch_path.parent.name
         if launch.get("run_id") != run_id:
             raise ValueError("run directory does not match launch identity")
+        overlap = set(batch_ids) & set(claimed)
+        continuation_of = launch.get("continuation_of")
+        if continuation_of is not None:
+            if (
+                overlap != set(batch_ids)
+                or {claimed[qid] for qid in overlap} != {continuation_of}
+                or overlap & set(observed)
+            ):
+                raise ValueError("continuation overlaps executed or differently claimed questions")
+            proof = verify_unstarted_continuation(
+                runs_root,
+                continuation_of,
+                manifest_sha256=digest,
+                question_ids=batch_ids,
+                generation_profile=generation_profile,
+                protocol=protocol,
+                model=launch["model"],
+            )
+            if (
+                launch.get("continuation_proof") is not None
+                and launch["continuation_proof"] != proof
+            ):
+                raise ValueError("frozen continuation proof changed")
+            continuations.append({"run_id": run_id, **proof})
+        elif overlap:
+            raise ValueError("repeated question IDs without proven explicit continuation")
         claimed.update({qid: run_id for qid in batch_ids})
         report_path, budget_path = directory / "reports.json", directory / "final_budget.json"
         reports, reports_sha = _read(report_path) if report_path.exists() else ([], None)
@@ -467,6 +529,7 @@ def analyze_series(
             "unattributed_attempts": len(set(calls_by_trace) - owners.keys()),
         },
         "batches": sorted(batches, key=lambda b: b["start"]),
+        "verified_unstarted_continuations": continuations,
         "ignored_other_series": ignored,
         "execution_signature": reference_signature,
         "source_snapshot_sha256s": sorted(x for x in source_versions if x is not None),

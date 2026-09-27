@@ -122,10 +122,19 @@ def add_batch(
         )
     dump(directory / "launch_plan.json", launch)
     dump(directory / "reports.json", rows)
-    dump(
-        directory / "final_budget.json",
-        {"calls": [c for r in rows for a in ARMS for c in r["arms"][a]["calls"]]},
-    )
+    calls = [c for r in rows for a in ARMS for c in r["arms"][a]["calls"]]
+    dump(directory / "final_budget.json", {"calls": calls})
+    (directory / "request_journal").mkdir()
+    (directory / "api_audit").mkdir()
+    for index, item in enumerate(calls):
+        dump(
+            directory / "request_journal" / f"{index:04d}_intent.json",
+            {"trace_id": item["trace_id"]},
+        )
+        dump(
+            directory / "request_journal" / f"{index:04d}_after.json", {"calls": calls[: index + 1]}
+        )
+        dump(directory / "api_audit" / f"{index:04d}.json", {"trace_id": item["trace_id"]})
     return directory
 
 
@@ -287,3 +296,42 @@ def test_unknown_api_request_count_and_zero_request_attempt_cost():
     assert report["unknown_api_request_attempts"] == 1
     assert report["unknown_cost_attempts"] == 1
     assert report["known_api_requests"] == 0
+
+
+def test_explicit_proven_unstarted_continuation_transfers_claim_once(context):
+    old = add_batch(context, 0, [(0, 1, "ok")], count=3)
+    (old / "events.jsonl").write_text(json.dumps({"kind": "exit", "status": "failed"}))
+    new = add_batch(context, 1, [(1, 1, "ok"), (1, 0, "ok")], count=2)
+    path = new / "launch_plan.json"
+    launch = json.loads(path.read_text())
+    launch["continuation_of"] = old.name
+    dump(path, launch)
+    report = analyze(context)
+    assert report["paired_scored_questions"] == 3 and report["claimed_questions"] == 3
+    assert report["all_attempt_cost"]["recorded_attempts"] == 6
+    assert len(report["verified_unstarted_continuations"]) == 1
+    assert report["question_index"][1]["run_id"] == new.name
+
+
+def test_explicit_continuation_does_not_excuse_actual_duplicate_report(context):
+    old = add_batch(context, 0, [(0, 1, "ok")], count=2)
+    (old / "events.jsonl").write_text(json.dumps({"kind": "exit", "status": "failed"}))
+    new = add_batch(context, 0, [(1, 1, "ok")], count=1)
+    path = new / "launch_plan.json"
+    launch = json.loads(path.read_text())
+    launch["continuation_of"] = old.name
+    dump(path, launch)
+    with pytest.raises(ValueError, match="executed"):
+        analyze(context)
+
+
+def test_frozen_continuation_proof_cannot_be_swapped(context):
+    old = add_batch(context, 0, [], count=2)
+    (old / "events.jsonl").write_text(json.dumps({"kind": "exit", "status": "failed"}))
+    new = add_batch(context, 1, [(1, 1, "ok")], count=1)
+    path = new / "launch_plan.json"
+    launch = json.loads(path.read_text())
+    launch.update(continuation_of=old.name, continuation_proof={"forged": True})
+    dump(path, launch)
+    with pytest.raises(ValueError, match="proof changed"):
+        analyze(context)
