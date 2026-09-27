@@ -18,10 +18,12 @@ GOLD_MARKER = "SYNTHETIC-SECRET-GOLD"
 
 def call(trace, *, cost=0.001):
     return {
-        "trace_id": trace, "api_requests": 1,
+        "trace_id": trace,
+        "api_requests": 1,
         "input_tokens": 30 if cost is not None else None,
         "output_tokens": 10 if cost is not None else None,
-        "estimated_actual_cny": cost, "reserved_cny": 0.01,
+        "estimated_actual_cny": cost,
+        "reserved_cny": 0.01,
     }
 
 
@@ -66,11 +68,15 @@ def fake_backend(monkeypatch):
                     self.events.append({"kind": "synthetic_failure"})
                     raise ValueError("synthetic failure, not a real model response")
             return {
-                "question_id": trace, "answer": "1901", "retrieval_rounds": 2,
+                "question_id": trace,
+                "answer": "1901",
+                "retrieval_rounds": 2,
                 "retrieved_documents": [{"doc_id": "final"}],
                 "initial_selector_documents": [{"doc_id": "initial"}],
-                "selected_pattern": "synthetic pattern", "rewritten_query": "foundation date",
-                "retrieval_query": query + " foundation date", "events": [],
+                "selected_pattern": "synthetic pattern",
+                "rewritten_query": "foundation date",
+                "retrieval_query": query + " foundation date",
+                "events": [],
             }
 
     monkeypatch.setattr(runner, "ReFormeRAPI", FakeAdapter)
@@ -99,8 +105,11 @@ def install_gold_spies(monkeypatch, output, order, *, expected_completed, fail_s
         if fail_score == context:
             raise ValueError("synthetic scoring failure")
         return {
-            "answer_em": 1.0, "answer_f1": 1.0, "raw_support_recall": 0.5,
-            "raw_support_hits": 1, "gold_support_count": 2,
+            "answer_em": 1.0,
+            "answer_f1": 1.0,
+            "raw_support_recall": 0.5,
+            "raw_support_hits": 1,
+            "gold_support_count": 2,
             "coverage_notice": "coverage is not entailment",
         }
 
@@ -110,10 +119,17 @@ def install_gold_spies(monkeypatch, output, order, *, expected_completed, fail_s
 
 def execute(tmp_path, backend, client, *, n=2):
     return runner.execute_batch(
-        [question(f"q{i}") for i in range(n)], backend, client,
-        Path("synthetic-reformer"), Path("synthetic-reader"),
-        Path("synthetic-manifest"), "synthetic-manifest-sha", tmp_path, FakeProgress(),
-        run_id="synthetic-run", start=0,
+        [question(f"q{i}") for i in range(n)],
+        backend,
+        client,
+        Path("synthetic-reformer"),
+        Path("synthetic-reader"),
+        Path("synthetic-manifest"),
+        "synthetic-manifest-sha",
+        tmp_path,
+        FakeProgress(),
+        run_id="synthetic-run",
+        start=0,
     )
 
 
@@ -122,8 +138,14 @@ def test_prediction_interface_cannot_accept_gold_or_cached_baselines(tmp_path, f
     assert not {"gold", "question_types", "baseline_results", "feedback"} & set(params)
     client = FakeClient()
     row = runner.execute_question(
-        question(), fake_backend.index, client, Path("r"), Path("s"),
-        tmp_path / "q", FakeProgress(), run_id="synthetic-run",
+        question(),
+        fake_backend.index,
+        client,
+        Path("r"),
+        Path("s"),
+        tmp_path / "q",
+        FakeProgress(),
+        run_id="synthetic-run",
     )
     assert row["status"] == "completed" and row["feedback"] is None
     assert row["result"]["question_id"] == "q0"
@@ -134,7 +156,9 @@ def test_prediction_interface_cannot_accept_gold_or_cached_baselines(tmp_path, f
 
 
 def test_all_predictions_sealed_before_gold_and_initial_only_has_coverage(
-    tmp_path, monkeypatch, fake_backend,
+    tmp_path,
+    monkeypatch,
+    fake_backend,
 ):
     order, client = [], FakeClient()
     install_gold_spies(monkeypatch, tmp_path, order, expected_completed=["q0", "q1"])
@@ -153,7 +177,9 @@ def test_all_predictions_sealed_before_gold_and_initial_only_has_coverage(
 
 
 def test_first_api_failure_never_reads_gold_or_executes_remaining(
-    tmp_path, monkeypatch, fake_backend,
+    tmp_path,
+    monkeypatch,
+    fake_backend,
 ):
     monkeypatch.setattr(corpus, "load_gold_after_execution", lambda *a, **k: pytest.fail("no gold"))
     client = FakeClient(fail_question="q0")
@@ -166,7 +192,9 @@ def test_first_api_failure_never_reads_gold_or_executes_remaining(
 
 
 def test_later_failure_still_scores_already_frozen_completed_prediction(
-    tmp_path, monkeypatch, fake_backend,
+    tmp_path,
+    monkeypatch,
+    fake_backend,
 ):
     order, client = [], FakeClient(fail_question="q1")
     install_gold_spies(monkeypatch, tmp_path, order, expected_completed=["q0"])
@@ -180,7 +208,11 @@ def test_later_failure_still_scores_already_frozen_completed_prediction(
 def test_score_failure_never_commits_partial_feedback(tmp_path, monkeypatch, fake_backend, failure):
     order, client = [], FakeClient()
     install_gold_spies(
-        monkeypatch, tmp_path, order, expected_completed=["q0", "q1"], fail_score=failure,
+        monkeypatch,
+        tmp_path,
+        order,
+        expected_completed=["q0", "q1"],
+        fail_score=failure,
     )
     summary = execute(tmp_path, fake_backend, client)
     assert summary["completed"] == 2 and summary["scored"] == 0
@@ -193,8 +225,12 @@ def test_score_failure_never_commits_partial_feedback(tmp_path, monkeypatch, fak
 
 def test_unknown_usage_stays_unknown_not_free():
     summary = runner.summarize(
-        [], [call("unknown", cost=None)], run_id="synthetic", planned=1,
-        stop_reason="unknown_usage", started=1,
+        [],
+        [call("unknown", cost=None)],
+        run_id="synthetic",
+        planned=1,
+        stop_reason="unknown_usage",
+        started=1,
     )
     totals = summary["all_actual_calls_including_interrupted"]
     assert totals["api_requests"] == 1 and totals["estimated_actual_cny"] is None
@@ -206,9 +242,19 @@ def test_valid_fixed_cohort_bounds(start, count):
     assert runner.batch_identity(start, count).endswith(f"{start:04d}_{start + count:04d}")
 
 
-@pytest.mark.parametrize("start,count", [
-    (-1, 1), (True, 1), (0, True), (0, 0), (0, 26), (100, 1), (90, 11), (1.0, 2),
-])
+@pytest.mark.parametrize(
+    "start,count",
+    [
+        (-1, 1),
+        (True, 1),
+        (0, True),
+        (0, 0),
+        (0, 26),
+        (100, 1),
+        (90, 11),
+        (1.0, 2),
+    ],
+)
 def test_invalid_fixed_cohort_bounds(start, count):
     with pytest.raises(ValueError):
         runner.batch_identity(start, count)
@@ -216,10 +262,14 @@ def test_invalid_fixed_cohort_bounds(start, count):
 
 def write_manifest(tmp_path, monkeypatch, *, split="train", role="development", n=500):
     path = tmp_path / "manifest.json"
-    runner.write_json(path, {
-        "official_split": split, "role": role,
-        "question_ids": [f"q{i}" for i in range(n)],
-    })
+    runner.write_json(
+        path,
+        {
+            "official_split": split,
+            "role": role,
+            "question_ids": [f"q{i}" for i in range(n)],
+        },
+    )
     sha = hashlib.sha256(path.read_bytes()).hexdigest()
     monkeypatch.setattr(runner, "FROZEN_MANIFEST_SHA", sha)
     return path, sha
@@ -233,9 +283,15 @@ def test_cohort_is_manifest_prefix_not_score_selected(tmp_path, monkeypatch):
         runner.frozen_ids(path, "unreviewed", 0, 5)
 
 
-@pytest.mark.parametrize("fields", [
-    {"split": "dev"}, {"split": "test"}, {"role": "training"}, {"n": 100},
-])
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"split": "dev"},
+        {"split": "test"},
+        {"role": "training"},
+        {"n": 100},
+    ],
+)
 def test_wrong_source_or_size_rejected(tmp_path, monkeypatch, fields):
     path, sha = write_manifest(tmp_path, monkeypatch, **fields)
     with pytest.raises(ValueError):
@@ -247,9 +303,14 @@ def test_any_existing_claim_blocks_replay_even_if_no_output(tmp_path, artifact):
     name = runner.batch_identity(0, 5)
     path = tmp_path / (f"{name}.claim.json" if artifact == "claim" else name + "/launch_plan.json")
     path.parent.mkdir(parents=True, exist_ok=True)
-    runner.write_json(path, {
-        "protocol": runner.PROTOCOL, "manifest_sha256": "frozen", "question_ids": ["q0", "q1"],
-    })
+    runner.write_json(
+        path,
+        {
+            "protocol": runner.PROTOCOL,
+            "manifest_sha256": "frozen",
+            "question_ids": ["q0", "q1"],
+        },
+    )
     with pytest.raises(ValueError, match="already claimed"):
         runner.check_no_replay(tmp_path, "frozen", ["q1"])
     with pytest.raises(ValueError, match="change protocol or dataset"):
@@ -258,18 +319,34 @@ def test_any_existing_claim_blocks_replay_even_if_no_output(tmp_path, artifact):
 
 
 def test_unknown_claim_cannot_be_silently_ignored(tmp_path):
-    runner.write_json(tmp_path / f"{runner.batch_identity(0, 5)}.claim.json", {
-        "protocol": runner.PROTOCOL, "manifest_sha256": "frozen", "question_ids": [],
-    })
+    runner.write_json(
+        tmp_path / f"{runner.batch_identity(0, 5)}.claim.json",
+        {
+            "protocol": runner.PROTOCOL,
+            "manifest_sha256": "frozen",
+            "question_ids": [],
+        },
+    )
     with pytest.raises(ValueError, match="offline audit"):
         runner.check_no_replay(tmp_path, "frozen", ["q0"])
 
 
 def cli_args(tmp_path, manifest):
     return [
-        "--manifest", str(manifest), "--reformer-snapshot", "synthetic-reformer",
-        "--reader-snapshot", "synthetic-reader", "--index-path", "synthetic.sqlite",
-        "--runs-root", str(tmp_path / "runs"), "--start", "0", "--count", "5",
+        "--manifest",
+        str(manifest),
+        "--reformer-snapshot",
+        "synthetic-reformer",
+        "--reader-snapshot",
+        "synthetic-reader",
+        "--index-path",
+        "synthetic.sqlite",
+        "--runs-root",
+        str(tmp_path / "runs"),
+        "--start",
+        "0",
+        "--count",
+        "5",
     ]
 
 
@@ -284,7 +361,10 @@ def prepare_plan(monkeypatch):
 
 
 def test_default_plan_reads_neither_secret_nor_gold_and_creates_no_claim(
-    tmp_path, monkeypatch, fake_backend, capsys,
+    tmp_path,
+    monkeypatch,
+    fake_backend,
+    capsys,
 ):
     manifest, _ = write_manifest(tmp_path, monkeypatch)
     prepare_plan(monkeypatch)
@@ -316,10 +396,15 @@ def test_project_cap_is_enforced_before_any_model_access(tmp_path, monkeypatch, 
 def put_prior_budget(runs, *, start, reserved):
     directory = runs / runner.batch_identity(start, 1)
     directory.mkdir(parents=True)
-    runner.write_json(directory / "launch_plan.json", {
-        "protocol": runner.PROTOCOL, "model": runner.PILOT_MODEL,
-        "manifest_sha256": "frozen", "question_ids": [f"q{start}"],
-    })
+    runner.write_json(
+        directory / "launch_plan.json",
+        {
+            "protocol": runner.PROTOCOL,
+            "model": runner.PILOT_MODEL,
+            "manifest_sha256": "frozen",
+            "question_ids": [f"q{start}"],
+        },
+    )
     # Deliberately allow invalid/nonfinite JSON numbers to test corrupted ledgers.
     (directory / "final_budget.json").write_text(
         json.dumps({"reserved_cny": reserved}), encoding="utf-8"
@@ -341,9 +426,14 @@ def test_invalid_or_unknown_series_cost_is_not_treated_as_free(tmp_path, reserve
 
 
 def test_incomplete_claim_blocks_other_nonoverlapping_batches(tmp_path):
-    runner.write_json(tmp_path / f"{runner.batch_identity(0, 5)}.claim.json", {
-        "protocol": runner.PROTOCOL, "manifest_sha256": "frozen", "question_ids": ["q0"],
-    })
+    runner.write_json(
+        tmp_path / f"{runner.batch_identity(0, 5)}.claim.json",
+        {
+            "protocol": runner.PROTOCOL,
+            "manifest_sha256": "frozen",
+            "question_ids": ["q0"],
+        },
+    )
     with pytest.raises(ValueError, match="unfinished ReFormeR claim"):
         runner.series_reserved(tmp_path)
 
@@ -363,4 +453,3 @@ def test_plan_reserves_only_remaining_series_budget(tmp_path, monkeypatch, fake_
     assert runner.main(cli_args(tmp_path, manifest)) == 0
     plan = json.loads(capsys.readouterr().out)
     assert plan["subcap_cny"] == 0.25 and plan["series_prior_reserved_cny"] == 2.75
-

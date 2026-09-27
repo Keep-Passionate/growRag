@@ -1,5 +1,7 @@
 # GrowRAG
 
+最新续轮（2026-09-27）：[ReFormeR–Qwen百题迁移已完成](knowledge/experiments/2026-09-27_ReFormeR百题迁移结果与ExpeL路线.md)，300次真实调用约¥0.072015。99共同完整题上BASE/ReFormeR/S2G的EM分别67.68/67.68/74.75%；ReFormeR没有增加BASE+S2G以外的oracle机会。先保留静态模式对照，后续向ExpeL式独立来源经验积累推进，不把简单组合当创新。以下500题是原S2G批次，不能混淆分母。
+
 最新进展（2026-09-27）：完成[S2G–Qwen五百题迁移验收](knowledge/experiments/2026-09-27_S2G五百题迁移验收与研究抉择.md)。500题全部尝试，491可评分配对：BASE EM65.58%/F1 73.58%，S2G EM76.58%/F1 84.14%，修复63/损害9；8技术失败、1预登记坏标注单列。3350真实API请求、1877项本地测试通过，已完成费用/轨迹/无gold查询重放审计。**这是共享封闭train语料上的作者控制流Qwen迁移，不是原LoRA/fullwiki/官方dev数字复现，也不是记忆收益。** 累计授权50元，完整状态见[项目记忆](knowledge/CURRENT_PROJECT_MEMORY.md)。
 
 历史进展（2026-09-23）：接通[查询侧路由＋有界修复闭环](docs/GrowRAG_三问题与可运行系统_2026-09-23.md)。三条研究问题仍是：历史额外机会、执行前能否选中、适用条件独立作用。以下历次结果按当时配置保留，不与新500题混算。
@@ -40,6 +42,7 @@ GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在�
 
 ## 当前入口
 
+- [ReFormeR百题真实结果、成本、审阅案例和ExpeL下一步](knowledge/experiments/2026-09-27_ReFormeR百题迁移结果与ExpeL路线.md)
 - [已选择ReFormeR起步、ExpeL后续：100题冻结开发协议与代码地图](docs/experiments/2026-09-27_ReFormeR起步与ExpeL后续路线.md)
 - [2026-09-27续轮：历史侧基线建议、减轮对照与逐题成本协议](docs/experiments/2026-09-27_历史侧基线与逐题成本协议.md)
 - [2026-09-27：S2G五百题结果、复现边界与研究抉择](knowledge/experiments/2026-09-27_S2G五百题迁移验收与研究抉择.md)

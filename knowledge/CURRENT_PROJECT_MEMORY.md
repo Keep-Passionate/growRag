@@ -1,11 +1,16 @@
 # GrowRAG 当前项目记忆
 
-更新日期：2026-09-27（500题全部尝试完成；独立账本/轨迹审计和同状态查询重放完成）
-状态：28封口批次、500固定题，492完整配对、491可评分、8技术失败、1预登记坏标注；没有未开始题。BASE EM65.58%/F1 73.58%，S2G–Qwen EM76.58%/F1 84.14%，修复63/损害9，F1提高76/退步14。3350真实请求，已知费用小计0.7258714元＋2未知；全项目4394请求、已知0.9081352元＋3未知、保守预留5.962860元，累计授权50元。训练0、建卡0、租卡0。仅完成作者控制流Qwen迁移及封闭共享train开发验收，非原LoRA/fullwiki/官方dev分数复现。
+更新日期：2026-09-27（S2G五百题之后，ReFormeR固定前100题真实迁移及审计完成）
+状态：新ReFormeR100/100成功、300真实请求、估价0.072015元；同题99完整三路对照BASE EM67.68/F1 75.16，ReFormeR67.68/74.43，S2G74.75/82.11（百分比）。额外于BASE+S2G的oracle机会为0，不直接训练复杂路由。全项目4694请求、已知0.9801502元＋历史3未知、保守预留6.4063382元，累计授权50元。本轮训练0、建卡0、租卡0。原500题数据和S2G结果仍保留，下面各历史数字不可混算。不是原论文模型/fullwiki/官方dev数值复现。
 权威性：当前入口；旧路线 A 决策保留为历史记录，但不再代表当前主线
 
 ## 2026-09-27新决定：ReFormeR起步、ExpeL后续
 
+- 实施完成报告`knowledge/experiments/2026-09-27_ReFormeR百题迁移结果与ExpeL路线.md`；逐题入口`runs/2026-09-27_reformer_analysis_v2/QUESTIONS.md`，v1原样保留。执行提交6acc2f9，固定5/25/25/25/20五批同源码、模型/提示。300请求全HTTP200且唯一，100题无技术失败、不重试；4次完整Answer/截断Rationale按原协议接受。独立审计`runs/2026-09-27_reformer_audit/full100_summary.json`。新增103项离线测试，全仓1997项通过（-W error）。执行后的格式整理不改运行逻辑，原运行源码仍由6acc2f9及各批source_snapshot固定。
+- 99共同完整题（旧S2G offset79技术失败排除）：ReFormeR对BASE修复1/损害1，对S2G修复3/损害10；三路oracle EM77.78/F1 84.7988%，与BASE+S2G相同。还没有证明静态模式带来额外机会，不能把修复S2G的3题说成只有经验做得到，因为BASE也对。
+- 56次模式对象不完全匹配均仅漏examples，规则/名称/描述未变；其余44完整匹配，回退0。不能把v1的mutation字段解读为语义篡改，v2改名object mismatch。Semantic Clarification68、Clarify Intent21，另4模式共11；6次原问不变。
+- 下一步先做取模式ID后回填完整规则/示例的隔离对照，再按ExpeL思路从独立来源积累并一次性提炼经验；先测同预算独有机会，再学适用条件/路由。不要立刻把两baseline拼接包装创新。原500/32继续禁止建库。
+- 0081是谨慎归因的例子：rewrite插入Marvin Williams，但初检/终检第2篇都含正确第五顺位Raymond Felton，Reader未看到rewrite且识别Felton，却错断交易球队；不能直接称query把实体检丢或Marvin直接污染Reader。需分开query/Reader因果对照。
 - 用户本轮选择先ReFormeR，后续向ExpeL发展；这取代下面“历史baseline未选定/建议先ExpeL”的历史状态。保持S2G不改，先做静态模式对照，再从独立来源积累动态经验，最后有互补机会才学习路由。
 - 调用前协议`docs/experiments/2026-09-27_ReFormeR起步与ExpeL后续路线.md`：原shared500前100题固定开发，不按成绩选题，不回流训练或建库；官方dev/test未用。先5题兼容，再至多25一批，整个新系列预留上限3元、项目仍累计50元。
 - 新桥接实际执行作者SHA锁定select_best_pattern/apply_pattern；初检3篇选模式，规则+示例改写；按论文hybrid原问+改写二检6篇，同S2G Answer回答原问。公开core本身只输出rewrite；公开实现是prompt选择，不冒称论文训练selector。十模式中有疑似漂移示例，本基线原样保留；canonical_library_match诊断不用于暗改输出。

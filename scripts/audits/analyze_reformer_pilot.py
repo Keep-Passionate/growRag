@@ -106,6 +106,29 @@ def compare(rows, against):
     }
 
 
+def paired_resources(paired, arm):
+    """Same score cohort, not all-attempt totals or cross-run deployment benchmarks."""
+    observed = [row["new_usage"] if arm == REFORMER else row["cached_usage"][arm] for row in paired]
+    available = [item for item in observed if item is not None]
+    durations = [row["arms"][arm].get("elapsed_seconds") for row in paired]
+    if any(value is not None and not number(value) for value in durations):
+        raise ValueError("invalid observed arm elapsed time")
+    known = [value for value in durations if value is not None]
+    return {
+        "n": len(paired),
+        "usage_observed_n": len(available),
+        "usage_missing_n": len(paired) - len(available),
+        "usage": merge_usage(available) if len(available) == len(paired) and paired else None,
+        "elapsed_seconds": {
+            "known_n": len(known),
+            "missing_n": len(paired) - len(known),
+            "known_subtotal": sum(known),
+            "total": sum(known) if len(known) == len(paired) and paired else None,
+            "mean": mean(known) if len(known) == len(paired) and paired else None,
+        },
+    }
+
+
 def assemble(expected_ids, baseline_questions, baseline_cost_rows, batches):
     """Pure analysis projection: tests need no files, API keys or author repository."""
     if len(set(expected_ids)) != len(expected_ids):
@@ -224,6 +247,25 @@ def assemble(expected_ids, baseline_questions, baseline_cost_rows, batches):
             for key in ("initial3_support_recall", "final6_support_recall", "base6_support_recall")
         )
     ]
+    oracle = {"n": len(paired)}
+    for metric in ("em", "f1"):
+        old_best = [
+            max(r["arms"][a]["feedback"][f"answer_{metric}"] for a in (BASE, S2G)) for r in paired
+        ]
+        new_best = [
+            max(old, row["arms"][REFORMER]["feedback"][f"answer_{metric}"])
+            for old, row in zip(old_best, paired, strict=True)
+        ]
+        oracle[f"base_s2g_{metric}"] = mean(old_best) if paired else None
+        oracle[f"three_arm_{metric}"] = mean(new_best) if paired else None
+        oracle[f"extra_over_base_s2g_{metric}"] = (
+            mean(new - old for new, old in zip(new_best, old_best, strict=True)) if paired else None
+        )
+    oracle["reformer_repairs_both_others_wrong"] = sum(
+        r["arms"][REFORMER]["feedback"]["answer_em"] == 1
+        and all(r["arms"][a]["feedback"]["answer_em"] == 0 for a in (BASE, S2G))
+        for r in paired
+    )
     summary = {
         "planned_questions": len(expected_ids),
         "new_status_counts": dict(Counter(r["arms"][REFORMER]["status"] for r in rows)),
@@ -242,36 +284,32 @@ def assemble(expected_ids, baseline_questions, baseline_cost_rows, batches):
             )
             for name in (BASE, S2G)
         },
-        "oracle_opportunity_not_a_router": {
+        "same_complete_case_online_resources": {
             "n": len(paired),
-            "three_arm_em": mean(
-                max(r["arms"][a]["feedback"]["answer_em"] for a in (BASE, S2G, REFORMER))
-                for r in paired
-            )
-            if paired
-            else None,
-            "three_arm_f1": mean(
-                max(r["arms"][a]["feedback"]["answer_f1"] for a in (BASE, S2G, REFORMER))
-                for r in paired
-            )
-            if paired
-            else None,
-            "reformer_repairs_both_others_wrong": sum(
-                r["arms"][REFORMER]["feedback"]["answer_em"] == 1
-                and all(r["arms"][a]["feedback"]["answer_em"] == 0 for a in (BASE, S2G))
-                for r in paired
-            ),
+            "arms": {arm: paired_resources(paired, arm) for arm in (BASE, S2G, REFORMER)},
+            "notice": "Online inference estimates exclude historical pattern induction. "
+            "Old arms are cached, not new charges. Elapsed times are observed serialized "
+            "arm durations across runs, not a controlled deployment latency benchmark. "
+            "All-attempt costs, including failures excluded here, remain reported separately.",
         },
+        "oracle_opportunity_not_a_router": oracle,
         "completed_new_questions": len(completed),
         "rewrite_diagnostics": {
             "selected_pattern_counts": dict(
                 Counter(d["selected_pattern"] or "unknown" for d in diagnostics)
             ),
             "library_match_known_n": len(library_known),
-            "library_mutation_n": sum(not d["canonical_library_match"] for d in library_known),
-            "library_mutation_rate": mean(not d["canonical_library_match"] for d in library_known)
-            if library_known
-            else None,
+            "library_object_mismatch_n": sum(
+                not d["canonical_library_match"] for d in library_known
+            ),
+            "library_object_mismatch_rate": (
+                mean(not d["canonical_library_match"] for d in library_known)
+                if library_known
+                else None
+            ),
+            "library_object_mismatch_notice": "Strict full-object inequality can mean omitted "
+            "examples or fields, not a changed rule or semantic drift. The source library "
+            "is never updated by this baseline; inspect field-level differences separately.",
             "repeat_rewrites": sum(d["rewrite_equals_original"] is True for d in diagnostics),
             "fallback_questions": sum(bool(d["author_fallback_stages"]) for d in diagnostics),
             "mean_characters": {
@@ -370,7 +408,7 @@ def analyze(runs_root, manifest_path, output, *, count=100):
         manifest["question_ids"][:count], baseline["question_index"], costs, batches
     )
     summary.update(
-        schema_version="growrag-reformer-pilot-analysis-v1",
+        schema_version="growrag-reformer-pilot-analysis-v2",
         created_utc=datetime.now(UTC).isoformat(),
         source_sha256=hashes,
     )
@@ -436,6 +474,25 @@ def write_markdown(output, rows, summary):
             "",
             "旧BASE/S2G成本单列在analysis.json的cached_usage_all_selected_questions，不算本次重复花费。",
             "",
+            "## 同一完整配对的在线资源",
+            "",
+            "下表与EM/F1使用同一批完整题；不含离线模式建库。被排除的失败调用仍计入上面的全尝试费用。",
+            "",
+            "| 方法 | 完整配对请求数 | 完整配对估价¥ | 平均每题观测耗时秒 |",
+            "| --- | ---: | ---: | ---: |",
+        ]
+    )
+    for arm, resources in summary["same_complete_case_online_resources"]["arms"].items():
+        u = resources["usage"] or {}
+        lines.append(
+            f"| {arm} | {u.get('api_requests')} | {u.get('total_estimated_cost_cny')} | "
+            f"{resources['elapsed_seconds']['mean']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "耗时是跨批次实测轨迹用时，包含检索/API等开销，不是控制了缓存与网络条件的部署延迟基准。",
+            "",
             "## 可以检查的差异",
             "",
         ]
@@ -456,9 +513,19 @@ def write_markdown(output, rows, summary):
             refs = [f"[{r['offset']:04d}](QUESTIONS.md#q{r['offset']:04d})" for r in cases[:5]]
             lines.append(f"{label}案例（仅按固定offset取前5）：" + ("、".join(refs) or "无"))
         lines.append("")
+    oracle = summary["oracle_opportunity_not_a_router"]
+    mismatch = summary["rewrite_diagnostics"]
     lines.extend(
         [
             "Oracle事后用gold挑最好者，只显示存在多少机会，不代表已经可以在线选中；不能作为方法分数。",
+            "",
+            f"原BASE/S2G Oracle：EM={oracle['base_s2g_em']}，F1={oracle['base_s2g_f1']}；"
+            f"加入ReFormeR后额外机会：EM={oracle['extra_over_base_s2g_em']}，"
+            f"F1={oracle['extra_over_base_s2g_f1']}。",
+            "",
+            f"选择结果与原模式库完整对象不一致：{mismatch['library_object_mismatch_n']} / "
+            f"{mismatch['library_match_known_n']}。这可能仅是漏掉示例或字段，"
+            "不能据此声称规则被改写、记忆被污染或语义发生漂移。原模式库没有被更新。",
             "",
             "初始选择器只有3篇，最终回答器有6篇，因此初始→最终证据覆盖变化不能全部归功于改写。另看BASE6→最终6对照。",
             "",
@@ -481,7 +548,8 @@ def write_markdown(output, rows, summary):
                 "",
                 row["question"] or "原问题请见缓存报告",
                 "",
-                f"模式：{diag['selected_pattern']}；作者库原样匹配：{diag['canonical_library_match']}。",
+                f"模式：{diag['selected_pattern']}；与作者库完整对象原样匹配："
+                f"{diag['canonical_library_match']}（字段省略也会不匹配，不等于规则漂移）。",
                 "",
                 f"改写：{diag['rewritten_query']}",
                 "",

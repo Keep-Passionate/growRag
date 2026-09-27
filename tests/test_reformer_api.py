@@ -24,8 +24,7 @@ ANSWER = "Answer: Northbridge\nRationale: The supplied sentence states this."
 QUESTION = "Which synthetic town is older?"
 REWRITE = "Northbridge Eastbridge foundation dates"
 DOCS = tuple(
-    AuthorDocument(f"doc-{i}", f"Title {i}", f"Unique retrieved text marker {i}.")
-    for i in range(6)
+    AuthorDocument(f"doc-{i}", f"Title {i}", f"Unique retrieved text marker {i}.") for i in range(6)
 )
 
 
@@ -70,16 +69,12 @@ def make_adapter(upstream, outputs, *, docs=DOCS, event_callback=None):
         calls.append((query, k))
         return docs[:k]
 
-    adapter = bridge.ReFormeRAPI(
-        upstream, READER, client, retrieve, event_callback=event_callback
-    )
+    adapter = bridge.ReFormeRAPI(upstream, READER, client, retrieve, event_callback=event_callback)
     return adapter, client, calls
 
 
 def run_normal(upstream, *, event_callback=None):
-    adapter, client, retrieval = make_adapter(
-        upstream, [], event_callback=event_callback
-    )
+    adapter, client, retrieval = make_adapter(upstream, [], event_callback=event_callback)
     selected = copy.deepcopy(adapter.patterns[2])
     client.outputs = [json.dumps(selected), REWRITE, ANSWER]
     return adapter, client, retrieval, selected, adapter.run(QUESTION, "train-q1")
@@ -98,9 +93,7 @@ def test_actual_author_methods_execute_and_same_reader_answers_original_question
     assert len(result["initial_selector_documents"]) == 3
     assert len(result["retrieved_documents"]) == 6
     assert result["author_fallback_stages"] == []
-    assert client.calls[2]["messages"][0]["content"] == adapter.reader.scope[
-        "force_answer_prompt"
-    ]
+    assert client.calls[2]["messages"][0]["content"] == adapter.reader.scope["force_answer_prompt"]
     assert QUESTION in client.calls[2]["messages"][1]["content"]
     assert REWRITE not in client.calls[2]["messages"][1]["content"]
     assert all(doc.text in client.calls[2]["messages"][1]["content"] for doc in DOCS)
@@ -137,7 +130,8 @@ def test_author_prompts_are_exact_and_documents_only_enter_selection(upstream):
     assert DOCS[3].text not in expected_selection
     assert all(doc.text not in expected_rewrite for doc in DOCS)
     assert [c["prompt_version"] for c in client.calls[:2]] == [
-        bridge.PROMPT_VERSIONS["select"], bridge.PROMPT_VERSIONS["rewrite"]
+        bridge.PROMPT_VERSIONS["select"],
+        bridge.PROMPT_VERSIONS["rewrite"],
     ]
 
 
@@ -257,9 +251,7 @@ def test_external_callback_cannot_corrupt_prompts_patterns_or_saved_events(upstr
         if "selected_pattern" in event:
             event["selected_pattern"]["transformation_rule"] = "corrupted rule"
 
-    adapter, client, _, selected, result = run_normal(
-        upstream, event_callback=corrupting_callback
-    )
+    adapter, client, _, selected, result = run_normal(upstream, event_callback=corrupting_callback)
     assert seen
     assert all(e["kind"] != "external corruption" for e in result["events"])
     assert result["selected_pattern"] == selected
@@ -298,7 +290,13 @@ def test_no_heavy_dependency_imports_or_execution_of_upstream_main(upstream, mon
 
     def checked_import(name, *args, **kwargs):
         assert name.split(".")[0] not in {
-            "torch", "transformers", "vllm", "peft", "pandas", "pyserini", "openai"
+            "torch",
+            "transformers",
+            "vllm",
+            "peft",
+            "pandas",
+            "pyserini",
+            "openai",
         }
         return original_import(name, *args, **kwargs)
 
@@ -328,7 +326,9 @@ def test_invalid_question_makes_no_model_or_retrieval_calls(upstream, question):
 
 def test_public_execution_interface_accepts_no_gold_argument():
     assert list(inspect.signature(bridge.ReFormeRAPI.run).parameters) == [
-        "self", "question", "trace_id"
+        "self",
+        "question",
+        "trace_id",
     ]
 
 

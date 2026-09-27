@@ -44,8 +44,8 @@ def fixture():
                 "offset": offset,
                 "question_type": "bridge",
                 "arms": {
-                    BASE: {"status": "completed", "feedback": feedback(b)},
-                    S2G: {"status": "completed", "feedback": feedback(s)},
+                    BASE: {"status": "completed", "feedback": feedback(b), "elapsed_seconds": 1},
+                    S2G: {"status": "completed", "feedback": feedback(s), "elapsed_seconds": 4},
                 },
             }
         )
@@ -67,6 +67,7 @@ def fixture():
                 "question": "Original query?",
                 "outcome": {
                     "status": "completed",
+                    "elapsed_seconds": 2,
                     "calls": [request],
                     "feedback": feedback(r),
                     "initial_feedback": {"raw_support_recall": 0.25},
@@ -100,9 +101,18 @@ def test_same_case_metrics_costs_oracle_and_diagnostics():
     assert summary["oracle_opportunity_not_a_router"]["reformer_repairs_both_others_wrong"] == 1
     assert summary["new_api_usage_all_attempts"]["api_requests"] == 2
     assert summary["cached_usage_all_selected_questions"][BASE]["api_requests"] == 2
-    assert summary["rewrite_diagnostics"]["library_mutation_rate"] == 0.5
+    assert summary["rewrite_diagnostics"]["library_object_mismatch_rate"] == 0.5
+    assert "library_mutation_rate" not in summary["rewrite_diagnostics"]
     assert summary["rewrite_diagnostics"]["repeat_rewrites"] == 1
     assert summary["exact_support_coverage"]["initial3_support_recall"] == 0.25
+    oracle = summary["oracle_opportunity_not_a_router"]
+    assert oracle["base_s2g_em"] == oracle["base_s2g_f1"] == 0.5
+    assert oracle["extra_over_base_s2g_em"] == oracle["extra_over_base_s2g_f1"] == 0.5
+    resources = summary["same_complete_case_online_resources"]
+    assert resources["n"] == 2
+    assert resources["arms"][REFORMER]["usage"]["api_requests"] == 2
+    assert resources["arms"][BASE]["elapsed_seconds"]["mean"] == 1
+    assert resources["arms"][S2G]["elapsed_seconds"]["total"] == 8
 
 
 def test_failed_cached_arm_excludes_question_for_every_method():
@@ -114,6 +124,42 @@ def test_failed_cached_arm_excludes_question_for_every_method():
     assert summary["paired_scores"][REFORMER]["answer_em"] == 1
     assert summary["paired_vs_base"]["em_harms"] == 0
     assert summary["new_api_usage_all_attempts"]["api_requests"] == 2
+    resources = summary["same_complete_case_online_resources"]
+    assert resources["n"] == 1
+    assert resources["arms"][REFORMER]["usage"]["api_requests"] == 1
+    assert resources["arms"][S2G]["elapsed_seconds"]["total"] == 4
+
+
+def test_no_new_oracle_opportunity_when_new_arm_duplicates_existing_successes():
+    args = fixture()
+    args[1][0]["arms"][S2G]["feedback"] = feedback(1)
+    _, summary = MODULE.assemble(*args)
+    oracle = summary["oracle_opportunity_not_a_router"]
+    assert oracle["base_s2g_em"] == oracle["three_arm_em"] == 1
+    assert oracle["extra_over_base_s2g_em"] == oracle["extra_over_base_s2g_f1"] == 0
+
+
+def test_oracle_f1_opportunity_not_conflated_with_em_repairs():
+    args = fixture()
+    args[1][0]["arms"][S2G]["feedback"] = feedback(0, 0.5)
+    args[3][0]["reports"][0]["outcome"]["feedback"] = feedback(0, 0.75)
+    _, summary = MODULE.assemble(*args)
+    oracle = summary["oracle_opportunity_not_a_router"]
+    assert oracle["extra_over_base_s2g_em"] == 0
+    assert oracle["extra_over_base_s2g_f1"] == 0.125
+
+
+def test_paired_missing_cost_or_duration_is_unknown_not_zero():
+    args = fixture()
+    args[2][0]["arms"][S2G]["usage"] = None
+    args[1][0]["arms"][BASE]["elapsed_seconds"] = None
+    _, summary = MODULE.assemble(*args)
+    resources = summary["same_complete_case_online_resources"]["arms"]
+    assert resources[S2G]["usage_missing_n"] == 1
+    assert resources[S2G]["usage"] is None
+    assert resources[BASE]["elapsed_seconds"]["known_subtotal"] == 1
+    assert resources[BASE]["elapsed_seconds"]["mean"] is None
+    assert resources[BASE]["elapsed_seconds"]["total"] is None
 
 
 def test_failure_cost_unknown_does_not_become_zero_or_disappear():

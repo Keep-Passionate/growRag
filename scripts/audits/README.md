@@ -1,5 +1,17 @@
 # Shared500 离线审计工具
 
+## ReFormeR续轮（2026-09-27）
+
+`analyze_reformer_pilot.py`读取已封口的ReFormeR固定100题迁移记录和旧500题BASE/S2G缓存，核对每次调用归属，并用相同完整题交集比较质量、费用和oracle额外机会。不是原ReFormeR论文TREC复现；未执行/失败不补0，旧缓存不重复计费。
+
+```powershell
+.venv/Scripts/python.exe -X utf8 scripts/audits/analyze_reformer_pilot.py --output runs/reformer_new_offline_review
+```
+
+已生成当前阅读入口`runs/2026-09-27_reformer_analysis_v2/README.md`与`QUESTIONS.md`。v2将“模式对象不匹配”与“规则改变”区分，增加BASE/S2G原有oracle和同分母费用，原v1仍保留。脚本只分析、不调用模型、不修改预测；输出目录必须未存在。
+
+## 原500题工具
+
 这些脚本只读已有实验记录；不调用模型 API、不读取 API 密钥、不训练或更新记忆、不修改原始 run。它们针对固定的 `500_v1` train-development 实验及其 manifest SHA，不是通用 benchmark 工具，也不把开发集结果称为官方测试复现。
 
 在项目根目录运行，先安装本项目及测试依赖。命令中的输出目录必须是新目录，不能覆盖旧结果。

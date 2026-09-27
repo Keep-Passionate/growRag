@@ -174,8 +174,18 @@ def summarize(reports, calls, *, run_id, planned, stop_reason, started):
 
 
 def execute_batch(
-    questions, runtime, client, reformer, reader, manifest_path, manifest_sha, output, progress,
-    *, run_id, start,
+    questions,
+    runtime,
+    client,
+    reformer,
+    reader,
+    manifest_path,
+    manifest_sha,
+    output,
+    progress,
+    *,
+    run_id,
+    start,
 ):
     """Freeze all batch predictions before any gold is loaded, then score offline."""
     from .shared_s2g_corpus import load_gold_after_execution, score_result
@@ -188,7 +198,13 @@ def execute_batch(
             started += 1
             directory = output / "questions" / f"{offset:04d}"
             outcome = execute_question(
-                question, runtime.index, client, reformer, reader, directory, progress,
+                question,
+                runtime.index,
+                client,
+                reformer,
+                reader,
+                directory,
+                progress,
                 run_id=run_id,
             )
             report = {
@@ -200,30 +216,41 @@ def execute_batch(
             }
             reports.append(report)
             write_json(directory / "prediction_report.json", report)
-            progress({
-                "kind": "question_complete", "question_id": question.question_id,
-                "status": outcome["status"], "requests": client.attempts,
-            })
+            progress(
+                {
+                    "kind": "question_complete",
+                    "question_id": question.question_id,
+                    "status": outcome["status"],
+                    "requests": client.attempts,
+                }
+            )
         # A batch-level runtime seal makes the prediction/feedback boundary visible.
-        write_json(output / "predictions_frozen.json", {
-            "run_id": run_id,
-            "completed_question_ids": [
-                r["question_id"] for r in reports if r["outcome"]["status"] == "completed"
-            ],
-            "reports_sha256_before_scoring": fingerprint(reports),
-            "created_utc": datetime.now(UTC).isoformat(),
-        })
+        write_json(
+            output / "predictions_frozen.json",
+            {
+                "run_id": run_id,
+                "completed_question_ids": [
+                    r["question_id"] for r in reports if r["outcome"]["status"] == "completed"
+                ],
+                "reports_sha256_before_scoring": fingerprint(reports),
+                "created_utc": datetime.now(UTC).isoformat(),
+            },
+        )
         for report in reports:
             if report["outcome"]["status"] != "completed":
                 write_json(output / "questions" / f"{report['offset']:04d}" / "report.json", report)
                 continue
             try:
                 gold = load_gold_after_execution(
-                    manifest_path, completed_question_ids=[report["question_id"]],
+                    manifest_path,
+                    completed_question_ids=[report["question_id"]],
                     expected_manifest_sha256=manifest_sha,
                 )[report["question_id"]]
                 feedback = score_result(
-                    report["outcome"]["result"], gold, runtime.index, retained_mode="raw",
+                    report["outcome"]["result"],
+                    gold,
+                    runtime.index,
+                    retained_mode="raw",
                 )
                 initial = score_result(
                     {
@@ -232,13 +259,18 @@ def execute_batch(
                             "initial_selector_documents"
                         ],
                     },
-                    gold, runtime.index, retained_mode="raw",
+                    gold,
+                    runtime.index,
+                    retained_mode="raw",
                 )
                 # These three documents informed selection but not the answer.
                 # Do not report answer accuracy as if it came from this context.
                 report["outcome"]["initial_feedback"] = {
-                    key: initial.get(key) for key in (
-                        "raw_support_recall", "raw_support_hits", "gold_support_count",
+                    key: initial.get(key)
+                    for key in (
+                        "raw_support_recall",
+                        "raw_support_hits",
+                        "gold_support_count",
                         "coverage_notice",
                     )
                 }
@@ -261,8 +293,12 @@ def execute_batch(
     finally:
         write_json(output / "reports.json", reports)
         summary = summarize(
-            reports, client.calls, run_id=run_id, planned=len(questions),
-            stop_reason=client.block_reason, started=started,
+            reports,
+            client.calls,
+            run_id=run_id,
+            planned=len(questions),
+            stop_reason=client.block_reason,
+            started=started,
         )
         write_json(output / "summary.json", summary)
     return summary
@@ -293,25 +329,43 @@ def main(argv=None):
     snapshot, git = source_snapshot(project), _git_state()
     probe = ReFormeRAPI(args.reformer_snapshot, args.reader_snapshot, None, None)
     plan = {
-        "run_id": run_id, "protocol": PROTOCOL, "arm": ARM,
-        "created_utc": datetime.now(UTC).isoformat(), "git": git,
+        "run_id": run_id,
+        "protocol": PROTOCOL,
+        "arm": ARM,
+        "created_utc": datetime.now(UTC).isoformat(),
+        "git": git,
         "manifest_path": str(args.manifest.resolve()),
         "manifest_sha256": args.expected_manifest_sha256,
-        "question_ids": ids, "start": args.start, "count": args.count,
+        "question_ids": ids,
+        "start": args.start,
+        "count": args.count,
         "cohort_policy": "first100_frozen_shared500_ids_not_selected_by_outcomes",
-        "model": PILOT_MODEL, "generation_profile": GENERATION_PROFILE,
-        "selector_and_rewrite_output_tokens": 512, "answer_output_tokens": 1024,
-        "temperature": 0, "top_p": 1, "enable_thinking": False,
-        "initial_top_docs": 3, "answer_top_docs": 6, "retrieval_rounds": 2,
-        "author": probe.provenance, "source_sha256": snapshot["sha256"],
+        "model": PILOT_MODEL,
+        "generation_profile": GENERATION_PROFILE,
+        "selector_and_rewrite_output_tokens": 512,
+        "answer_output_tokens": 1024,
+        "temperature": 0,
+        "top_p": 1,
+        "enable_thinking": False,
+        "initial_top_docs": 3,
+        "answer_top_docs": 6,
+        "retrieval_rounds": 2,
+        "author": probe.provenance,
+        "source_sha256": snapshot["sha256"],
         "index_path": str(args.index_path.resolve()),
-        "subcap_cny": subcap, "project_cap_cny": 50, "max_calls": 3 * args.count,
-        "series_cap_cny": SERIES_CAP_CNY, "series_prior_reserved_cny": series_prior,
-        "timeout_seconds": 1800, "historical_budget": history,
+        "subcap_cny": subcap,
+        "project_cap_cny": 50,
+        "max_calls": 3 * args.count,
+        "series_cap_cny": SERIES_CAP_CNY,
+        "series_prior_reserved_cny": series_prior,
+        "timeout_seconds": 1800,
+        "historical_budget": history,
         "price_checked_date": "2026-09-27",
         "price_source": "https://help.aliyun.com/zh/model-studio/qwen3-7-flash",
-        "price_input_cny_per_million": 0.2, "price_output_cny_per_million": 0.8,
-        "no_training_no_memory_updates": True, "official_dev_test_used": False,
+        "price_input_cny_per_million": 0.2,
+        "price_output_cny_per_million": 0.8,
+        "no_training_no_memory_updates": True,
+        "official_dev_test_used": False,
         "baseline_results_access": "separate offline analysis after prediction; never runtime",
         "failure_policy": "First API/protocol failure stops predictions; no retries. "
         "Unused claimed IDs require a separate continuation audit.",
@@ -321,17 +375,21 @@ def main(argv=None):
         "BASE1/ReFormeR2/S2G4 have unequal budgets; not a causal memory ablation.",
     }
     if not args.allow_network:
-        print(json.dumps(
-            {key: value for key, value in plan.items() if key != "historical_budget"},
-            ensure_ascii=False, indent=2,
-        ))
+        print(
+            json.dumps(
+                {key: value for key, value in plan.items() if key != "historical_budget"},
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
         return 0
     if not args.api_config or not git["commit"] or git["worktree_dirty"]:
         raise ValueError("live launch needs config path and a clean committed checkout")
     from .shared_s2g_corpus import load_runtime
 
     runtime = load_runtime(
-        args.manifest, index_path=args.index_path,
+        args.manifest,
+        index_path=args.index_path,
         expected_manifest_sha256=args.expected_manifest_sha256,
     )
     previous, client, failed = os.environ.get(KEY_VARIABLE), None, False
@@ -349,34 +407,65 @@ def main(argv=None):
         # Exclusive create protects a duplicated launch of this exact batch.
         runs.mkdir(parents=True, exist_ok=True)
         with (runs / f"{run_id}.claim.json").open("x", encoding="utf-8") as handle:
-            json.dump({
-                "protocol": PROTOCOL, "manifest_sha256": args.expected_manifest_sha256,
-                "question_ids": ids, "plan_sha256": fingerprint(plan), "no_retry": True,
-            }, handle, ensure_ascii=False, indent=2)
+            json.dump(
+                {
+                    "protocol": PROTOCOL,
+                    "manifest_sha256": args.expected_manifest_sha256,
+                    "question_ids": ids,
+                    "plan_sha256": fingerprint(plan),
+                    "no_retry": True,
+                },
+                handle,
+                ensure_ascii=False,
+                indent=2,
+            )
         output.mkdir(parents=True, exist_ok=False)
         write_json(output / "launch_plan.json", plan)
         write_json(output / "source_snapshot.json", snapshot)
-        write_json(output / "process.json", {
-            "pid": os.getpid(), "argv": sys.argv, "started_utc": datetime.now(UTC).isoformat(),
-        })
+        write_json(
+            output / "process.json",
+            {
+                "pid": os.getpid(),
+                "argv": sys.argv,
+                "started_utc": datetime.now(UTC).isoformat(),
+            },
+        )
         progress = ProgressLog(output)
         progress({"kind": "launch", "pid": os.getpid(), "model": PILOT_MODEL})
         os.environ[KEY_VARIABLE] = settings.api_key
         client = SharedBudgetClient(
-            LiveChatClient(ChatConfig(
-                settings.base_url, PILOT_MODEL, KEY_VARIABLE,
-                max_calls=3 * args.count, max_output_tokens=512,
-                output_limit_parameter="max_tokens", enable_thinking=False,
-                temperature=0, top_p=1, allow_s2g_answer_prefix_on_length=True,
-            ), output / "api_audit", allow_network=True),
+            LiveChatClient(
+                ChatConfig(
+                    settings.base_url,
+                    PILOT_MODEL,
+                    KEY_VARIABLE,
+                    max_calls=3 * args.count,
+                    max_output_tokens=512,
+                    output_limit_parameter="max_tokens",
+                    enable_thinking=False,
+                    temperature=0,
+                    top_p=1,
+                    allow_s2g_answer_prefix_on_length=True,
+                ),
+                output / "api_audit",
+                allow_network=True,
+            ),
             PriceLimits(budget_cny=subcap, max_elapsed_seconds=1800, max_prompt_bytes=30000),
             output / "request_journal",
         )
         client.schema_stages, client.qwen_output_caps = True, True
         execute_batch(
-            questions, runtime, client, args.reformer_snapshot, args.reader_snapshot,
-            args.manifest, args.expected_manifest_sha256, output, progress,
-            run_id=run_id, start=args.start,
+            questions,
+            runtime,
+            client,
+            args.reformer_snapshot,
+            args.reader_snapshot,
+            args.manifest,
+            args.expected_manifest_sha256,
+            output,
+            progress,
+            run_id=run_id,
+            start=args.start,
         )
         return int(bool(client.block_reason))
     except Exception as error:
@@ -393,17 +482,23 @@ def main(argv=None):
         runtime.index.close()
         if client is not None:
             write_json(output / "final_budget.json", client.report())
-            write_json(output / "cumulative_budget.json", {
-                "prior_reserved_cny": history["prior_reserved_cny"],
-                "new_reserved_cny": client.reserved_cny,
-                "cumulative_reserved_cny": history["prior_reserved_cny"] + client.reserved_cny,
-                "prior_unknown_cost_requests": history["prior_unknown_cost_requests"],
-                "project_cap_cny": 50,
-            })
-            progress({
-                "kind": "exit", "requests": client.attempts,
-                "status": "failed" if failed or client.block_reason else "completed",
-            })
+            write_json(
+                output / "cumulative_budget.json",
+                {
+                    "prior_reserved_cny": history["prior_reserved_cny"],
+                    "new_reserved_cny": client.reserved_cny,
+                    "cumulative_reserved_cny": history["prior_reserved_cny"] + client.reserved_cny,
+                    "prior_unknown_cost_requests": history["prior_unknown_cost_requests"],
+                    "project_cap_cny": 50,
+                },
+            )
+            progress(
+                {
+                    "kind": "exit",
+                    "requests": client.attempts,
+                    "status": "failed" if failed or client.block_reason else "completed",
+                }
+            )
         if previous is None:
             os.environ.pop(KEY_VARIABLE, None)
         else:
