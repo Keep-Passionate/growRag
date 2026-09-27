@@ -6,6 +6,7 @@ free of feedback until global collection completes, then train labels scan once.
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import math
@@ -45,6 +46,69 @@ PLAN_SHA = "e3f3d1e22ebd1f7289d7ae5c336ee1e1894adb67573038b487867a06e3ee3362"
 MAX_BATCH = 16
 SERIES_CAP_CNY = 3.0
 SOURCE_COUNT = 64
+CORE_PATH = "src/growrag/experiments/source_collection_core.py"
+RUNNER_PATH = "src/growrag/experiments/run_memory_source.py"
+RUNTIME_FUNCTIONS = (
+    "batch_identity",
+    "source_plan",
+    "load_source_questions",
+    "load_source_runtime",
+    "collect_batch",
+    "recheck_exposure",
+)
+RUNTIME_CONSTANTS = (
+    "PROTOCOL",
+    "PREFIX",
+    "PLAN_SHA",
+    "MAX_BATCH",
+    "SERIES_CAP_CNY",
+    "SOURCE_COUNT",
+)
+
+
+def execution_signature(snapshot):
+    """Separate audit/continuation changes from the unchanged execution method.
+
+    Keep every other src file exact, plus the runtime functions/constants in this
+    module. The full per-run snapshot remains independently verified and saved.
+    Older launches need not have recorded this derived signature explicitly.
+    """
+    files = snapshot["files"]
+    tree = ast.parse(files[CORE_PATH]["text"])
+    selected, imports = {}, []
+    for node in tree.body:
+        names = []
+        if isinstance(node, ast.ImportFrom):
+            imports.append(ast.dump(node, include_attributes=False))
+        elif isinstance(node, ast.Import):
+            aliases = [alias for alias in node.names if alias.name != "ast"]
+            if aliases:
+                imports.append(ast.dump(ast.Import(names=aliases), include_attributes=False))
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            names = [node.name] if node.name in RUNTIME_FUNCTIONS else []
+        elif isinstance(node, ast.Assign):
+            names = [
+                target.id
+                for target in node.targets
+                if isinstance(target, ast.Name) and target.id in RUNTIME_CONSTANTS
+            ]
+        for name in names:
+            if name in selected:
+                raise ValueError("duplicate source runtime definition")
+            selected[name] = ast.dump(node, include_attributes=False)
+    if set(selected) != set(RUNTIME_FUNCTIONS) | set(RUNTIME_CONSTANTS):
+        raise ValueError("source snapshot lacks locked runtime definitions")
+    return fingerprint(
+        {
+            "files": {
+                name: entry["sha256"]
+                for name, entry in files.items()
+                if name not in {CORE_PATH, RUNNER_PATH}
+            },
+            "core_runtime_ast": selected,
+            "core_runtime_imports": imports,
+        }
+    )
 
 
 def batch_identity(start, count):
@@ -203,11 +267,63 @@ def recheck_exposure(runs, plan):
             raise ValueError("source ID has a foreign experimental exposure after splitting")
 
 
+def _verify_continuation_links(batches):
+    """Overlapping claims are allowed only for explicitly proved unstarted IDs."""
+    by_name = {root.name: (root, launch, batch) for root, launch, batch in batches}
+    for _root, launch, _ in batches:
+        prior = [
+            item
+            for item in batches
+            if item[1]["start"] < launch["start"]
+            and set(item[1]["question_ids"]) & set(launch["question_ids"])
+        ]
+        parent = launch.get("continuation_of")
+        proof = launch.get("continuation_proof")
+        if not prior:
+            if parent is not None or proof is not None:
+                raise ValueError("continuation proof has no overlapping parent claim")
+            continue
+        if len(prior) != 1 or parent != prior[0][0].name or not isinstance(proof, dict):
+            raise ValueError("overlapping source claims lack a unique continuation proof")
+        previous_root, previous_launch, previous_rows = by_name[parent]
+        untouched = previous_launch["question_ids"][len(previous_rows) :]
+        required_records = (
+            "launch_plan.json",
+            "predictions.json",
+            "predictions_frozen.json",
+            "final_budget.json",
+            "events.jsonl",
+        )
+        if (
+            proof.get("schema_version") != "growrag-memory-source-unstarted-continuation-v1"
+            or proof.get("prior_run_id") != parent
+            or proof.get("parent_run_id") != parent
+            or proof.get("question_ids") != launch["question_ids"]
+            or proof.get("continued_question_ids") != launch["question_ids"]
+            or proof.get("released_question_ids") != untouched
+            or not set(launch["question_ids"]).issubset(untouched)
+            or any(
+                proof.get("prior_record_sha256", {}).get(name) != _sha(previous_root / name)
+                for name in required_records
+            )
+        ):
+            raise ValueError("continuation proof differs from frozen unstarted parent prefix")
+
+
 def verify_collection(runs, plan, questions=None):
-    """All 64 must finish before labels are opened; failures need separate decisions."""
-    reports, hashes, configurations, all_calls = [], {}, set(), set()
+    """Seal every source status before labels; failed attempts remain unscored.
+
+    Recovery admits a closed failed prefix and explicit continuation of only its
+    unstarted suffix. It never retries, silently drops, or assigns EM=0 to failure.
+    """
+    reports, hashes, configurations, all_calls, batches = [], {}, set(), set(), []
     question_map = {q.question_id: q.text for q in questions} if questions is not None else {}
     recheck_exposure(runs, plan)
+    for claim_path in Path(runs).glob(f"{PREFIX}*.claim.json"):
+        if not (
+            Path(runs) / claim_path.name.removesuffix(".claim.json") / "launch_plan.json"
+        ).is_file():
+            raise ValueError("orphan source claim requires reconciliation")
     for root in sorted(Path(runs).glob(f"{PREFIX}*")):
         if not root.is_dir():
             continue
@@ -252,22 +368,27 @@ def verify_collection(runs, plan, questions=None):
             )
         ):
             raise ValueError("source snapshot changed")
+        signature = execution_signature(snapshot)
+        if launch.get("execution_signature", signature) != signature:
+            raise ValueError("declared execution signature differs from snapshot")
         configurations.add(
             fingerprint(
                 {
-                    k: launch.get(k)
-                    for k in (
-                        "source_sha256",
-                        "model",
-                        "generation_profile",
-                        "backend_output_caps",
-                        "author",
-                        "index_path",
-                        "runtime_metadata",
-                        "temperature",
-                        "top_p",
-                        "enable_thinking",
-                    )
+                    "execution_signature": signature,
+                    **{
+                        k: launch.get(k)
+                        for k in (
+                            "model",
+                            "generation_profile",
+                            "backend_output_caps",
+                            "author",
+                            "index_path",
+                            "runtime_metadata",
+                            "temperature",
+                            "top_p",
+                            "enable_thinking",
+                        )
+                    },
                 }
             )
         )
@@ -278,47 +399,89 @@ def verify_collection(runs, plan, questions=None):
             for line in (root / "events.jsonl").read_bytes().splitlines()
             if line.strip()
         ]
-        if (
-            not events
-            or events[-1].get("kind") != "exit"
-            or events[-1].get("status") != "completed"
-        ):
-            raise ValueError("source run did not exit successfully")
         ledger = json.loads((root / "final_budget.json").read_bytes())
         batch = json.loads((root / "predictions.json").read_bytes())
         seal = json.loads((root / "predictions_frozen.json").read_bytes())
+        actual_ids = [r["question_id"] for r in batch]
         if (
-            fingerprint(batch) != seal["reports_sha256_before_scoring"]
+            not batch
+            or len(batch) > count
+            or fingerprint(batch) != seal["reports_sha256_before_scoring"]
             or seal.get("run_id") != root.name
-            or seal.get("question_ids") != launch["question_ids"]
-            or [r["question_id"] for r in batch] != launch["question_ids"]
-            or [r["offset"] for r in batch] != list(range(start, start + count))
+            or seal.get("question_ids") != actual_ids
+            or actual_ids != launch["question_ids"][: len(batch)]
+            or [r["offset"] for r in batch] != list(range(start, start + len(batch)))
         ):
             raise ValueError("collection prediction seal mismatch")
-        owned = []
+        if {p.name for p in (root / "questions").iterdir()} != {
+            f"{row['offset']:04d}" for row in batch
+        }:
+            raise ValueError("unowned source question artifacts could hide a started question")
+        failed_rows = [r for r in batch if not r["complete_pair"]]
+        expected_exit = "failed" if failed_rows else "completed"
+        if (
+            not events
+            or events[-1].get("kind") != "exit"
+            or events[-1].get("status") != expected_exit
+            or len(failed_rows) > 1
+            or (failed_rows and failed_rows[0] is not batch[-1])
+            or (failed_rows and ledger.get("block_reason") != "transport_failure")
+            or (not failed_rows and (len(batch) != count or ledger.get("block_reason")))
+        ):
+            raise ValueError("source run has an unreviewed termination or incomplete prefix")
+        owned, owned_audits = [], set()
         for row in batch:
             if (
-                not row["complete_pair"]
-                or any(row["arms"][a]["status"] != "completed" for a in ARMS)
+                type(row["complete_pair"]) is not bool
+                or row["complete_pair"]
+                != all(row["arms"][a]["status"] == "completed" for a in ARMS)
                 or any(row["arms"][a].get("feedback") is not None for a in ARMS)
                 or "offline_gold_answers" in row
             ):
-                raise ValueError("source collection is incomplete or already labelled")
+                raise ValueError("source completion status inconsistent or already labelled")
             path = root / "questions" / f"{row['offset']:04d}" / "prediction_report.json"
             if json.loads(path.read_bytes()) != row:
                 raise ValueError("per-question prediction mismatch")
             if question_map and row["question"] != question_map[row["question_id"]]:
                 raise ValueError("prediction question differs from frozen source text")
+            arm_failed = False
             for arm in ARMS:
                 outcome = row["arms"][arm]
-                if json.loads((path.parent / f"{arm}_execution.json").read_bytes()) != outcome:
+                status = outcome.get("status")
+                execution_path = path.parent / f"{arm}_execution.json"
+                if status == "not_executed":
+                    if (
+                        not arm_failed
+                        or outcome.get("calls") != []
+                        or outcome.get("result") is not None
+                    ):
+                        raise ValueError("unexecuted arm must follow a failed arm and own no calls")
+                    if (
+                        execution_path.exists()
+                        and json.loads(execution_path.read_bytes()) != outcome
+                    ):
+                        raise ValueError("unexecuted arm differs from prediction")
+                    continue
+                if status not in {"completed", "failed"} or arm_failed:
+                    raise ValueError("source arm continued after failure or has unknown status")
+                if json.loads(execution_path.read_bytes()) != outcome:
                     raise ValueError("arm execution differs from frozen prediction")
-                if outcome["result"].get("question_id") != row["question_id"]:
+                if (
+                    status == "completed"
+                    and outcome["result"].get("question_id") != row["question_id"]
+                ):
                     raise ValueError("arm answer has wrong source identity")
+                if status == "failed":
+                    arm_failed = True
+                    if (
+                        outcome.get("result") is not None
+                        or outcome.get("error_type") != "APIRequestError"
+                    ):
+                        raise ValueError("only audited length-failed attempts are reviewed")
                 calls = outcome["calls"]
                 if not calls or (arm == ARMS[0] and len(calls) != 1) or len(calls) > 10:
                     raise ValueError("source arm call count mismatch")
-                for call in calls:
+                for call_index, call in enumerate(calls):
                     trace = call["trace_id"]
                     stages = {value: name for name, value in PROMPT_VERSIONS.items()}
                     stage = stages.get(call.get("prompt_version"))
@@ -347,9 +510,20 @@ def verify_collection(runs, plan, questions=None):
                     if not audit_path.is_relative_to((root / "api_audit").resolve()):
                         raise ValueError("API audit escaped source run")
                     audit = json.loads(audit_path.read_bytes())
+                    owned_audits.add(audit_path)
                     request = audit.get("request", {})
+                    failed_call = status == "failed" and call_index == len(calls) - 1
+                    expected_status = "failed" if failed_call else "completed"
+                    if failed_call and (
+                        audit.get("error_type") != "APIRequestError"
+                        or audit.get("response", {}).get("choices", [{}])[0].get("finish_reason")
+                        != "length"
+                        or call.get("output_tokens") != SHARED_OUTPUT_CAPS[stage]
+                    ):
+                        raise ValueError("failed source call is not the reviewed length failure")
                     if (
-                        audit.get("status") != "completed"
+                        audit.get("status") != expected_status
+                        or call.get("status", "completed") != expected_status
                         or audit.get("http_status") != 200
                         or audit.get("retry_count") != 0
                         or audit.get("request", {}).get("model") != PILOT_MODEL
@@ -377,23 +551,27 @@ def verify_collection(runs, plan, questions=None):
             hashes[str(path.resolve())] = _sha(path)
         if owned != ledger["calls"] or len(owned) != ledger["api_requests"]:
             raise ValueError("source ledger not uniquely owned by predictions")
+        if owned_audits != {p.resolve() for p in (root / "api_audit").glob("*.json")}:
+            raise ValueError("unowned source API audit could hide a started question")
         if not math.isclose(
             sum(c["reserved_cny"] for c in owned), ledger["reserved_cny"], abs_tol=1e-12
         ):
             raise ValueError("source reservation sum mismatch")
         reports.extend(batch)
+        batches.append((root, launch, batch))
     reports.sort(key=lambda r: r["offset"])
     if [r["offset"] for r in reports] != list(range(SOURCE_COUNT)) or [
         r["question_id"] for r in reports
     ] != plan["roles"]["source"]:
         raise ValueError("complete source64 collection required before any gold")
     if len(configurations) != 1:
-        raise ValueError("source batches changed model, corpus, prompt or source code")
+        raise ValueError("source batches changed model, corpus, prompt or execution code")
+    _verify_continuation_links(batches)
     return reports, hashes
 
 
 def project_source_gold(raw_path, questions):
-    """AFTER global seal only: project labels for the explicit source64 allowlist."""
+    """AFTER global status seal only: project labels for completed source IDs."""
     if _sha(raw_path) != SOURCE_SHA:
         raise ValueError("raw official train mirror changed")
     by_id = {q.question_id: q for q in questions}
@@ -433,6 +611,8 @@ def score_collection(runs, source_manifest, runtime, raw_path, output):
     reports, hashes = verify_collection(runs, plan, runtime.questions)
     if [q.question_id for q in runtime.questions] != plan["roles"]["source"]:
         raise ValueError("offline source runtime mismatch")
+    completed_ids = [row["question_id"] for row in reports if row["complete_pair"]]
+    failed_ids = [row["question_id"] for row in reports if not row["complete_pair"]]
     output.mkdir(parents=True, exist_ok=False)
     write_json(
         output / "collection_frozen.json",
@@ -440,13 +620,20 @@ def score_collection(runs, source_manifest, runtime, raw_path, output):
             "protocol": PROTOCOL,
             "source_plan_sha256": PLAN_SHA,
             "question_ids": plan["roles"]["source"],
+            "completed_question_ids": completed_ids,
+            "failed_question_ids": failed_ids,
+            "scoring_policy": "completed-pairs-only-after-all-source-statuses-frozen-v2",
             "prediction_artifact_sha256": hashes,
             "created_utc": datetime.now(UTC).isoformat(),
             "gold_not_loaded_yet": True,
         },
     )
-    gold = project_source_gold(raw_path, runtime.questions)
+    selected_questions = tuple(q for q in runtime.questions if q.question_id in completed_ids)
+    gold = project_source_gold(raw_path, selected_questions)
     for row in reports:
+        if not row["complete_pair"]:
+            row["scoring_status"] = "not_scored_incomplete_pair"
+            continue
         scores = {
             a: score_result(
                 row["arms"][a]["result"],

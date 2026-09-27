@@ -10,6 +10,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -30,6 +31,7 @@ from .run_shared_s2g import (
     reviewed_history,
 )
 from .s2g_author_api import S2GAuthorAPI
+from .shared_continuation import _event_mentions, _read, _request_evidence, _safe_file
 from .source_collection_core import (
     PLAN_SHA,
     PREFIX,
@@ -37,6 +39,7 @@ from .source_collection_core import (
     SERIES_CAP_CNY,
     batch_identity,
     collect_batch,
+    execution_signature,
     load_source_questions,
     load_source_runtime,
     recheck_exposure,
@@ -46,7 +49,159 @@ from .source_collection_core import (
 KEY_VARIABLE = "GROWRAG_MEMORY_SOURCE_API_KEY"
 
 
-def check_no_replay(runs, ids):
+def prove_unstarted_continuation(runs, parent_run_id, question_ids):
+    """Transfer only untouched claims; a failed question is permanently ineligible.
+
+    Reuse the existing request-journal audit, adapting only the source runner's
+    predictions.json/seal layout. No old record or request is rewritten/replayed.
+    """
+    if not isinstance(parent_run_id, str) or not re.fullmatch(
+        re.escape(PREFIX) + r"[0-9]{4}_[0-9]{4}", parent_run_id
+    ):
+        raise ValueError("exact safe source parent run name required")
+    root = Path(runs).resolve(strict=True)
+    directory = (root / parent_run_id).resolve(strict=True)
+    if directory.parent != root or not directory.is_dir():
+        raise ValueError("source parent escapes runs root")
+    wanted = tuple(question_ids)
+    if not wanted or len(wanted) != len(set(wanted)):
+        raise ValueError("explicit unique untouched source IDs required")
+    files = {}
+    for name in (
+        "launch_plan.json",
+        "predictions.json",
+        "predictions_frozen.json",
+        "final_budget.json",
+    ):
+        files[name] = _read(_safe_file(directory, name))
+    launch, reports, seal, budget = (
+        files[n][0]
+        for n in (
+            "launch_plan.json",
+            "predictions.json",
+            "predictions_frozen.json",
+            "final_budget.json",
+        )
+    )
+    expected = {
+        "run_id": parent_run_id,
+        "protocol": PROTOCOL,
+        "manifest_sha256": PLAN_SHA,
+        "model": PILOT_MODEL,
+        "generation_profile": GENERATION_PROFILE,
+        "backend_output_caps": SHARED_OUTPUT_CAPS,
+    }
+    if any(launch.get(k) != value for k, value in expected.items()) or launch.get(
+        "continuation_of"
+    ):
+        raise ValueError("parent source protocol changed or continuation ancestry needs audit")
+    old_ids = launch.get("question_ids")
+    if (
+        not isinstance(old_ids, list)
+        or not old_ids
+        or len(old_ids) != len(set(old_ids))
+        or not set(wanted) <= set(old_ids)
+        or parent_run_id != batch_identity(launch["start"], launch["count"])
+        or launch["count"] != len(old_ids)
+    ):
+        raise ValueError("continuation IDs must be within the old frozen claim")
+    claim, claim_sha = _read(_safe_file(root, f"{parent_run_id}.claim.json"))
+    if (
+        claim.get("protocol") != PROTOCOL
+        or claim.get("manifest_sha256") != PLAN_SHA
+        or claim.get("question_ids") != old_ids
+        or claim.get("plan_sha256") != fingerprint(launch)
+    ):
+        raise ValueError("parent exclusive claim mismatch")
+    if (
+        not isinstance(reports, list)
+        or not isinstance(budget.get("calls"), list)
+        or seal.get("run_id") != parent_run_id
+        or seal.get("question_ids") != [r["question_id"] for r in reports]
+        or seal.get("reports_sha256_before_scoring") != fingerprint(reports)
+    ):
+        raise ValueError("parent prediction seal mismatch")
+    seen, owned, recorded_offsets = set(), [], set()
+    for report in reports:
+        qid, offset = report["question_id"], report["offset"]
+        if (
+            qid in seen
+            or qid in wanted
+            or qid not in old_ids
+            or offset != launch["start"] + old_ids.index(qid)
+            or set(report.get("arms", {})) != {"BASE1_AUTHOR_READER", "S2G_AUTHOR_API4"}
+        ):
+            raise ValueError("continuation target was started or parent report invalid")
+        seen.add(qid)
+        recorded_offsets.add(f"{offset:04d}")
+        question_dir = (directory / "questions" / f"{offset:04d}").resolve(strict=True)
+        if question_dir.parent != directory / "questions":
+            raise ValueError("parent question escaped run")
+        if _read(_safe_file(question_dir, "prediction_report.json"))[0] != report:
+            raise ValueError("parent per-question prediction mismatch")
+        for arm, outcome in report["arms"].items():
+            if outcome.get("feedback") is not None or "offline_gold_answers" in report:
+                raise ValueError("parent was already scored")
+            execution_path = question_dir / f"{arm}_execution.json"
+            if outcome.get("status") == "not_executed":
+                if outcome.get("calls") or execution_path.exists():
+                    raise ValueError("unstarted parent arm has execution artifacts")
+            elif _read(_safe_file(question_dir, execution_path.name))[0] != outcome:
+                raise ValueError("parent arm execution mismatch")
+            owned.extend(outcome.get("calls", []))
+    if {p.name for p in (directory / "questions").iterdir()} != recorded_offsets:
+        raise ValueError("unreported parent question directory needs audit")
+    if owned != budget["calls"] or len({c["trace_id"] for c in owned}) != len(owned):
+        raise ValueError("parent final ledger is not uniquely owned by predictions")
+    for call in owned:
+        parts = call["trace_id"].split("/")
+        if (
+            len(parts) < 4
+            or parts[0] != parent_run_id
+            or parts[1] not in seen
+            or parts[1] in wanted
+        ):
+            raise ValueError("continuation target has a prior request")
+    event_path = _safe_file(directory, "events.jsonl")
+    event_raw = event_path.read_bytes()
+    events = [json.loads(line) for line in event_raw.splitlines() if line.strip()]
+    if (
+        not events
+        or events[-1].get("kind") != "exit"
+        or events[-1].get("status") not in {"completed", "failed"}
+        or any(e.get("kind") == "exit" for e in events[:-1])
+        or any(_event_mentions(e, set(wanted)) for e in events)
+    ):
+        raise ValueError("parent is not closed or target appears in its events")
+    request_proof = _request_evidence(directory, budget, set(wanted), reports, events[-4:])
+    untouched = [qid for qid in old_ids if qid not in seen]
+    for qid in wanted:
+        if qid not in untouched:
+            raise ValueError("failed or completed source cannot be retried")
+    import hashlib
+
+    hashes = {name: value[1] for name, value in files.items()}
+    hashes["events.jsonl"] = hashlib.sha256(event_raw).hexdigest()
+    hashes["parent_claim.json"] = claim_sha
+    return {
+        "schema_version": "growrag-memory-source-unstarted-continuation-v1",
+        "prior_run_id": parent_run_id,
+        "parent_run_id": parent_run_id,
+        "question_ids": list(wanted),
+        "continued_question_ids": list(wanted),
+        "released_question_ids": untouched,
+        "checked_global_offsets": [launch["start"] + old_ids.index(qid) for qid in wanted],
+        "prior_record_sha256": hashes,
+        "validated_prior_runs": [parent_run_id],
+        "prior_request_evidence": request_proof,
+        "prior_terminal_status": events[-1]["status"],
+        "proof_scope": "Closed immutable logs show no execution or request for these IDs; "
+        "not permission to repeat failed/completed questions or change baseline methods.",
+    }
+
+
+def check_no_replay(runs, ids, *, continuation_of=None):
+    proof = prove_unstarted_continuation(runs, continuation_of, ids) if continuation_of else None
     for path in [
         *Path(runs).glob(f"{PREFIX}*/launch_plan.json"),
         *Path(runs).glob(f"{PREFIX}*.claim.json"),
@@ -58,7 +213,15 @@ def check_no_replay(runs, ids):
         if not isinstance(existing, list) or not existing or len(existing) != len(set(existing)):
             raise ValueError("unreadable source claim needs offline audit")
         if set(ids) & set(existing):
+            identity = (
+                path.parent.name
+                if path.name == "launch_plan.json"
+                else path.name.removesuffix(".claim.json")
+            )
+            if proof is not None and identity in proof["validated_prior_runs"]:
+                continue
             raise ValueError("source already claimed; no automatic replay")
+    return proof
 
 
 def series_reserved(runs):
@@ -92,6 +255,7 @@ def main(argv=None):
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--count", type=int, default=8)
     parser.add_argument("--api-config", type=Path)
+    parser.add_argument("--continue-unstarted-from")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--allow-network", action="store_true")
     mode.add_argument("--score-only", action="store_true")
@@ -112,7 +276,11 @@ def main(argv=None):
             print(
                 json.dumps(
                     {
-                        "scored_sources": len(reports),
+                        "source_records": len(reports),
+                        "scored_sources": sum(
+                            all(o.get("feedback") is not None for o in r["arms"].values())
+                            for r in reports
+                        ),
                         "memory_cards_created": 0,
                         "network_used": False,
                     }
@@ -126,7 +294,7 @@ def main(argv=None):
     if output.exists() or (runs / f"{run_id}.claim.json").exists():
         raise FileExistsError("preserve existing source run; no automatic replay")
     ids = [q.question_id for q in questions[args.start : args.start + args.count]]
-    check_no_replay(runs, ids)
+    continuation_proof = check_no_replay(runs, ids, continuation_of=args.continue_unstarted_from)
     history, prior_series = reviewed_history(runs), series_reserved(runs)
     subcap = min(SERIES_CAP_CNY - prior_series, 50.0 - history["prior_reserved_cny"])
     if subcap <= 0:
@@ -142,6 +310,8 @@ def main(argv=None):
     plan = {
         "run_id": run_id,
         "protocol": PROTOCOL,
+        "continuation_of": args.continue_unstarted_from,
+        "continuation_proof": continuation_proof,
         "manifest_sha256": PLAN_SHA,
         "manifest_path": str(args.manifest.resolve()),
         "question_ids": ids,
@@ -150,6 +320,7 @@ def main(argv=None):
         "created_utc": datetime.now(UTC).isoformat(),
         "git": git,
         "source_sha256": snapshot["sha256"],
+        "execution_signature": execution_signature(snapshot),
         "author": author,
         "model": PILOT_MODEL,
         "generation_profile": GENERATION_PROFILE,

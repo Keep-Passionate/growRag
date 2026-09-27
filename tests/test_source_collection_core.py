@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from copy import deepcopy
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -141,28 +142,36 @@ def test_source_batch_bounds(start, count):
         core.batch_identity(start, count)
 
 
-def frozen_collection(tmp_path, monkeypatch):
+def frozen_collection(tmp_path, monkeypatch, *, start=0, count=2, total=None):
     """Entire synthetic two-question collection; no real data or model outputs."""
-    monkeypatch.setattr(core, "SOURCE_COUNT", 2)
-    ids = ["a" * 24, "b" * 24]
+    total = total or count
+    monkeypatch.setattr(core, "SOURCE_COUNT", total)
+    ids = [chr(97 + offset) * 24 for offset in range(total)]
     questions = [synthetic_question(qid) for qid in ids]
+    chosen = questions[start : start + count]
+    chosen_ids = [question.question_id for question in chosen]
     plan = {"roles": {"source": ids}}
-    root = tmp_path / core.batch_identity(0, 2)
+    root = tmp_path / core.batch_identity(start, count)
     root.mkdir()
     snapshot = {
         "files": {
             "src/synthetic.py": {"text": "pass\n", "sha256": hashlib.sha256(b"pass\n").hexdigest()}
         }
     }
+    source_text = Path(core.__file__).read_text(encoding="utf-8")
+    snapshot["files"][core.CORE_PATH] = {
+        "text": source_text,
+        "sha256": hashlib.sha256(source_text.encode()).hexdigest(),
+    }
     snapshot["sha256"] = core.fingerprint(snapshot["files"])
     launch = {
         "protocol": core.PROTOCOL,
         "manifest_sha256": core.PLAN_SHA,
-        "start": 0,
-        "count": 2,
+        "start": start,
+        "count": count,
         "run_id": root.name,
-        "question_ids": ids,
-        "max_calls": 22,
+        "question_ids": chosen_ids,
+        "max_calls": 11 * count,
         "model": core.PILOT_MODEL,
         "git": {"commit": "synthetic", "worktree_dirty": False},
         "generation_profile": core.GENERATION_PROFILE,
@@ -184,7 +193,7 @@ def frozen_collection(tmp_path, monkeypatch):
         {
             "protocol": core.PROTOCOL,
             "manifest_sha256": core.PLAN_SHA,
-            "question_ids": ids,
+            "question_ids": chosen_ids,
             "plan_sha256": core.fingerprint(launch),
         },
     )
@@ -192,7 +201,7 @@ def frozen_collection(tmp_path, monkeypatch):
     (root / "events.jsonl").write_text('{"kind":"exit","status":"completed"}\n')
     (root / "api_audit").mkdir()
     reports, calls = [], []
-    for offset, question in enumerate(questions):
+    for offset, question in enumerate(chosen, start):
         directory = root / "questions" / f"{offset:04d}"
         directory.mkdir(parents=True)
         arms = {}
@@ -208,6 +217,7 @@ def frozen_collection(tmp_path, monkeypatch):
                 "output_tokens": 2,
                 "reserved_cny": 0.01,
                 "estimated_actual_cny": 0.001,
+                "status": "completed",
             }
             calls.append(call)
             dump(
@@ -260,11 +270,18 @@ def frozen_collection(tmp_path, monkeypatch):
         root / "predictions_frozen.json",
         {
             "run_id": root.name,
-            "question_ids": ids,
+            "question_ids": chosen_ids,
             "reports_sha256_before_scoring": core.fingerprint(reports),
         },
     )
-    dump(root / "final_budget.json", {"calls": calls, "api_requests": 4, "reserved_cny": 0.04})
+    dump(
+        root / "final_budget.json",
+        {
+            "calls": calls,
+            "api_requests": 2 * count,
+            "reserved_cny": sum(c["reserved_cny"] for c in calls),
+        },
+    )
     return root, plan, questions
 
 
@@ -370,3 +387,241 @@ def test_global_collection_tampering_blocks_before_gold(tmp_path, monkeypatch, m
             tmp_path / "scored",
         )
     assert not (tmp_path / "scored").exists()
+
+
+def mark_closed_length_failure(root, *, attempted=None, failed_arm=None):
+    """Transform synthetic fixtures only, preserving a terminal failed prefix."""
+    reports = json.loads((root / "predictions.json").read_bytes())
+    attempted = attempted or len(reports)
+    for row in reports[attempted:]:
+        for outcome in row["arms"].values():
+            for call in outcome["calls"]:
+                Path(call["audit_path"]).unlink()
+        directory = root / "questions" / f"{row['offset']:04d}"
+        for path in directory.iterdir():
+            path.unlink()
+        directory.rmdir()
+    reports = reports[:attempted]
+    row, failed_arm = reports[-1], failed_arm or core.ARMS[1]
+    outcome = row["arms"][failed_arm]
+    outcome.pop("result")
+    outcome.update(status="failed", error_type="APIRequestError", events=[])
+    call = outcome["calls"][-1]
+    call.update(
+        status="failed",
+        prompt_version=core.PROMPT_VERSIONS["judge"],
+        output_tokens=core.SHARED_OUTPUT_CAPS["judge"],
+    )
+    audit_path = Path(call["audit_path"])
+    audit = json.loads(audit_path.read_bytes())
+    audit.update(
+        status="failed",
+        error_type="APIRequestError",
+        prompt_version=call["prompt_version"],
+        output_tokens=call["output_tokens"],
+    )
+    audit["request"]["max_tokens"] = core.SHARED_OUTPUT_CAPS["judge"]
+    audit["response"]["choices"] = [{"finish_reason": "length"}]
+    dump(audit_path, audit)
+    if failed_arm == core.ARMS[0]:
+        for unstarted_call in row["arms"][core.ARMS[1]]["calls"]:
+            Path(unstarted_call["audit_path"]).unlink()
+        row["arms"][core.ARMS[1]] = {"status": "not_executed", "feedback": None, "calls": []}
+    row["complete_pair"] = False
+    directory = root / "questions" / f"{row['offset']:04d}"
+    for arm, value in row["arms"].items():
+        dump(directory / f"{arm}_execution.json", value)
+    dump(directory / "prediction_report.json", row)
+    dump(root / "predictions.json", reports)
+    seal = json.loads((root / "predictions_frozen.json").read_bytes())
+    seal.update(
+        question_ids=[row["question_id"] for row in reports],
+        reports_sha256_before_scoring=core.fingerprint(reports),
+    )
+    dump(root / "predictions_frozen.json", seal)
+    calls = [c for row in reports for arm in core.ARMS for c in row["arms"][arm]["calls"]]
+    dump(
+        root / "final_budget.json",
+        {
+            "calls": calls,
+            "api_requests": len(calls),
+            "reserved_cny": sum(c["reserved_cny"] for c in calls),
+            "block_reason": "transport_failure",
+        },
+    )
+    (root / "events.jsonl").write_text('{"kind":"exit","status":"failed"}\n')
+    return reports
+
+
+def save_launch(root, launch):
+    dump(root / "launch_plan.json", launch)
+    claim_path = root.parent / f"{root.name}.claim.json"
+    claim = json.loads(claim_path.read_bytes())
+    claim["plan_sha256"] = core.fingerprint(launch)
+    dump(claim_path, claim)
+
+
+def synthetic_recovery(tmp_path, monkeypatch):
+    parent, plan, questions = frozen_collection(tmp_path, monkeypatch, count=3, total=3)
+    parent_rows = mark_closed_length_failure(parent, attempted=2)
+    child, _, _ = frozen_collection(tmp_path, monkeypatch, start=2, count=1, total=3)
+    launch = json.loads((child / "launch_plan.json").read_bytes())
+    launch["continuation_of"] = parent.name
+    launch["continuation_proof"] = {
+        "schema_version": "growrag-memory-source-unstarted-continuation-v1",
+        "prior_run_id": parent.name,
+        "parent_run_id": parent.name,
+        "question_ids": launch["question_ids"],
+        "continued_question_ids": launch["question_ids"],
+        "released_question_ids": plan["roles"]["source"][len(parent_rows) :],
+        "prior_record_sha256": {
+            name: core._sha(parent / name)
+            for name in (
+                "launch_plan.json",
+                "predictions.json",
+                "predictions_frozen.json",
+                "final_budget.json",
+                "events.jsonl",
+            )
+        },
+    }
+    save_launch(child, launch)
+    return parent, child, plan, questions
+
+
+def test_failed_prefix_explicit_unstarted_continuation_is_not_retry(tmp_path, monkeypatch):
+    _, _, plan, questions = synthetic_recovery(tmp_path, monkeypatch)
+    rows, hashes = core.verify_collection(tmp_path, plan, questions)
+    assert [row["offset"] for row in rows] == [0, 1, 2]
+    assert [row["complete_pair"] for row in rows] == [True, False, True]
+    assert len(hashes) == 3
+    assert sum(len(row["arms"][arm]["calls"]) for row in rows for arm in core.ARMS) == 6
+
+
+@pytest.mark.parametrize(
+    "mutation", ["missing", "parent_hash", "replay_id", "unused_api", "unused_directory"]
+)
+def test_continuation_proof_tampering_rejected(tmp_path, monkeypatch, mutation):
+    parent, child, plan, questions = synthetic_recovery(tmp_path, monkeypatch)
+    launch = json.loads((child / "launch_plan.json").read_bytes())
+    if mutation == "missing":
+        launch.pop("continuation_proof")
+    elif mutation == "parent_hash":
+        launch["continuation_proof"]["prior_record_sha256"]["final_budget.json"] = "wrong"
+    elif mutation == "replay_id":
+        launch["continuation_proof"]["continued_question_ids"] = [questions[1].question_id]
+    elif mutation == "unused_api":
+        dump(parent / "api_audit/unowned.json", {"trace_id": "unowned"})
+    else:
+        (parent / "questions/0002").mkdir()
+    save_launch(child, launch)
+    with pytest.raises(ValueError):
+        core.verify_collection(tmp_path, plan, questions)
+
+
+@pytest.mark.parametrize("mutation", ["audit_only", "runtime", "other_src", "declared_signature"])
+def test_execution_signature_keeps_runtime_but_allows_audit_revision(
+    tmp_path, monkeypatch, mutation
+):
+    _, child, plan, questions = synthetic_recovery(tmp_path, monkeypatch)
+    snapshot = json.loads((child / "source_snapshot.json").read_bytes())
+    original = core.execution_signature(snapshot)
+    name = "src/synthetic.py" if mutation == "other_src" else core.CORE_PATH
+    if mutation == "audit_only":
+        snapshot["files"][name]["text"] += "\ndef offline_audit_addition():\n    pass\n"
+    elif mutation == "runtime":
+        snapshot["files"][name]["text"] = snapshot["files"][name]["text"].replace(
+            "only 1-16 frozen source questions", "changed runtime source questions"
+        )
+    elif mutation == "other_src":
+        snapshot["files"][name]["text"] = "print('changed method')\n"
+    snapshot["files"][name]["sha256"] = hashlib.sha256(
+        snapshot["files"][name]["text"].encode()
+    ).hexdigest()
+    snapshot["sha256"] = core.fingerprint(snapshot["files"])
+    dump(child / "source_snapshot.json", snapshot)
+    launch = json.loads((child / "launch_plan.json").read_bytes())
+    launch["source_sha256"] = snapshot["sha256"]
+    launch["execution_signature"] = (
+        "wrong" if mutation == "declared_signature" else core.execution_signature(snapshot)
+    )
+    save_launch(child, launch)
+    if mutation == "audit_only":
+        assert core.execution_signature(snapshot) == original
+        assert len(core.verify_collection(tmp_path, plan, questions)[0]) == 3
+    else:
+        with pytest.raises(ValueError):
+            core.verify_collection(tmp_path, plan, questions)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["finish", "http", "call_status", "output_cap", "block", "exit"]
+)
+def test_only_closed_audited_length_failure_is_admitted(tmp_path, monkeypatch, mutation):
+    root, plan, questions = frozen_collection(tmp_path, monkeypatch)
+    reports = mark_closed_length_failure(root)
+    call = reports[-1]["arms"][core.ARMS[1]]["calls"][-1]
+    audit_path = Path(call["audit_path"])
+    audit = json.loads(audit_path.read_bytes())
+    if mutation == "finish":
+        audit["response"]["choices"][0]["finish_reason"] = "stop"
+    elif mutation == "http":
+        audit["http_status"] = 500
+    elif mutation == "call_status":
+        audit["status"] = "completed"
+    elif mutation == "output_cap":
+        audit["request"]["max_tokens"] += 1
+    elif mutation == "block":
+        ledger = json.loads((root / "final_budget.json").read_bytes())
+        ledger["block_reason"] = None
+        dump(root / "final_budget.json", ledger)
+    else:
+        (root / "events.jsonl").write_text('{"kind":"exit","status":"completed"}\n')
+    dump(audit_path, audit)
+    with pytest.raises(ValueError):
+        core.verify_collection(tmp_path, plan, questions)
+
+
+def test_not_executed_arm_must_own_no_call(tmp_path, monkeypatch):
+    root, plan, questions = frozen_collection(tmp_path, monkeypatch)
+    rows = mark_closed_length_failure(root, failed_arm=core.ARMS[0])
+    verified, _ = core.verify_collection(tmp_path, plan, questions)
+    assert verified[-1]["arms"][core.ARMS[1]]["calls"] == []
+    rows[-1]["arms"][core.ARMS[1]]["calls"] = [deepcopy(rows[0]["arms"][core.ARMS[1]]["calls"][0])]
+    dump(root / "predictions.json", rows)
+    dump(root / "questions/0001/prediction_report.json", rows[-1])
+    seal = json.loads((root / "predictions_frozen.json").read_bytes())
+    seal["reports_sha256_before_scoring"] = core.fingerprint(rows)
+    dump(root / "predictions_frozen.json", seal)
+    with pytest.raises(ValueError, match="own no calls"):
+        core.verify_collection(tmp_path, plan, questions)
+
+
+def test_score_only_completed_sources_after_all_statuses_sealed(tmp_path, monkeypatch):
+    root, plan, questions = frozen_collection(tmp_path, monkeypatch)
+    mark_closed_length_failure(root)
+    output = tmp_path / "scored"
+    monkeypatch.setattr(core, "source_plan", lambda _: plan)
+
+    def project(_raw, selected):
+        seal = json.loads((output / "collection_frozen.json").read_bytes())
+        assert seal["question_ids"] == plan["roles"]["source"]
+        assert seal["failed_question_ids"] == [questions[1].question_id]
+        assert [q.question_id for q in selected] == [questions[0].question_id]
+        return {questions[0].question_id: SimpleNamespace(answers=("synthetic gold",))}
+
+    monkeypatch.setattr(core, "project_source_gold", project)
+    monkeypatch.setattr(
+        core, "score_result", lambda *args, **kwargs: {"answer_em": 1, "answer_f1": 1}
+    )
+    rows = core.score_collection(
+        tmp_path,
+        Path("manifest"),
+        SimpleNamespace(questions=questions, index=None),
+        Path("raw"),
+        output,
+    )
+    assert rows[0]["scoring_status"] == "completed"
+    assert rows[1]["scoring_status"] == "not_scored_incomplete_pair"
+    assert "offline_gold_answers" not in rows[1]
+    assert all(rows[1]["arms"][arm]["feedback"] is None for arm in core.ARMS)

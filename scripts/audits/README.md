@@ -1,4 +1,4 @@
-# Shared500 离线审计工具
+# GrowRAG 离线审计工具
 
 ## ReFormeR续轮（2026-09-27）
 
@@ -49,3 +49,13 @@
 仓库只包含我们编写的审计逻辑与合成测试；不提交作者源码快照、数据集、API 响应、原始运行记录或凭据。人工整理的结果报告会入库，原始审计留本地。全量 query replay 需要自行准备并核验上述快照和现有只读索引；其余五个工具不执行作者代码。
 
 已生成的逐题成本：`runs/2026-09-27_shared500_cost_export_v1/`。`per_question_costs.jsonl`每行一道题，内含两臂和角色小计；`summary.json`区分全部尝试与492完整配对。查看这些文件不会重新调用API；重复导出必须换新目录。
+
+## 独立来源64题的离线汇总（2026-09-27新增）
+
+`analyze_memory_sources.py`仅读取全局封存后单独产生的来源评分，重新核查原预测与全部调用账本。输出逐题query、回答、EM/F1、原始/保留证据覆盖、轮次和成本；技术失败与标注不可评分分别报告，不把失败填成EM0。
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 scripts/audits/analyze_memory_sources.py --scored-dir runs/2026-09-27_memory_source_scored_v1 --output runs/2026-09-27_memory_source_analysis_v1
+```
+
+候选来源口径A/B/C/D是探索性计数，不会创建经验卡或晋升trusted；A只表示答对，B增加相对BASE的标注证据增量条件，C还要求修复原先错误，D标记答对但标注覆盖不完整（不等于语义不支持）。本工具没有API调用。
