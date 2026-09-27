@@ -30,6 +30,10 @@ SIGNATURE_FIELDS = (
     "top_docs",
     "gap_profile",
     "arms",
+    "author",
+    "answer_length_policy",
+    "price_input_cny_per_million",
+    "price_output_cny_per_million",
 )
 
 

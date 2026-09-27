@@ -93,6 +93,16 @@ def add_batch(
         "top_docs": 6,
         "gap_profile": "paper_k1",
         "arms": list(ARMS),
+        "author": {
+            "upstream_commit": "fixed-author",
+            "source_sha256": {"inference.py": "source-hash"},
+            "author_prompt_sha256": {"judge": "prompt-hash"},
+            "sentence_splitter": "author_regex_fallback",
+            "dedup_key": "document_id",
+        },
+        "answer_length_policy": "complete-answer-before-rationale",
+        "price_input_cny_per_million": 0.2,
+        "price_output_cny_per_million": 0.8,
         "source_sha256": "source",
         "start": start,
         "count": count,
@@ -334,4 +344,39 @@ def test_frozen_continuation_proof_cannot_be_swapped(context):
     launch.update(continuation_of=old.name, continuation_proof={"forged": True})
     dump(path, launch)
     with pytest.raises(ValueError, match="proof changed"):
+        analyze(context)
+
+
+@pytest.mark.parametrize(
+    ("section", "key", "replacement"),
+    [
+        ("author", "sentence_splitter", "pysbd"),
+        ("author", "dedup_key", "title"),
+        ("author", "source_sha256", {"inference.py": "changed"}),
+        ("author", "author_prompt_sha256", {"judge": "changed"}),
+        (None, "answer_length_policy", "reject-every-length-response"),
+        (None, "price_input_cny_per_million", 9.0),
+        (None, "price_output_cny_per_million", 9.0),
+    ],
+)
+def test_series_cannot_mix_author_provenance_or_output_policy(context, section, key, replacement):
+    """Same profile name is insufficient if splitter, source, prompt or pricing changed."""
+    add_batch(context, 0, [(0, 1, "ok")])
+    second = add_batch(context, 1, [(1, 1, "ok")])
+    path = second / "launch_plan.json"
+    launch = json.loads(path.read_text())
+    target = launch if section is None else launch[section]
+    target[key] = replacement
+    dump(path, launch)
+    with pytest.raises(ValueError, match="configuration changed"):
+        analyze(context)
+
+
+def test_series_rejects_missing_author_provenance(context):
+    directory = add_batch(context, 0, [(0, 1, "ok")])
+    path = directory / "launch_plan.json"
+    launch = json.loads(path.read_text())
+    del launch["author"]
+    dump(path, launch)
+    with pytest.raises(ValueError, match="missing run signature"):
         analyze(context)
