@@ -1,5 +1,13 @@
 # 上游代码
 
+## 2026-09-27：ReFormeR参考文件已取得
+
+- 来源：`https://github.com/aminbigdeli/ReFormeR/tree/72e52450a922bc0051b5b39c3a6307186a555137`。
+- 本地：`reformer_author_snapshot/aminbigdeli-ReFormeR-72e5245/`，仅下载core、prompt manager、prompts、patterns与README；不安装上游依赖、不运行main。
+- `src/growrag/experiments/reformer_api.py`保存四个运行文件的SHA，只有匹配后才加载已审阅方法；API替换vLLM，非作者训练selector复现。
+- README有MIT徽章，但缺完整LICENSE、GitHub API licence=null；继续保留在ignored external，不向公开仓库转存源码或示例库。
+- 下载需固定commit，不能换成main后忽略哈希失败。库中的示例不默默修正；方法改进要另立版本与对照。
+
 本目录用于浅克隆 QPP-4-RAG、ReFormeR、QueryGym 等公开上游。目录内容不提交 Git；上游版本应在实验清单中记录 commit hash。
 
 官方地址：

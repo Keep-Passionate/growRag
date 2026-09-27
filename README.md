@@ -40,6 +40,7 @@ GrowRAG 已确认方案 B「可信自适应查询修复」。当前目标是在�
 
 ## 当前入口
 
+- [已选择ReFormeR起步、ExpeL后续：100题冻结开发协议与代码地图](docs/experiments/2026-09-27_ReFormeR起步与ExpeL后续路线.md)
 - [2026-09-27续轮：历史侧基线建议、减轮对照与逐题成本协议](docs/experiments/2026-09-27_历史侧基线与逐题成本协议.md)
 - [2026-09-27：S2G五百题结果、复现边界与研究抉择](knowledge/experiments/2026-09-27_S2G五百题迁移验收与研究抉择.md)
 - [五百题只读审计工具与使用说明](scripts/audits/README.md)

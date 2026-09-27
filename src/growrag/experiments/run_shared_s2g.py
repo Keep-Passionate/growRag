@@ -59,6 +59,10 @@ HISTORICAL_ROOTS = (
         for name in (RUN_ID, JSON_RUN_ID, SCHEMA_RUN_ID, CAPACITY_RUN_ID)
     ),
 )
+# 新的模式库实验仍消费同一项目预算；不是重新获得一个50元额度。
+REVIEWED_OTHER_SERIES = {
+    "2026-09-27_reformer_hotpot_v1_": {"growrag-reformer-public-qwen-v1"},
+}
 
 
 class SharedBudgetClient(AuthorBudgetClient):
@@ -81,20 +85,21 @@ def _sha(path: Path) -> str:
 
 
 def reviewed_history(runs: Path) -> dict:
-    """Only our declared shared protocol roots are added; unknown audits still fail."""
+    """Declared S2G/ReFormeR roots share one budget; unknown audits still fail."""
     extra = list(HISTORICAL_ROOTS)
-    for directory in runs.glob(f"{PREFIX}*/request_journal"):
-        if any(directory.iterdir()) and not (directory.parent / "final_budget.json").exists():
-            raise ValueError("unfinished request journal needs offline budget reconciliation")
-    for ledger_path in sorted(runs.glob(f"{PREFIX}*/final_budget.json")):
-        launch = json.loads((ledger_path.parent / "launch_plan.json").read_bytes())
-        if launch.get("protocol") not in REVIEWED_PROTOCOLS or launch.get("model") != PILOT_MODEL:
-            raise ValueError("unreviewed shared-run protocol/model")
-        ledger = json.loads(ledger_path.read_bytes())
-        if ledger.get("api_requests", 0):
-            extra.append(ledger_path.relative_to(runs).as_posix())
-        elif ledger.get("calls"):
-            raise ValueError("zero-request run has uncertain pending calls")
+    for prefix, protocols in {PREFIX: REVIEWED_PROTOCOLS, **REVIEWED_OTHER_SERIES}.items():
+        for directory in runs.glob(f"{prefix}*/request_journal"):
+            if any(directory.iterdir()) and not (directory.parent / "final_budget.json").exists():
+                raise ValueError("unfinished request journal needs offline budget reconciliation")
+        for ledger_path in sorted(runs.glob(f"{prefix}*/final_budget.json")):
+            launch = json.loads((ledger_path.parent / "launch_plan.json").read_bytes())
+            if launch.get("protocol") not in protocols or launch.get("model") != PILOT_MODEL:
+                raise ValueError("unreviewed shared-run protocol/model")
+            ledger = json.loads(ledger_path.read_bytes())
+            if ledger.get("api_requests", 0):
+                extra.append(ledger_path.relative_to(runs).as_posix())
+            elif ledger.get("calls"):
+                raise ValueError("zero-request run has uncertain pending calls")
     return reconcile_history(runs, reviewed_extra_ledgers=tuple(extra))
 
 
