@@ -181,6 +181,94 @@ def test_unknown_audit_trace_blocks_inheritance(prior):
         verify(prior)
 
 
+def component_failure(prior):
+    directory = prior[1]
+    call = {
+        "trace_id": f"{RUN}/q79/S2G_AUTHOR_API4/01-answer",
+        "status": "completed",
+        "api_requests": 1,
+    }
+    after = {"calls": [call], "block_reason": None, "reserved_cny": 0.1}
+    dump(directory / "request_journal" / "0000_intent.json", {"trace_id": call["trace_id"]})
+    dump(directory / "request_journal" / "0000_after.json", after)
+    dump(directory / "api_audit" / "0000.json", {"trace_id": call["trace_id"]})
+    dump(directory / "final_budget.json", {**after, "block_reason": "author_component_failure"})
+    dump(
+        directory / "reports.json",
+        [
+            {
+                "question_id": "q79",
+                "arms": {
+                    "BASE1_AUTHOR_READER": {"status": "completed", "calls": []},
+                    "S2G_AUTHOR_API4": {
+                        "status": "failed",
+                        "error_type": "ValueError",
+                        "calls": [call],
+                    },
+                },
+            }
+        ],
+    )
+    events = [
+        {"kind": "api_response", "trace_id": call["trace_id"]},
+        {"kind": "arm_failed", "error_type": "ValueError"},
+        {"kind": "question_complete", "question_id": "q79", "status": "failed"},
+        {"kind": "exit", "status": "failed"},
+    ]
+    for event in events:
+        event["arm"] = "S2G_AUTHOR_API4"
+    (directory / "events.jsonl").write_text("\n".join(json.dumps(e) for e in events))
+
+
+def test_proven_post_transport_component_failure_can_close_ledger(prior):
+    component_failure(prior)
+    result = verify(prior)
+    assert result["prior_request_evidence"]["verified_finalization_transition"] == (
+        "None_to_author_component_failure"
+    )
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("reserved_cny", 0.2),
+        ("block_reason", "other_failure"),
+        ("extra", "not allowed"),
+    ],
+)
+def test_component_stop_never_allows_other_ledger_changes(prior, field, value):
+    component_failure(prior)
+    path = prior[1] / "final_budget.json"
+    budget = json.loads(path.read_text())
+    budget[field] = value
+    dump(path, budget)
+    with pytest.raises(ValueError, match="differs from final budget"):
+        verify(prior)
+
+
+@pytest.mark.parametrize(
+    "change", ["wrong_arm", "wrong_question", "missing_failure", "wrong_report"]
+)
+def test_component_stop_requires_matching_event_and_report_proof(prior, change):
+    component_failure(prior)
+    path = prior[1] / "events.jsonl"
+    events = [json.loads(line) for line in path.read_text().splitlines()]
+    if change == "wrong_arm":
+        events[1]["arm"] = "BASE1_AUTHOR_READER"
+    elif change == "wrong_question":
+        events[2]["question_id"] = "q78"
+    elif change == "missing_failure":
+        events.pop(1)
+    else:
+        report_path = prior[1] / "reports.json"
+        reports = json.loads(report_path.read_text())
+        reports[0]["arms"]["S2G_AUTHOR_API4"]["status"] = "completed"
+        dump(report_path, reports)
+    path.write_text("\n".join(json.dumps(e) for e in events))
+    with pytest.raises(ValueError, match="differs from final budget"):
+        verify(prior)
+
+
 @pytest.mark.parametrize(
     "events",
     [

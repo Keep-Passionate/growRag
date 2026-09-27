@@ -52,7 +52,39 @@ def _event_mentions(value, wanted):
     return False
 
 
-def _request_evidence(directory, budget, wanted):
+def _verified_component_failure(after, budget, reports, event_tail):
+    """Only a logged post-transport ValueError may add this one stop reason."""
+    if (
+        "block_reason" not in after
+        or after["block_reason"] is not None
+        or budget.get("block_reason") != "author_component_failure"
+        or after != {**budget, "block_reason": None}
+        or not budget.get("calls")
+        or len(event_tail) != 4
+    ):
+        return False
+    call = budget["calls"][-1]
+    parts = call["trace_id"].split("/")
+    qid, arm = parts[1:3]
+    response, failed, complete, exit_event = event_tail
+    report = next((r for r in reports if r.get("question_id") == qid), {})
+    outcome = report.get("arms", {}).get(arm, {})
+    return (
+        call.get("status") == "completed"
+        and call.get("api_requests") == 1
+        and [e.get("kind") for e in event_tail]
+        == ["api_response", "arm_failed", "question_complete", "exit"]
+        and all(e.get("arm") == arm for e in event_tail)
+        and response.get("trace_id") == call["trace_id"]
+        and failed.get("error_type") == "ValueError"
+        and complete.get("question_id") == qid
+        and complete.get("status") == exit_event.get("status") == "failed"
+        and outcome.get("status") == "failed"
+        and outcome.get("error_type") == failed.get("error_type")
+    )
+
+
+def _request_evidence(directory, budget, wanted, reports, event_tail):
     """核对原始请求意图与结果；未进入最终摘要的请求同样不得重放。"""
     file_hashes, journal, audits = {}, {}, {}
     calls = budget["calls"]
@@ -95,15 +127,23 @@ def _request_evidence(directory, budget, wanted):
             raise ValueError("prior after ledger does not reconcile request prefix")
         if call.get("api_requests", 1) != 0 and call["trace_id"] not in audits:
             raise ValueError("prior network attempt lacks raw API audit")
+    transition = False
     if calls and journal[len(calls) - 1]["after"] != budget:
-        raise ValueError("last prior after record differs from final budget")
+        transition = _verified_component_failure(
+            journal[len(calls) - 1]["after"], budget, reports, event_tail
+        )
+        if not transition:
+            raise ValueError("last prior after record differs from final budget")
     digest = hashlib.sha256(json.dumps(file_hashes, sort_keys=True).encode()).hexdigest()
-    return {
+    result = {
         "file_count": len(file_hashes),
         "intent_after_pairs": len(journal),
         "raw_audit_count": len(audits),
         "files_sha256": digest,
     }
+    if transition:
+        result["verified_finalization_transition"] = "None_to_author_component_failure"
+    return result
 
 
 def verify_unstarted_continuation(
@@ -200,8 +240,8 @@ def verify_unstarted_continuation(
         trace not in canonical or canonical[trace] != call for trace, call in report_calls.items()
     ):
         raise ValueError("prior final ledger does not reconcile all reported attempts")
-    request_evidence = _request_evidence(directory, budget, set(wanted))
     events_sha, last_event = hashlib.sha256(), None
+    event_tail = []
     with paths["events.jsonl"].open("rb") as handle:
         for raw in handle:
             events_sha.update(raw)
@@ -215,12 +255,14 @@ def verify_unstarted_continuation(
             if _event_mentions(event, set(wanted)):
                 raise ValueError("continuation target already appears in prior events")
             last_event = event
+            event_tail = [*event_tail[-3:], event]
     if (
         last_event is None
         or last_event.get("kind") != "exit"
         or last_event.get("status") not in {"completed", "failed"}
     ):
         raise ValueError("prior run is not closed by a terminal exit event")
+    request_evidence = _request_evidence(directory, budget, set(wanted), reports, event_tail)
     checked_offsets = []
     for qid in wanted:
         offset = launch["start"] + old_ids.index(qid)
