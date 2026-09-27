@@ -11,10 +11,13 @@ from types import SimpleNamespace
 
 import pytest
 
+from growrag.experiments import run_s2g_author_pilot as legacy
 from growrag.experiments import run_shared_s2g as runner
 from growrag.experiments import shared_s2g_corpus as corpus
+from growrag.experiments.api_client import ChatConfig, ChatResponse
+from growrag.experiments.budget import PriceLimits, request_input_bytes
 from growrag.experiments.protocol import RuntimeQuestion
-from growrag.experiments.s2g_author_api import AuthorDocument
+from growrag.experiments.s2g_author_api import PROMPT_VERSIONS, AuthorDocument
 
 GOLD_MARKER = "SYNTHETIC-SECRET-GOLD"
 
@@ -396,3 +399,130 @@ def test_summary_preserves_failed_and_unattributed_call_cost():
     assert all(
         a["all_started_cost"]["estimated_actual_cny"] is None for a in summary["arms"].values()
     )
+
+
+def capacity_client(tmp_path, client_type=runner.SharedBudgetClient):
+    config = ChatConfig("https://example.invalid/v1", "fake", "NEVER_READ", 10)
+    delegate = SimpleNamespace(config=config, attempts=0, transport_source="fake_test")
+    observed = []
+
+    def complete(messages, *, trace_id, prompt_version):
+        observed.append((delegate.config, json.loads(json.dumps(messages)), prompt_version))
+        delegate.attempts += 1
+        return ChatResponse(
+            "synthetic", "fake", "fake", None, None, 10, 4, 0, Path("unused"), "fake_test"
+        )
+
+    delegate.complete = complete
+    client = client_type(delegate, PriceLimits(), tmp_path / "journal")
+    client.schema_stages = client.qwen_output_caps = True
+    return client, delegate, config, observed
+
+
+def test_shared_v5_changes_only_answer_capacity_not_legacy_or_author_prompt(tmp_path):
+    client, delegate, config, observed = capacity_client(tmp_path)
+    messages = [
+        {"role": "system", "content": "Frozen synthetic author system prompt."},
+        {"role": "user", "content": "Frozen synthetic author query and evidence."},
+    ]
+    frozen_messages = json.loads(json.dumps(messages))
+    for stage, requested in legacy.AUTHOR_OUTPUT_CAPS.items():
+        client.complete_author(
+            messages,
+            trace_id=f"v5-{stage}",
+            prompt_version=PROMPT_VERSIONS[stage],
+            max_output_tokens=requested,
+            temperature=0,
+            top_p=1,
+        )
+        assert client.config == delegate.config == config
+        assert messages == frozen_messages
+    assert [item[0].max_output_tokens for item in observed] == [768, 128, 1024]
+    assert [item[0].json_schema_mode for item in observed] == [True, True, False]
+    assert not any(item[0].json_object_mode for item in observed)
+    assert all(item[1] == frozen_messages for item in observed)
+    assert [item[2] for item in observed] == list(PROMPT_VERSIONS.values())
+    assert client.generation_profile == "qwen_capacity_v5_judge768_extract128_answer1024"
+    assert legacy.QWEN_OUTPUT_CAPS == {"judge": 768, "extract": 128, "answer": 256}
+    assert legacy.AUTHOR_OUTPUT_CAPS == {"judge": 256, "extract": 64, "answer": 128}
+    assert runner.SHARED_OUTPUT_CAPS is not legacy.QWEN_OUTPUT_CAPS
+    assert client.report()["api_requests"] == 3
+    expected_reserve = sum(
+        (
+            (request_input_bytes(c, messages, prompt_version=version) + 1024) * 0.2
+            + c.max_output_tokens * 0.8
+        )
+        / 1_000_000
+        for c, _, version in observed
+    )
+    assert client.reserved_cny == pytest.approx(expected_reserve)
+
+
+def test_original_v4_client_still_uses_answer_256(tmp_path):
+    client, _, _, observed = capacity_client(tmp_path, legacy.AuthorBudgetClient)
+    client.complete_author(
+        [{"role": "user", "content": "unchanged"}],
+        trace_id="original-v4",
+        prompt_version=PROMPT_VERSIONS["answer"],
+        max_output_tokens=128,
+        temperature=0,
+        top_p=1,
+    )
+    assert observed[0][0].max_output_tokens == 256
+    assert client.generation_profile == "qwen_capacity_v4_judge768_extract128_answer256"
+
+
+@pytest.mark.parametrize(
+    "version,cap",
+    [
+        ("unknown", 128),
+        (PROMPT_VERSIONS["answer"], 1024),
+        (PROMPT_VERSIONS["answer"], 256),
+        (PROMPT_VERSIONS["answer"], True),
+        (PROMPT_VERSIONS["extract"], 128),
+    ],
+)
+def test_v5_rejects_unreviewed_original_stage_caps_before_any_call(tmp_path, version, cap):
+    client, delegate, _, observed = capacity_client(tmp_path)
+    with pytest.raises(ValueError):
+        client.complete_author(
+            [{"role": "user", "content": "no transport"}],
+            trace_id="rejected-cap",
+            prompt_version=version,
+            max_output_tokens=cap,
+            temperature=0,
+            top_p=1,
+        )
+    assert delegate.attempts == 0 and not observed and not client.calls
+
+
+@pytest.mark.parametrize("json_mode,schema_mode", [(True, True), (False, False)])
+def test_v5_cannot_bypass_strict_schema_configuration(tmp_path, json_mode, schema_mode):
+    client, delegate, _, _ = capacity_client(tmp_path)
+    client.json_stages, client.schema_stages = json_mode, schema_mode
+    with pytest.raises(ValueError, match="strict schema"):
+        client.author_output_cap(PROMPT_VERSIONS["answer"], 128)
+    assert delegate.attempts == 0
+
+
+def test_reviewed_v1_failed_capacity_run_remains_in_v2_budget(tmp_path, monkeypatch):
+    assert runner.PROTOCOL == "growrag-s2g-shared-qwen-capacity-v2"
+    directory = put_plan(
+        tmp_path,
+        runner.batch_identity("32_v1", 0, 32),
+        protocol="growrag-s2g-shared-qwen-capacity-v1",
+    )
+    runner.write_json(
+        directory / "final_budget.json",
+        {"api_requests": 1, "calls": [call()], "block_reason": "truncated_response"},
+    )
+    observed = []
+
+    def reconcile(runs, *, reviewed_extra_ledgers):
+        observed.extend(reviewed_extra_ledgers)
+        return {"prior_reserved_cny": 0.01}
+
+    monkeypatch.setattr(runner, "reconcile_history", reconcile)
+    assert runner.reviewed_history(tmp_path)["prior_reserved_cny"] == 0.01
+    assert f"{directory.name}/final_budget.json" in observed
+    assert runner.batch_identity("32_v2", 0, 32) != directory.name

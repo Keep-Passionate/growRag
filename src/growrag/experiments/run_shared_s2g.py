@@ -39,9 +39,12 @@ from .run_s2g_author_pilot import (
     AuthorBudgetClient,
     ProgressLog,
 )
-from .s2g_author_api import S2GAuthorAPI
+from .s2g_author_api import PROMPT_VERSIONS, S2GAuthorAPI
 
-PROTOCOL = "growrag-s2g-shared-qwen-capacity-v1"
+PROTOCOL = "growrag-s2g-shared-qwen-capacity-v2"
+REVIEWED_PROTOCOLS = {PROTOCOL, "growrag-s2g-shared-qwen-capacity-v1"}
+SHARED_OUTPUT_CAPS = {**QWEN_OUTPUT_CAPS, "answer": 1024}
+GENERATION_PROFILE = "qwen_capacity_v5_judge768_extract128_answer1024"
 PREFIX = "2026-09-27_s2g_shared"
 KEY_VARIABLE = "GROWRAG_SHARED_S2G_API_KEY"
 MAX_BATCH = 50
@@ -52,6 +55,20 @@ HISTORICAL_ROOTS = (
         for name in (RUN_ID, JSON_RUN_ID, SCHEMA_RUN_ID, CAPACITY_RUN_ID)
     ),
 )
+
+
+class SharedBudgetClient(AuthorBudgetClient):
+    """Explicit v5 capacity change; original v4 runs and transport are unchanged."""
+
+    @property
+    def generation_profile(self):
+        return GENERATION_PROFILE
+
+    def author_output_cap(self, prompt_version, requested_cap):
+        original = super().author_output_cap(prompt_version, requested_cap)
+        if self.qwen_output_caps and prompt_version == PROMPT_VERSIONS["answer"]:
+            return SHARED_OUTPUT_CAPS["answer"]
+        return original
 
 
 def _sha(path: Path) -> str:
@@ -67,7 +84,7 @@ def reviewed_history(runs: Path) -> dict:
             raise ValueError("unfinished request journal needs offline budget reconciliation")
     for ledger_path in sorted(runs.glob(f"{PREFIX}*/final_budget.json")):
         launch = json.loads((ledger_path.parent / "launch_plan.json").read_bytes())
-        if launch.get("protocol") != PROTOCOL or launch.get("model") != PILOT_MODEL:
+        if launch.get("protocol") not in REVIEWED_PROTOCOLS or launch.get("model") != PILOT_MODEL:
             raise ValueError("unreviewed shared-run protocol/model")
         ledger = json.loads(ledger_path.read_bytes())
         if ledger.get("api_requests", 0):
@@ -351,9 +368,7 @@ def main(argv=None):
         args.upstream, None, lambda q, k: (), gap_profile="paper_k1", remove_repeat_docs=True
     )
     author_provenance = probe.provenance
-    author_provenance["backend_generation_settings"] = (
-        "qwen_capacity_v4_judge768_extract128_answer256"
-    )
+    author_provenance["backend_generation_settings"] = GENERATION_PROFILE
     plan = {
         "run_id": run_id,
         "protocol": PROTOCOL,
@@ -366,8 +381,8 @@ def main(argv=None):
         "start": args.start,
         "count": args.count,
         "model": PILOT_MODEL,
-        "backend_output_caps": QWEN_OUTPUT_CAPS,
-        "generation_profile": "qwen_capacity_v4_judge768_extract128_answer256",
+        "backend_output_caps": SHARED_OUTPUT_CAPS,
+        "generation_profile": GENERATION_PROFILE,
         "max_retrieval_rounds": 4,
         "top_docs": 6,
         "gap_profile": "paper_k1",
@@ -433,7 +448,7 @@ def main(argv=None):
     previous, client, failed = os.environ.get(KEY_VARIABLE), None, False
     os.environ[KEY_VARIABLE] = settings.api_key
     try:
-        client = AuthorBudgetClient(
+        client = SharedBudgetClient(
             LiveChatClient(
                 ChatConfig(
                     settings.base_url,
