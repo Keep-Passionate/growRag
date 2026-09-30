@@ -36,8 +36,10 @@ from .operator_profiles import (
     action_list_execution_configuration,
     action_list_execution_signature,
     get_profile,
+    profile_execution_signature,
     structured_execution_configuration,
     structured_execution_signature,
+    study_profile,
     validate_profile_options,
 )
 from .operator_resume import verify_certificate
@@ -155,14 +157,17 @@ def _evaluation_gate(options, project, *, chosen_ids=None):
         )
     from .operator_evaluation_freeze import validate_evaluation_freeze
 
+    active_profile = study_profile(getattr(options, "profile", LEGACY.name))
+    profile_options = {"profile": active_profile.name} if active_profile != LEGACY else {}
     project = Path(project).resolve(strict=True)
     body = validate_evaluation_freeze(
         project,
         options.evaluation_freeze,
         expected_certificate_sha256=options.expected_freeze_sha256,
+        **profile_options,
     )
     if (
-        body["protocol"] != PROTOCOL
+        body["protocol"] != active_profile.protocol
         or (project / body["paths"]["manifest"]).resolve(strict=True)
         != options.manifest.resolve(strict=True)
         or (project / body["paths"]["banks"]).resolve(strict=True)
@@ -170,7 +175,12 @@ def _evaluation_gate(options, project, *, chosen_ids=None):
         or (project / body["paths"]["runs"]).resolve(strict=True) != project / "runs"
         or body["expected"]["manifest"] != options.expected_manifest_sha256
         or body["expected"]["execution"] != options.expected_execution_sha256
-        or execution_signature(project) != body["execution_signature"]
+        or (
+            execution_signature(project)
+            if active_profile == LEGACY
+            else profile_execution_signature(project, active_profile)
+        )
+        != body["execution_signature"]
         or set(body["controls"]) != set(ARMS)
     ):
         raise ValueError("evaluation request differs from the frozen manifest/banks/method")
@@ -194,6 +204,7 @@ def _evaluation_gate(options, project, *, chosen_ids=None):
             signature=body["execution_signature"],
             evaluation_freeze=options.evaluation_freeze,
             expected_freeze_sha256=options.expected_freeze_sha256,
+            **profile_options,
         )
     return body
 
@@ -261,7 +272,8 @@ def load_inputs(path, phase, *, evaluation_options=None):
     return manifest, tuple(RuntimeQuestion(**row) for row in rows)
 
 
-def load_banks(directory, arms, manifest):
+def load_banks(directory, arms, manifest, *, profile=LEGACY.name):
+    active_profile = get_profile(profile)
     banks = {}
     for arm in arms:
         if not arm.startswith("memory"):
@@ -276,7 +288,7 @@ def load_banks(directory, arms, manifest):
         bank = FrozenOperatorBank.from_json(path.read_text(encoding="utf-8"))
         if set(bank.allowed_source_ids) != set(manifest["nested_source_ids"][size]):
             raise ValueError("bank source scope does not match the expected prefix")
-        if bank.protocol_id != PROTOCOL:
+        if bank.protocol_id != active_profile.protocol:
             raise ValueError("bank must have reviewed protocol")
         banks[arm] = (bank, path, _sha(path))
     return banks
@@ -319,11 +331,16 @@ def check_unstarted(runs, phase, ids, arms, *, resume_certificate=None, profile=
             or not old["arms"]
             or not set(old["arms"]) <= set(ARMS)
             or (
-                registered != LEGACY
+                registered == STRUCTURED
                 and (
                     old["phase"] != "calibration"
                     or not set(old["arms"]) <= {"base", "fresh", "static"}
                 )
+            )
+            or (
+                registered == ACTION_LIST
+                and old["phase"] != "evaluation"
+                and not set(old["arms"]) <= {"base", "fresh", "static"}
             )
         ):
             raise ValueError("old pending claim/launch requires offline audit")
@@ -366,7 +383,9 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log, profi
     }[active_profile]()
     planner_type, reader = ModelOperatorPlanner, answer_episode
     if active_profile != LEGACY:
-        if bank is not None or arm not in {"base", "fresh", "static"}:
+        if active_profile == STRUCTURED and (
+            bank is not None or arm not in {"base", "fresh", "static"}
+        ):
             raise ValueError(f"{active_profile.name} calibration cannot use memory banks")
         from .operator_model_v2 import answer_episode_v2
 
@@ -395,6 +414,8 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log, profi
         if arm.startswith("memory"):
             if bank is None:
                 raise ValueError("memory arm requires a frozen bank; missing is not empty")
+            if bank.protocol_id != active_profile.protocol:
+                raise ValueError("memory bank protocol differs from the selected method")
             # 空库不是额外的提示处理：让模型输入逐字等同 FRESH，避免把模式标签
             # 或过滤掉的卡片数量造成的差异误认为经验收益。审计信息只留在日志。
             published_count = len(specs)
@@ -491,6 +512,7 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
                 signature=signature,
                 evaluation_freeze=args.evaluation_freeze,
                 expected_freeze_sha256=args.expected_freeze_sha256,
+                **({"profile": active_profile.name} if active_profile != LEGACY else {}),
             )
             if args.resume_certificate
             else None
@@ -586,7 +608,11 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
         }
         if active_profile != LEGACY:
             plan["profile"] = active_profile.name
-            plan["profile_scope"] = "calibration_only_not_source_or_evaluation"
+            plan["profile_scope"] = (
+                "calibration_only_not_source_or_evaluation"
+                if active_profile == STRUCTURED
+                else "source_calibration_and_frozen_evaluation"
+            )
         output = runs / run_id
         if output.exists():
             raise FileExistsError("old run output requires audit; never overwrite")
@@ -801,7 +827,12 @@ def main(argv=None):
     chosen = questions[args.start : args.start + args.count]
     if len(chosen) != args.count:
         raise ValueError("batch exceeds frozen split")
-    banks = load_banks(args.banks, args.arms, manifest)
+    banks = load_banks(
+        args.banks,
+        args.arms,
+        manifest,
+        **({"profile": active_profile.name} if active_profile != LEGACY else {}),
+    )
     run_id = (
         f"{active_profile.prefix}{args.phase}_{'_'.join(args.arms)}"
         f"_{args.start:04d}_{args.start + args.count:04d}"
@@ -817,9 +848,14 @@ def main(argv=None):
             arms=args.arms,
             manifest_sha256=manifest_sha,
             model=PILOT_MODEL,
-            signature=execution_signature(project),
+            signature=(
+                execution_signature(project)
+                if active_profile == LEGACY
+                else profile_execution_signature(project, active_profile)
+            ),
             evaluation_freeze=args.evaluation_freeze,
             expected_freeze_sha256=args.expected_freeze_sha256,
+            **({"profile": active_profile.name} if active_profile != LEGACY else {}),
         )
         if args.resume_certificate
         else None

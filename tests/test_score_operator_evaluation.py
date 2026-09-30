@@ -9,7 +9,13 @@ import pytest
 
 from growrag.experiments import score_operator_evaluation as module
 from growrag.experiments.operator_evaluation_freeze import ANALYSIS_FILES, analysis_signature
-from growrag.experiments.operator_execution_signature import METHOD_FILES, execution_signature
+from growrag.experiments.operator_execution_signature import METHOD_FILES
+from growrag.experiments.operator_profiles import (
+    ACTION_LIST_METHOD_FILES,
+    LEGACY,
+    profile_execution_signature,
+    study_profile,
+)
 from growrag.macro_operators import GapField, OperatorSpec, QueryStep
 from growrag.operator_bank import FrozenOperatorBank, OperatorRecord, operator_to_dict
 
@@ -50,14 +56,18 @@ def _gold(qid):
     }
 
 
-def _setup(tmp_path, monkeypatch, count=3):
+def _setup(tmp_path, monkeypatch, count=3, *, profile=LEGACY.name):
+    selected = study_profile(profile)
     monkeypatch.setattr(module, "_EVALUATION_COUNT", count)
-    methods = (*METHOD_FILES, "src/growrag/experiments/run_operator_study.py")
+    methods = (
+        *(METHOD_FILES if selected == LEGACY else ACTION_LIST_METHOD_FILES),
+        "src/growrag/experiments/run_operator_study.py",
+    )
     for name in methods:
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("synthetic code", encoding="utf-8")
-    signature = execution_signature(tmp_path)
+    signature = profile_execution_signature(tmp_path, selected)
     # The scorer verifies its actually imported analysis against the frozen copy.
     actual_root = Path(module.__file__).resolve().parents[3]
     for name in ANALYSIS_FILES:
@@ -86,16 +96,17 @@ def _setup(tmp_path, monkeypatch, count=3):
         record = OperatorRecord(
             spec,
             (source[0],),
-            module.PROTOCOL,
+            selected.protocol,
             "audit/source-0",
             status="validated",
             validation_ref="audit/source-0/publication",
         )
-        bank = FrozenOperatorBank(module.PROTOCOL, tuple(source[:size]), (record,))
+        bank = FrozenOperatorBank(selected.protocol, tuple(source[:size]), (record,))
         path = tmp_path / "banks" / f"bank_{size}.json"
         _write(path, bank.to_dict())
         banks[str(size)] = {"fingerprint": bank.fingerprint, "file_sha256": module._sha(path)}
     freeze = {
+        "protocol": selected.protocol,
         "evaluation_ids": ids,
         "evaluation_order_sha256": module.fingerprint(ids),
         "expected": {"manifest": module._sha(manifest_path), "execution": signature["sha256"]},
@@ -108,7 +119,12 @@ def _setup(tmp_path, monkeypatch, count=3):
     certificate = tmp_path / "certificate.json"
     _write(certificate, {"freeze": freeze})
     certsha = module._sha(certificate)
-    monkeypatch.setattr(module, "_validate_freeze", lambda root, path, expected: deepcopy(freeze))
+
+    def validate(root, path, expected, **options):
+        assert options == ({} if selected == LEGACY else {"profile": selected.name})
+        return deepcopy(freeze)
+
+    monkeypatch.setattr(module, "_validate_freeze", validate)
     snapshot_files = {
         name: {"text": "synthetic code", "sha256": hashlib.sha256(b"synthetic code").hexdigest()}
         for name in methods
@@ -116,10 +132,10 @@ def _setup(tmp_path, monkeypatch, count=3):
     snapshot = {"files": snapshot_files, "sha256": module.fingerprint(snapshot_files)}
 
     def launch(name, chosen, *, fail_at=None, omit_last=False, plan_change=None):
-        folder = runs / f"{module.PREFIX}{name}"
+        folder = runs / f"{selected.prefix}{name}"
         plan = {
             **signature["configuration"],
-            "protocol": module.PROTOCOL,
+            "protocol": selected.protocol,
             "phase": "evaluation",
             "evaluation_freeze_sha256": certsha,
             "evaluation_freeze_path": str(certificate),
@@ -137,6 +153,7 @@ def _setup(tmp_path, monkeypatch, count=3):
             "source_sha256": snapshot["sha256"],
             "gold_loaded": False,
             "memory_updates": False,
+            **({} if selected == LEGACY else {"profile": selected.name}),
         }
         plan.update(plan_change or {})
         reports = []
@@ -191,6 +208,7 @@ def _setup(tmp_path, monkeypatch, count=3):
         "ids": ids,
         "launch": launch,
         "spec": operator_to_dict(spec),
+        "profile": selected.name,
     }
 
 

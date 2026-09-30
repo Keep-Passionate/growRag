@@ -19,12 +19,15 @@ from growrag.operator_bank import FrozenOperatorBank, operator_to_dict
 from .build_operator_banks import _read
 from .fresh_dev_manifest import _sha
 from .operator_execution_signature import validate_execution_signature
+from .operator_profiles import LEGACY, PROFILES, study_profile, validate_profile_execution_signature
 from .pre_pilot import write_json
 from .representation_runner import fingerprint
-from .run_operator_study import ARMS, PREFIX, PROTOCOL
+from .run_operator_study import ARMS
 from .score_operator_sources import score_source_report
 
 SCHEMA = "growrag-operator-evaluation-feedback-v1"
+PREFIX = LEGACY.prefix
+PROTOCOL = LEGACY.protocol
 _EVALUATION_COUNT = 500
 
 
@@ -35,11 +38,16 @@ def _inside(root: Path, value: str | Path, *, directory=False) -> Path:
     return path
 
 
-def _validate_freeze(root, path, expected):
+def _validate_freeze(root, path, expected, *, profile=None):
     # Local import avoids a scorer->freeze->runner import cycle during integration.
     from .operator_evaluation_freeze import validate_evaluation_freeze
 
-    return validate_evaluation_freeze(root, path, expected_certificate_sha256=expected)
+    return validate_evaluation_freeze(
+        root,
+        path,
+        expected_certificate_sha256=expected,
+        **({"profile": profile} if profile is not None else {}),
+    )
 
 
 def _check_executed_reuse(outcome: dict, arm: str, published: dict) -> None:
@@ -87,8 +95,18 @@ def collect_frozen_evaluation(
     runs_root: Path,
     certificate_path: Path,
     certificate_sha: str,
+    *,
+    profile=LEGACY.name,
 ) -> tuple[list, list]:
     """Read only predictions/provenance. Do not open runtime question text or labels."""
+    selected = study_profile(profile)
+    if freeze.get("protocol") != selected.protocol:
+        raise ValueError("evaluation freeze profile differs from requested profile")
+    validate_signature = (
+        validate_execution_signature
+        if selected == LEGACY
+        else lambda value: validate_profile_execution_signature(value, selected)
+    )
     root = Path(root).resolve(strict=True)
     runs_root = _inside(root, runs_root, directory=True)
     certificate_path = _inside(root, certificate_path)
@@ -110,6 +128,18 @@ def collect_frozen_evaluation(
         audited[str(path)] = _sha(path)
         return _read(path)
 
+    # A new prefix must never hide a competing evaluation claim or launch.
+    for registered in PROFILES:
+        for path in (
+            *runs_root.glob(f"{registered.prefix}*/launch_plan.json"),
+            *runs_root.glob(f"{registered.prefix}*.claim.json"),
+        ):
+            plan = _read(_inside(root, path))
+            if plan.get("phase") == "evaluation":
+                if registered != selected or plan.get("protocol") != selected.protocol:
+                    raise ValueError("mixed-profile evaluation claims cannot be scored together")
+                read(path)
+
     expected_banks = {f"memory{size}": row["fingerprint"] for size, row in freeze["banks"].items()}
     expected_bank_files = {
         f"memory{size}": row["file_sha256"] for size, row in freeze["banks"].items()
@@ -122,26 +152,28 @@ def collect_frozen_evaluation(
         if (
             audited[str(path)] != entry["file_sha256"]
             or bank.fingerprint != entry["fingerprint"]
-            or bank.protocol_id != PROTOCOL
+            or bank.protocol_id != selected.protocol
             or set(bank.allowed_source_ids) != set(manifest["nested_source_ids"][size])
         ):
             raise ValueError("evaluation bank changed or contains non-source records")
         published[f"memory{size}"] = [operator_to_dict(spec) for spec in bank.published_specs]
-    for launch_path in sorted(runs_root.glob(f"{PREFIX}*/launch_plan.json")):
+    for launch_path in sorted(runs_root.glob(f"{selected.prefix}*/launch_plan.json")):
         launch_path = _inside(runs_root, launch_path)
         plan = _read(launch_path)
-        if plan.get("protocol") != PROTOCOL or plan.get("phase") != "evaluation":
+        if plan.get("protocol") != selected.protocol or plan.get("phase") != "evaluation":
             continue
         read(launch_path)
         folder = launch_path.parent
         if (
-            plan.get("evaluation_freeze_sha256") != certificate_sha
+            selected != LEGACY
+            and plan.get("profile") != selected.name
+            or plan.get("evaluation_freeze_sha256") != certificate_sha
             or _inside(root, Path(plan.get("evaluation_freeze_path", ""))) != certificate_path
             or plan.get("evaluation_order_sha256") != freeze["evaluation_order_sha256"]
             or plan.get("manifest_sha256") != freeze["expected"]["manifest"]
             or plan.get("model") != freeze["execution_signature"]["configuration"]["model"]
             or plan.get("execution_signature") != freeze["execution_signature"]
-            or validate_execution_signature(plan.get("execution_signature"))
+            or validate_signature(plan.get("execution_signature"))
             != freeze["expected"]["execution"]
             or plan.get("arms") != list(ARMS)
             or plan.get("bank_sha256") != expected_banks
@@ -252,7 +284,7 @@ def collect_frozen_evaluation(
             result = {
                 "question_id": qid,
                 "phase": "evaluation",
-                "protocol": PROTOCOL,
+                "protocol": selected.protocol,
                 "arms": deepcopy(arms),
             }
             for arm in ARMS[len(arms) :]:
@@ -362,7 +394,10 @@ def score_operator_evaluation(
     *,
     expected_certificate_sha256: str,
     write: bool = False,
+    profile=LEGACY.name,
 ) -> dict:
+    selected = study_profile(profile)
+    profile_options = {} if selected == LEGACY else {"profile": selected.name}
     from . import (
         hotpot,
         operator_evaluation_inference,
@@ -391,7 +426,11 @@ def score_operator_evaluation(
         raise ValueError("evaluation feedback output must be a new project directory")
     if write and output_dir.exists():
         raise FileExistsError("evaluation feedback exists; never overwrite or select a rerun")
-    freeze = _validate_freeze(root, certificate_path, expected_certificate_sha256)
+    freeze = _validate_freeze(
+        root, certificate_path, expected_certificate_sha256, **profile_options
+    )
+    if freeze.get("protocol") != selected.protocol:
+        raise ValueError("evaluation freeze profile differs from requested profile")
     # Check the code actually imported by this scorer, not only declared workspace bytes.
     actual_analysis = analysis_signature(Path(__file__).resolve().parents[3])
     if freeze.get("analysis") != actual_analysis:
@@ -403,7 +442,13 @@ def score_operator_evaluation(
         raise ValueError("evaluation manifest changed")
     manifest = _read(manifest_path)
     reports, inputs = collect_frozen_evaluation(
-        root, manifest, freeze, runs_root, certificate_path, expected_certificate_sha256
+        root,
+        manifest,
+        freeze,
+        runs_root,
+        certificate_path,
+        expected_certificate_sha256,
+        **profile_options,
     )
     statuses = ("completed", "failed", "failure_induced_unstarted")
     execution_counts = {}
@@ -413,7 +458,7 @@ def score_operator_evaluation(
     audit = {
         "schema_version": SCHEMA,
         "phase": "evaluation",
-        "protocol": PROTOCOL,
+        "protocol": selected.protocol,
         "certificate_sha256": expected_certificate_sha256,
         "manifest_sha256": freeze["expected"]["manifest"],
         "execution_sha256": freeze["expected"]["execution"],
@@ -465,7 +510,10 @@ def score_operator_evaluation(
     for entry in inputs + gold_inputs:
         if _sha(_inside(root, Path(entry["path"]))) != entry["sha256"]:
             raise ValueError("evaluation input changed during offline scoring")
-    if _validate_freeze(root, certificate_path, expected_certificate_sha256) != freeze:
+    if (
+        _validate_freeze(root, certificate_path, expected_certificate_sha256, **profile_options)
+        != freeze
+    ):
         raise ValueError("evaluation bank/method/freeze changed while scoring")
     if any(_sha(Path(entry["path"])) != entry["sha256"] for entry in implementation_inputs):
         raise ValueError("scoring implementation changed during scoring")
@@ -503,6 +551,7 @@ def main(argv=None):
     parser.add_argument("--runs", type=Path, default=Path("runs"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--score-new", action="store_true")
+    parser.add_argument("--profile", choices=["legacy-v1", "action-list-v3"], default=LEGACY.name)
     args = parser.parse_args(argv)
     result = score_operator_evaluation(
         args.root,
@@ -511,6 +560,7 @@ def main(argv=None):
         args.output_dir,
         expected_certificate_sha256=args.expected_certificate_sha256,
         write=args.score_new,
+        profile=args.profile,
     )
     print(
         json.dumps(

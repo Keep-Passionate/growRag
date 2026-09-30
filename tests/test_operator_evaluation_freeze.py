@@ -8,6 +8,12 @@ import pytest
 from growrag.experiments import build_operator_banks as builder
 from growrag.experiments import operator_evaluation_freeze as module
 from growrag.experiments.operator_execution_signature import METHOD_FILES, execution_signature
+from growrag.experiments.operator_profiles import (
+    ACTION_LIST_METHOD_FILES,
+    LEGACY,
+    profile_execution_signature,
+    study_profile,
+)
 from growrag.experiments.score_operator_sources import SCHEMA as FEEDBACK_SCHEMA
 
 
@@ -20,18 +26,19 @@ def _qid(number):
     return f"{number:024x}"
 
 
-@pytest.fixture
-def frozen(tmp_path, monkeypatch):
+def _setup_frozen(tmp_path, monkeypatch, *, profile=LEGACY.name):
+    selected = study_profile(profile)
+    methods = METHOD_FILES if selected == LEGACY else ACTION_LIST_METHOD_FILES
     # These are inert text fixtures hashed by execution_signature, never imported.
     for name in (
-        *METHOD_FILES,
+        *methods,
         "src/growrag/experiments/run_operator_study.py",
         *module.ANALYSIS_FILES,
     ):
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("synthetic frozen code\n", encoding="utf-8")
-    signature = execution_signature(tmp_path)
+    signature = profile_execution_signature(tmp_path, selected)
     data = tmp_path / "data/operator"
     data.mkdir(parents=True)
     roles = {
@@ -77,7 +84,7 @@ def frozen(tmp_path, monkeypatch):
     monkeypatch.setattr(module, "load_inputs", lambda path, phase: (manifest, ()))
     monkeypatch.setattr(builder, "load_inputs", lambda path, phase: (manifest, ()))
     runs = tmp_path / "runs"
-    launch_dir = runs / f"{module.PREFIX}source_fixture"
+    launch_dir = runs / f"{selected.prefix}source_fixture"
     reports = [
         {
             "question_id": qid,
@@ -89,7 +96,7 @@ def frozen(tmp_path, monkeypatch):
         for qid in roles["source"]
     ]
     launch = {
-        "protocol": module.PROTOCOL,
+        "protocol": selected.protocol,
         "phase": "source",
         "model": signature["configuration"]["model"],
         "manifest_sha256": module._sha(manifest_path),
@@ -98,6 +105,7 @@ def frozen(tmp_path, monkeypatch):
         "gold_loaded": False,
         "memory_updates": False,
         "execution_signature": signature,
+        **({} if selected == LEGACY else {"profile": selected.name}),
     }
     _write(launch_dir / "launch_plan.json", launch)
     _write(launch_dir / "predictions.json", reports)
@@ -114,7 +122,7 @@ def frozen(tmp_path, monkeypatch):
     )
     feedback_dir = tmp_path / "scored"
     scored_reports = [
-        {**report, "phase": "source", "protocol": module.PROTOCOL} for report in reports
+        {**report, "phase": "source", "protocol": selected.protocol} for report in reports
     ]
     feedback = {
         qid: {
@@ -127,7 +135,7 @@ def frozen(tmp_path, monkeypatch):
     _write(feedback_dir / "source_reports.json", scored_reports)
     audit = {
         "schema_version": FEEDBACK_SCHEMA,
-        "protocol": module.PROTOCOL,
+        "protocol": selected.protocol,
         "phase": "source",
         "model": launch["model"],
         "manifest_sha256": module._sha(manifest_path),
@@ -148,6 +156,8 @@ def frozen(tmp_path, monkeypatch):
             for name in ("feedback.json", "source_reports.json")
         },
     }
+    if selected != LEGACY:
+        audit.update(profile=selected.name, execution_signature_sha256=signature["sha256"])
     _write(feedback_dir / "audit.json", audit)
     banks = tmp_path / "banks"
     builder.build_operator_banks(
@@ -157,6 +167,7 @@ def frozen(tmp_path, monkeypatch):
         banks,
         expected_audit_sha256=module._sha(feedback_dir / "audit.json"),
         write=True,
+        **({} if selected == LEGACY else {"profile": selected.name}),
     )
     return {
         "root": tmp_path,
@@ -169,7 +180,13 @@ def frozen(tmp_path, monkeypatch):
         "expected_scoring_audit_sha256": module._sha(feedback_dir / "audit.json"),
         "expected_bank_bundle_sha256": module._sha(banks / "bank_bundle.json"),
         "expected_execution_sha256": signature["sha256"],
+        **({} if selected == LEGACY else {"profile": selected.name}),
     }
+
+
+@pytest.fixture
+def frozen(tmp_path, monkeypatch):
+    return _setup_frozen(tmp_path, monkeypatch)
 
 
 def _validate(args):

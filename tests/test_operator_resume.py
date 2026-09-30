@@ -14,6 +14,14 @@ from growrag.experiments.operator_execution_signature import (
 from growrag.experiments.operator_execution_signature import (
     SCHEMA as SIGNATURE_SCHEMA,
 )
+from growrag.experiments.operator_profiles import (
+    ACTION_LIST_METHOD_FILES,
+    ACTION_LIST_SCHEMA,
+    LEGACY,
+    action_list_execution_configuration,
+    profile_from_protocol,
+    study_profile,
+)
 from growrag.experiments.representation_runner import fingerprint
 
 
@@ -25,26 +33,41 @@ def read(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def signature(marker="a"):
+def signature(marker="a", *, profile=LEGACY.name):
+    selected = study_profile(profile)
     body = {
-        "schema": SIGNATURE_SCHEMA,
-        "configuration": execution_configuration(),
-        "files": {name: marker * 64 for name in METHOD_FILES},
+        "schema": SIGNATURE_SCHEMA if selected == LEGACY else ACTION_LIST_SCHEMA,
+        "configuration": execution_configuration()
+        if selected == LEGACY
+        else action_list_execution_configuration(),
+        "files": {
+            name: marker * 64
+            for name in (METHOD_FILES if selected == LEGACY else ACTION_LIST_METHOD_FILES)
+        },
     }
     return {**body, "sha256": fingerprint(body)}
 
 
 def closed_run(
-    root, *, name=None, phase="calibration", ids=None, sig=None, parent=None, evaluation=None
+    root,
+    *,
+    name=None,
+    phase="calibration",
+    ids=None,
+    sig=None,
+    parent=None,
+    evaluation=None,
+    profile="legacy-v1",
 ):
-    name = name or f"{resume.PREFIX}{phase}_base_0000_0004"
+    selected = resume.study_profile(profile)
+    name = name or f"{selected.prefix}{phase}_base_0000_0004"
     ids = ids or [f"{n:024x}" for n in range(4)]
     directory = root / name
     directory.mkdir(parents=True)
     for folder in ("request_journal", "api_audit"):
         (directory / folder).mkdir()
     launch = {
-        "protocol": resume.PROTOCOL,
+        "protocol": selected.protocol,
         "run_id": name,
         "phase": phase,
         "question_ids": ids,
@@ -53,6 +76,7 @@ def closed_run(
         "model": "fixture-model",
         "gold_loaded": False,
         "memory_updates": False,
+        **({} if selected == LEGACY else {"profile": selected.name}),
     }
     if sig:
         launch["execution_signature"] = sig
@@ -301,20 +325,21 @@ def test_cli_certificate_is_exclusive_and_offline(tmp_path, capsys):
         resume.main(command)
 
 
-@pytest.fixture
-def eval_context(tmp_path, monkeypatch):
+def _eval_context(tmp_path, monkeypatch, *, profile=LEGACY.name):
     from growrag.experiments import operator_evaluation_freeze as freeze
 
+    selected = study_profile(profile)
+    method = signature(profile=selected)
     runs = tmp_path / "runs"
     runs.mkdir()
     runner = tmp_path / "runner-fixture.py"
     runner.write_text("synthetic immutable runner\n", encoding="utf-8")
     ids = [f"{n:024x}" for n in range(500)]
     body = {
-        "protocol": resume.PROTOCOL,
+        "protocol": selected.protocol,
         "paths": {"runs": "runs"},
-        "expected": {"manifest": "c" * 64, "execution": signature()["sha256"]},
-        "execution_signature": signature(),
+        "expected": {"manifest": "c" * 64, "execution": method["sha256"]},
+        "execution_signature": method,
         "evaluation_ids": ids,
         "evaluation_order_sha256": fingerprint(ids),
         "runner_sha256": freeze._sha(runner),
@@ -325,8 +350,9 @@ def eval_context(tmp_path, monkeypatch):
     path = tmp_path / "evaluation-freeze.json"
     dump(path, {"freeze": body})
 
-    def validate(root, certificate_path, *, expected_certificate_sha256):
+    def validate(root, certificate_path, *, expected_certificate_sha256, **options):
         assert root == tmp_path
+        assert options == ({} if selected == LEGACY else {"profile": selected.name})
         if (
             certificate_path != path
             or freeze._sha(path) != expected_certificate_sha256
@@ -341,15 +367,22 @@ def eval_context(tmp_path, monkeypatch):
     )
 
 
+@pytest.fixture
+def eval_context(tmp_path, monkeypatch):
+    return _eval_context(tmp_path, monkeypatch)
+
+
 def eval_run(context, *, start=0, end=4, parent=None):
+    selected = profile_from_protocol(context.body["protocol"])
     return closed_run(
         context.runs,
-        name=f"{resume.PREFIX}evaluation_all_{start:04d}_{end:04d}",
+        name=f"{selected.prefix}evaluation_all_{start:04d}_{end:04d}",
         phase="evaluation",
         ids=context.body["evaluation_ids"][start:end],
-        sig=signature(),
+        sig=context.body["execution_signature"],
         parent=parent,
         evaluation=context,
+        profile=selected,
     )
 
 
@@ -359,8 +392,8 @@ def verify_eval(context, path, ids, **changes):
         "question_ids": ids,
         "arms": resume._EVALUATION_ARMS,
         "manifest_sha256": "c" * 64,
-        "model": signature()["configuration"]["model"],
-        "signature": signature(),
+        "model": context.body["execution_signature"]["configuration"]["model"],
+        "signature": context.body["execution_signature"],
         "evaluation_freeze": context.path,
         "expected_freeze_sha256": context.sha,
     }

@@ -17,11 +17,19 @@ from growrag.operator_bank import FrozenOperatorBank
 
 from .fresh_dev_manifest import _sha
 from .operator_data_plan import SOURCE_SIZES
-from .operator_source_bank import METRICS, SOURCE_PROTOCOL, build_source_bank
+from .operator_profiles import (
+    ACTION_LIST,
+    LEGACY,
+    study_profile,
+    validate_profile_execution_signature,
+)
+from .operator_source_bank import METRICS, build_source_bank
+from .operator_source_bank import SOURCE_PROTOCOL as SOURCE_PROTOCOL
 from .pre_pilot import write_json
 from .representation_runner import fingerprint
 from .run_operator_study import load_inputs
 from .score_operator_sources import SCHEMA as FEEDBACK_SCHEMA
+from .score_operator_sources import collect_frozen_sources
 
 SCHEMA = "growrag-operator-bank-bundle-v1"
 _ARMS = {"base", "fresh", "static"}
@@ -71,6 +79,35 @@ def _validate_feedback(feedback: dict, source_ids: list[str]) -> None:
                     raise ValueError("invalid scalar source feedback")
 
 
+def _verify_profile_predictions(root, manifest, manifest_sha, scoring, reports, selected):
+    """Reconstruct the v3 source handoff from original label-free terminal files."""
+    inputs = scoring["prediction_inputs"]
+    paths = [_inside(root, Path(entry["path"])) for entry in inputs]
+    if len(set(paths)) != len(paths):
+        raise ValueError("duplicate frozen prediction audit input")
+    launches = [path for path in paths if path.name == "launch_plan.json"]
+    runs_roots = {path.parent.parent for path in launches}
+    if len(runs_roots) != 1:
+        raise ValueError("source scoring must retain launches from one runs root")
+    recovered, model, audited = collect_frozen_sources(
+        manifest, manifest_sha, runs_roots.pop(), profile=selected.name
+    )
+    expected = {str(path): entry["sha256"] for path, entry in zip(paths, inputs, strict=True)}
+    actual = {entry["path"]: entry["sha256"] for entry in audited}
+    signatures = {
+        validate_profile_execution_signature(_read(path).get("execution_signature"), selected)
+        for path in launches
+    }
+    if (
+        recovered != reports
+        or model != scoring["model"]
+        or expected != actual
+        or scoring.get("profile") != selected.name
+        or signatures != {scoring.get("execution_signature_sha256")}
+    ):
+        raise ValueError("source scoring differs from its frozen profile/method/predictions")
+
+
 def build_operator_banks(
     root: Path,
     manifest_path: Path,
@@ -79,6 +116,7 @@ def build_operator_banks(
     *,
     expected_audit_sha256: str,
     write: bool = False,
+    profile=LEGACY.name,
 ) -> dict:
     """Verify and plan by default. write=True publishes only a new frozen bundle.
 
@@ -86,6 +124,7 @@ def build_operator_banks(
     proof. The caller must obtain it from the completed offline scoring operation.
     No evaluation authorization certificate is issued by this builder.
     """
+    selected = study_profile(profile)
     root = Path(root).resolve(strict=True)
     manifest_path = _inside(root, manifest_path)
     feedback_dir = (root / feedback_dir).resolve(strict=True)
@@ -111,7 +150,7 @@ def build_operator_banks(
     if (
         scoring.get("schema_version") != FEEDBACK_SCHEMA
         or scoring.get("phase") != "source"
-        or scoring.get("protocol") != SOURCE_PROTOCOL
+        or scoring.get("protocol") != selected.protocol
         or scoring.get("manifest_sha256") != manifest_sha
         or scoring.get("source_ids") != source_ids
         or scoring.get("source_count") != len(source_ids)
@@ -158,10 +197,13 @@ def build_operator_banks(
     ):
         raise ValueError("source report IDs/order must exactly match source500")
     if any(
-        item.get("phase") != "source" or item.get("protocol") != SOURCE_PROTOCOL for item in reports
+        item.get("phase") != "source" or item.get("protocol") != selected.protocol
+        for item in reports
     ):
         raise ValueError("calibration/evaluation/foreign reports cannot build memory")
     _validate_feedback(feedback, source_ids)
+    if selected != LEGACY:
+        _verify_profile_predictions(root, manifest, manifest_sha, scoring, reports, selected)
 
     products, summaries = {}, {}
     for size in SOURCE_SIZES:
@@ -173,12 +215,13 @@ def build_operator_banks(
             prefix,
             reports[:size],
             {qid: feedback[qid] for qid in prefix},
-            protocol_id=SOURCE_PROTOCOL,
+            protocol_id=selected.protocol,
             retrieval_budget=3,
+            **({"profile": selected.name} if selected != LEGACY else {}),
         )
         if (
             set(bank.allowed_source_ids) != set(prefix)
-            or bank.protocol_id != SOURCE_PROTOCOL
+            or bank.protocol_id != selected.protocol
             or any(not set(record.source_qids) <= set(prefix) for record in bank.records)
         ):
             raise ValueError("built bank escaped its source prefix")
@@ -201,7 +244,7 @@ def build_operator_banks(
         products[str(size)] = (bank, audit)
     bundle = {
         "schema_version": SCHEMA,
-        "protocol": SOURCE_PROTOCOL,
+        "protocol": selected.protocol,
         "phase": "source",
         "model": scoring["model"],
         "manifest_sha256": manifest_sha,
@@ -220,6 +263,11 @@ def build_operator_banks(
         "empty_bank_notice": "Zero published operators is a valid result: the memory arm "
         "must fall back to FRESH, preserve the same source/test IDs, and report zero publication.",
     }
+    if selected != LEGACY:
+        bundle.update(
+            profile=selected.name,
+            execution_signature_sha256=scoring["execution_signature_sha256"],
+        )
     if not write:
         return bundle
     for entry in input_files:
@@ -253,6 +301,7 @@ def main(argv=None):
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--score-audit-sha256", required=True)
     parser.add_argument("--build-new", action="store_true")
+    parser.add_argument("--profile", choices=[LEGACY.name, ACTION_LIST.name], default=LEGACY.name)
     args = parser.parse_args(argv)
     result = build_operator_banks(
         args.root,
@@ -261,6 +310,7 @@ def main(argv=None):
         args.output_dir,
         expected_audit_sha256=args.score_audit_sha256,
         write=args.build_new,
+        **({"profile": args.profile} if args.profile != LEGACY.name else {}),
     )
     print(
         json.dumps(

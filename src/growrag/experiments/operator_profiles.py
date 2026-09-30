@@ -1,4 +1,4 @@
-"""Explicit operator study profiles; structured v2/v3 are calibration-only.
+"""Explicit study profiles; v3 supports the frozen source-to-evaluation pipeline.
 
 Legacy method files and signature validation stay untouched. A new prefix never
 releases an old claim, and selecting a profile is not permission to spend money.
@@ -50,6 +50,46 @@ def get_profile(name: str = LEGACY.name) -> OperatorProfile:
         if type(name) is str and name == profile.name:
             return profile
     raise ValueError("unknown operator profile")
+
+
+def profile_from_protocol(protocol: str) -> OperatorProfile:
+    """Resolve a recorded exact protocol, without aliases or a default fallback."""
+    for profile in PROFILES:
+        if type(protocol) is str and protocol == profile.protocol:
+            return profile
+    raise ValueError("unknown operator protocol")
+
+
+def study_profile(profile=LEGACY.name) -> OperatorProfile:
+    """Only reviewed end-to-end protocols can score, build banks or freeze eval."""
+    resolved = get_profile(profile.name if type(profile) is OperatorProfile else profile)
+    if type(profile) is OperatorProfile and profile != resolved:
+        raise ValueError("unregistered operator profile")
+    if resolved not in (LEGACY, ACTION_LIST):
+        raise ValueError("calibration-only profile has no formal study pipeline")
+    return resolved
+
+
+def profile_execution_signature(project_root: Path, profile=LEGACY.name) -> dict:
+    from .operator_execution_signature import execution_signature
+
+    resolved = study_profile(profile)
+    return (
+        execution_signature(project_root)
+        if resolved == LEGACY
+        else action_list_execution_signature(project_root)
+    )
+
+
+def validate_profile_execution_signature(value: dict, profile=LEGACY.name) -> str:
+    from .operator_execution_signature import validate_execution_signature
+
+    resolved = study_profile(profile)
+    return (
+        validate_execution_signature(value)
+        if resolved == LEGACY
+        else validate_action_list_execution_signature(value)
+    )
 
 
 def structured_execution_configuration() -> dict:
@@ -138,7 +178,21 @@ def validate_profile_options(profile: OperatorProfile, options) -> None:
     """Run before reading data, certificates, banks, secrets or history."""
     if profile == LEGACY:
         return
-    if profile not in {STRUCTURED, ACTION_LIST}:
+    if profile == ACTION_LIST:
+        if options.phase not in {"source", "calibration", "evaluation"}:
+            raise ValueError("unknown formal study phase")
+        if options.phase != "evaluation" and (
+            not options.arms
+            or not set(options.arms) <= {"base", "fresh", "static"}
+            or options.banks is not None
+            or options.evaluation_freeze is not None
+            or options.expected_freeze_sha256 is not None
+        ):
+            raise ValueError("memory banks and evaluation freezes require the evaluation phase")
+        if options.allow_network and options.expected_execution_sha256 is None:
+            raise ValueError("action-list study requires explicit expected execution SHA256")
+        return
+    if profile != STRUCTURED:
         raise ValueError("unknown operator profile")
     if (
         options.phase != "calibration"

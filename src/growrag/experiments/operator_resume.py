@@ -13,6 +13,12 @@ import re
 from pathlib import Path
 
 from .operator_execution_signature import validate_execution_signature
+from .operator_profiles import (
+    LEGACY,
+    profile_from_protocol,
+    study_profile,
+    validate_profile_execution_signature,
+)
 from .pre_pilot import write_json
 from .representation_runner import fingerprint
 from .shared_continuation import _event_mentions, _read, _request_evidence, _safe_file
@@ -41,7 +47,15 @@ def _ids(value):
     return value
 
 
-def _evaluation_binding(runs, launch, read):
+def _method_signature(value, profile):
+    return (
+        validate_execution_signature(value)
+        if profile == LEGACY
+        else validate_profile_execution_signature(value, profile)
+    )
+
+
+def _evaluation_binding(runs, launch, read, profile=LEGACY):
     """Revalidate the exact evaluation freeze, not just its copied hash string."""
     from .operator_evaluation_freeze import validate_evaluation_freeze
 
@@ -60,13 +74,18 @@ def _evaluation_binding(runs, launch, read):
     path = Path(path_value).resolve(strict=True)
     if not path.is_relative_to(project):
         raise ValueError("evaluation freeze path escapes the project")
-    body = validate_evaluation_freeze(project, path, expected_certificate_sha256=digest)
-    method = validate_execution_signature(launch.get("execution_signature"))
+    body = validate_evaluation_freeze(
+        project,
+        path,
+        expected_certificate_sha256=digest,
+        **({} if profile == LEGACY else {"profile": profile.name}),
+    )
+    method = _method_signature(launch.get("execution_signature"), profile)
     ids, planned = body["evaluation_ids"], launch["question_ids"]
     start = ids.index(planned[0]) if planned[0] in ids else -1
     if (
         read("evaluation_freeze_verified.json") != body
-        or body["protocol"] != PROTOCOL
+        or body["protocol"] != profile.protocol
         or (project / body["paths"]["runs"]).resolve(strict=True) != runs
         or launch["arms"] != _EVALUATION_ARMS
         or launch["manifest_sha256"] != body["expected"]["manifest"]
@@ -102,10 +121,11 @@ def _evaluation_binding(runs, launch, read):
     }
 
 
-def _audit(runs, parent_id, *, visited=()):
+def _audit(runs, parent_id, *, visited=(), profile=LEGACY.name):
+    selected = study_profile(profile)
     if (
         not isinstance(parent_id, str)
-        or not re.fullmatch(re.escape(PREFIX) + r"[A-Za-z0-9_]+", parent_id)
+        or not re.fullmatch(re.escape(selected.prefix) + r"[A-Za-z0-9_]+", parent_id)
         or parent_id in visited
         or len(visited) >= _EVALUATION_DEPTH
     ):
@@ -134,7 +154,9 @@ def _audit(runs, parent_id, *, visited=()):
     files["../" + f"{parent_id}.claim.json"] = claim_sha
     if (
         launch.get("run_id") != parent_id
-        or launch.get("protocol") != PROTOCOL
+        or launch.get("protocol") != selected.protocol
+        or selected != LEGACY
+        and launch.get("profile") != selected.name
         or launch.get("phase") not in {"source", "calibration", "evaluation"}
         or launch.get("gold_loaded") is not False
         or launch.get("memory_updates") is not False
@@ -230,17 +252,19 @@ def _audit(runs, parent_id, *, visited=()):
         files[name] = hashlib.sha256(path.read_bytes()).hexdigest()
     signature = launch.get("execution_signature")
     source_signature = None
-    if launch["phase"] == "source":
-        source_signature = validate_execution_signature(signature)
+    if launch["phase"] == "source" or selected != LEGACY:
+        source_signature = _method_signature(signature, selected)
     evaluation_binding = (
-        _evaluation_binding(root, launch, read) if launch["phase"] == "evaluation" else None
+        _evaluation_binding(root, launch, read, selected)
+        if launch["phase"] == "evaluation"
+        else None
     )
     ancestors = [parent_id]
     if launch.get("resume_parent_run_id") is not None:
         certificate = read("resume_certificate.json")
         if fingerprint(certificate) != launch.get("resume_certificate_sha256"):
             raise ValueError("parent continuation certificate changed")
-        previous = _validate(root, certificate, visited=(*visited, parent_id))
+        previous = _validate(root, certificate, visited=(*visited, parent_id), profile=selected)
         if (
             previous["parent_run_id"] != launch["resume_parent_run_id"]
             or previous["phase"] != launch["phase"]
@@ -281,14 +305,15 @@ def _audit(runs, parent_id, *, visited=()):
     return proof
 
 
-def build_certificate(runs, parent_run_id):
-    proof = _audit(runs, parent_run_id)
+def build_certificate(runs, parent_run_id, *, profile=LEGACY.name):
+    selected = study_profile(profile)
+    proof = _audit(runs, parent_run_id, profile=selected)
     schema = EVALUATION_SCHEMA if proof["phase"] == "evaluation" else SCHEMA
-    body = {"schema": schema, "protocol": PROTOCOL, "proof": proof}
+    body = {"schema": schema, "protocol": selected.protocol, "proof": proof}
     return {**body, "sha256": fingerprint(body)}
 
 
-def _validate(runs, certificate, *, visited=()):
+def _validate(runs, certificate, *, visited=(), profile=None):
     if type(certificate) is not dict or set(certificate) != {
         "schema",
         "protocol",
@@ -297,14 +322,16 @@ def _validate(runs, certificate, *, visited=()):
     }:
         raise ValueError("invalid explicit resume certificate")
     body = {k: certificate[k] for k in ("schema", "protocol", "proof")}
+    selected = study_profile(profile_from_protocol(certificate["protocol"]))
+    if profile is not None and study_profile(profile) != selected:
+        raise ValueError("resume certificate profile differs from requested profile")
     if (
         certificate["schema"]
         != (EVALUATION_SCHEMA if certificate["proof"].get("phase") == "evaluation" else SCHEMA)
-        or certificate["protocol"] != PROTOCOL
         or fingerprint(body) != certificate["sha256"]
     ):
         raise ValueError("resume certificate checksum/schema mismatch")
-    proof = _audit(runs, certificate["proof"]["parent_run_id"], visited=visited)
+    proof = _audit(runs, certificate["proof"]["parent_run_id"], visited=visited, profile=selected)
     if proof != certificate["proof"]:
         raise ValueError("parent evidence changed since certificate creation")
     return proof
@@ -322,9 +349,11 @@ def verify_certificate(
     signature,
     evaluation_freeze=None,
     expected_freeze_sha256=None,
+    profile=None,
 ):
     certificate, _ = _read(Path(path).resolve(strict=True))
-    proof = _validate(runs, certificate)
+    proof = _validate(runs, certificate, profile=profile)
+    selected = study_profile(profile_from_protocol(certificate["protocol"]))
     if (
         proof["phase"] != phase
         or proof["manifest_sha256"] != manifest_sha256
@@ -332,8 +361,8 @@ def verify_certificate(
         or proof["arms"] != list(arms)
         or not set(_ids(list(question_ids))) <= set(proof["question_ids"])
         or (
-            phase == "source"
-            and proof["source_execution_sha256"] != validate_execution_signature(signature)
+            (phase == "source" or selected != LEGACY)
+            and proof["source_execution_sha256"] != _method_signature(signature, selected)
         )
     ):
         raise ValueError("resume only permits untouched questions under the approved method/role")
@@ -343,7 +372,7 @@ def verify_certificate(
             evaluation_freeze is None
             or binding["freeze_path"] != str(Path(evaluation_freeze).resolve(strict=True))
             or binding["freeze_sha256"] != expected_freeze_sha256
-            or binding["execution_sha256"] != validate_execution_signature(signature)
+            or binding["execution_sha256"] != _method_signature(signature, selected)
             or list(question_ids) != proof["question_ids"]
         ):
             raise ValueError(
@@ -357,8 +386,9 @@ def main(argv=None):
     parser.add_argument("--runs-root", type=Path, required=True)
     parser.add_argument("--parent-run-id", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--profile", choices=["legacy-v1", "action-list-v3"], default=LEGACY.name)
     args = parser.parse_args(argv)
-    certificate = build_certificate(args.runs_root, args.parent_run_id)
+    certificate = build_certificate(args.runs_root, args.parent_run_id, profile=args.profile)
     write_json(args.output, certificate)
     count = len(certificate["proof"]["question_ids"])
     print(f"Offline certificate: {count} untouched questions; no API.")

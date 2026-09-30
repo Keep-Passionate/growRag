@@ -21,12 +21,22 @@ from .build_operator_banks import _read, build_operator_banks
 from .fresh_dev_manifest import _sha
 from .operator_data_plan import SOURCE_SIZES
 from .operator_execution_signature import execution_signature, validate_execution_signature
+from .operator_profiles import (
+    LEGACY,
+    PROFILES,
+    profile_execution_signature,
+    profile_from_protocol,
+    study_profile,
+    validate_profile_execution_signature,
+)
 from .pre_pilot import write_json
 from .representation_runner import fingerprint
-from .run_operator_study import ARMS, PREFIX, PROTOCOL, artifact, load_inputs
+from .run_operator_study import ARMS, artifact, load_inputs
 from .score_operator_sources import collect_frozen_sources
 
 SCHEMA = "growrag-operator-evaluation-freeze-v1"
+PREFIX = LEGACY.prefix
+PROTOCOL = LEGACY.protocol
 _SHA = re.compile(r"[0-9a-f]{64}")
 ANALYSIS_FILES = tuple(
     f"src/growrag/experiments/{name}.py"
@@ -67,10 +77,17 @@ def _expected(value: str) -> None:
 
 def _no_evaluation_claims(runs: Path) -> None:
     # Claims count as preparation already underway, even before the first API call.
-    paths = [*runs.glob(f"{PREFIX}*/launch_plan.json"), *runs.glob(f"{PREFIX}*.claim.json")]
+    paths = [
+        path
+        for profile in PROFILES
+        for path in (
+            *runs.glob(f"{profile.prefix}*/launch_plan.json"),
+            *runs.glob(f"{profile.prefix}*.claim.json"),
+        )
+    ]
     for path in paths:
         data = _read(_path(runs, path))
-        if data.get("protocol") == PROTOCOL and data.get("phase") == "evaluation":
+        if data.get("phase") == "evaluation":
             raise ValueError("evaluation already claimed; cannot create a before-evaluation freeze")
 
 
@@ -83,7 +100,15 @@ def _freeze_body(
     expected: dict,
     *,
     require_unstarted_evaluation: bool,
+    profile=LEGACY.name,
 ) -> dict:
+    selected = study_profile(profile)
+    profile_options = {} if selected == LEGACY else {"profile": selected.name}
+    validate_signature = (
+        validate_execution_signature
+        if selected == LEGACY
+        else lambda value: validate_profile_execution_signature(value, selected)
+    )
     root = root.resolve(strict=True)
     manifest_path = _path(root, manifest_path)
     runs_root, feedback_dir, banks_dir = (
@@ -114,8 +139,12 @@ def _freeze_body(
         artifact(manifest_path.parent, manifest, "corpus.jsonl"),
         manifest["artifacts"]["corpus.jsonl"]["sha256"],
     )
-    signature = execution_signature(root)
-    if validate_execution_signature(signature) != expected["execution"]:
+    signature = (
+        execution_signature(root)
+        if selected == LEGACY
+        else profile_execution_signature(root, selected)
+    )
+    if validate_signature(signature) != expected["execution"]:
         raise ValueError("current method differs from the expected frozen execution signature")
     for name, digest in signature["files"].items():
         pin(root / name, digest)
@@ -128,7 +157,7 @@ def _freeze_body(
         pin(root / name, digest)
 
     reports, model, prediction_inputs = collect_frozen_sources(
-        manifest, expected["manifest"], runs_root
+        manifest, expected["manifest"], runs_root, **profile_options
     )
     if model != signature["configuration"]["model"]:
         raise ValueError("source model differs from frozen execution model")
@@ -137,14 +166,16 @@ def _freeze_body(
         pin(path, entry["sha256"])
         if path.name == "launch_plan.json":
             launch = _read(path)
-            if (
-                validate_execution_signature(launch.get("execution_signature"))
-                != expected["execution"]
-            ):
+            if validate_signature(launch.get("execution_signature")) != expected["execution"]:
                 raise ValueError("source launch used a different method signature")
     scoring_path = _path(root, feedback_dir / "audit.json")
     pin(scoring_path, expected["scoring_audit"])
     scoring = _read(scoring_path)
+    if selected != LEGACY and (
+        scoring.get("profile") != selected.name
+        or scoring.get("execution_signature_sha256") != expected["execution"]
+    ):
+        raise ValueError("source scoring profile/method differs from evaluation freeze")
     if fingerprint(reports) != scoring.get("source_reports_sha256"):
         raise ValueError("scored reports differ from current frozen source collection")
 
@@ -189,6 +220,7 @@ def _freeze_body(
         banks_dir,
         expected_audit_sha256=expected["scoring_audit"],
         write=False,
+        **profile_options,
     )
     bundle_path = _path(root, banks_dir / "bank_bundle.json")
     pin(bundle_path, expected["bank_bundle"])
@@ -200,6 +232,14 @@ def _freeze_body(
         raise ValueError("bank bundle SHA sidecar mismatch")
     pin(sidecar)
     bundle = _read(bundle_path)
+    if selected != LEGACY and any(
+        bundle.get(key) != value or rebuilt.get(key) != value
+        for key, value in (
+            ("profile", selected.name),
+            ("execution_signature_sha256", expected["execution"]),
+        )
+    ):
+        raise ValueError("bank bundle profile/method differs from evaluation freeze")
     for key in (
         "schema_version",
         "protocol",
@@ -236,13 +276,13 @@ def _freeze_body(
         bank = FrozenOperatorBank.from_json(path.read_text(encoding="utf-8"))
         if (
             bank.fingerprint != computed["bank_fingerprint"]
-            or bank.protocol_id != PROTOCOL
+            or bank.protocol_id != selected.protocol
             or set(bank.allowed_source_ids) != set(manifest["nested_source_ids"][str(size)])
         ):
             raise ValueError("bank content or source scope mismatch")
         bank_audit = _read(audit_path)
         if (
-            bank_audit.get("protocol_id") != PROTOCOL
+            bank_audit.get("protocol_id") != selected.protocol
             or bank_audit.get("source_prefix_ids") != manifest["nested_source_ids"][str(size)]
             or set(bank_audit.get("questions", {})) != set(bank.allowed_source_ids)
         ):
@@ -262,7 +302,7 @@ def _freeze_body(
     configuration = signature["configuration"]
     return {
         "schema_version": SCHEMA,
-        "protocol": PROTOCOL,
+        "protocol": selected.protocol,
         "paths": {
             "manifest": manifest_path.relative_to(root).as_posix(),
             "runs": runs_root.relative_to(root).as_posix(),
@@ -324,8 +364,10 @@ def create_evaluation_freeze(
     expected_bank_bundle_sha256: str,
     expected_execution_sha256: str,
     write: bool = False,
+    profile=LEGACY.name,
 ) -> dict:
     """Create a new certificate only before any evaluation launch/claim exists."""
+    selected = study_profile(profile)
     root = Path(root).resolve(strict=True)
     certificate_path = (root / certificate_path).resolve()
     if not certificate_path.is_relative_to(root) or certificate_path.suffix != ".json":
@@ -346,6 +388,7 @@ def create_evaluation_freeze(
         banks_dir,
         expected,
         require_unstarted_evaluation=True,
+        profile=selected,
     )
     certificate = {
         "freeze": body,
@@ -362,7 +405,7 @@ def create_evaluation_freeze(
 
 
 def validate_evaluation_freeze(
-    root: Path, certificate_path: Path, *, expected_certificate_sha256: str
+    root: Path, certificate_path: Path, *, expected_certificate_sha256: str, profile=None
 ) -> dict:
     """Re-audit every dependency; does not authorize API calls or load runtime text."""
     root = Path(root).resolve(strict=True)
@@ -385,6 +428,9 @@ def validate_evaluation_freeze(
     ):
         raise ValueError("invalid evaluation certificate payload")
     body = certificate["freeze"]
+    selected = study_profile(profile_from_protocol(body.get("protocol")))
+    if profile is not None and study_profile(profile) != selected:
+        raise ValueError("evaluation certificate profile differs from requested profile")
     paths = body["paths"]
     refreshed = _freeze_body(
         root,
@@ -394,6 +440,7 @@ def validate_evaluation_freeze(
         Path(paths["banks"]),
         body["expected"],
         require_unstarted_evaluation=False,
+        profile=selected,
     )
     if refreshed != body:
         raise ValueError("evaluation freeze dependencies changed")
@@ -417,6 +464,7 @@ def main(argv=None):
     parser.add_argument("--expected-scoring-audit-sha256")
     parser.add_argument("--expected-bank-bundle-sha256")
     parser.add_argument("--expected-execution-sha256")
+    parser.add_argument("--profile", choices=["legacy-v1", "action-list-v3"])
     args = parser.parse_args(argv)
     if args.validate:
         if args.expected_certificate_sha256 is None:
@@ -425,6 +473,7 @@ def main(argv=None):
             args.root,
             args.certificate,
             expected_certificate_sha256=args.expected_certificate_sha256,
+            **({"profile": args.profile} if args.profile is not None else {}),
         )
         action, written = "validated", False
     else:
@@ -454,6 +503,7 @@ def main(argv=None):
             expected_bank_bundle_sha256=args.expected_bank_bundle_sha256,
             expected_execution_sha256=args.expected_execution_sha256,
             write=args.issue_new,
+            profile=args.profile or LEGACY.name,
         )
         body = result["freeze"]
         action, written = ("issued", True) if args.issue_new else ("preflight_only", False)

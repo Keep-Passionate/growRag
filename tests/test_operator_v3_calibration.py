@@ -125,24 +125,21 @@ def test_action_list_signature_rejects_rehashed_unknown_contracts(alter):
 @pytest.mark.parametrize(
     "options",
     [
-        ["--phase", "source"],
-        ["--phase", "evaluation"],
         ["--banks", "missing"],
-        ["--resume-certificate", "missing"],
         ["--evaluation-freeze", "missing"],
         ["--expected-freeze-sha256", "a" * 64],
         ["--arms", "memory50"],
     ],
 )
 @pytest.mark.parametrize("live", [False, True])
-def test_action_list_formal_paths_stay_locked_before_input_read(
+def test_action_list_calibration_still_excludes_banks_and_evaluation_options(
     tmp_path, monkeypatch, options, live
 ):
     monkeypatch.chdir(tmp_path)
     cmd = ["--manifest", "missing", "--profile", "action-list-v3", "--phase", "calibration"]
     if live:
         cmd.append("--allow-network")
-    with pytest.raises(ValueError, match="calibration-only"):
+    with pytest.raises(ValueError, match="require the evaluation phase"):
         study.main(cmd + options)
     assert not (tmp_path / "runs").exists()
 
@@ -166,7 +163,7 @@ def test_action_list_dispatch_keeps_inherited_budget_and_reader_audit(sandbox, a
     plan, budget = read(root / "launch_plan.json"), read(root / "final_budget.json")
     assert plan["protocol"] == profiles.ACTION_LIST.protocol
     assert plan["execution_signature"] == action_list.signature
-    assert plan["profile_scope"] == "calibration_only_not_source_or_evaluation"
+    assert plan["profile_scope"] == "source_calibration_and_frozen_evaluation"
     assert plan["prior_reserved_cny"] == 199.99
     assert plan["project_cap_cny"] == 200 and plan["historical_authorized_total_cny"] == 50
     assert budget["limits"]["budget_cny"] == pytest.approx(0.01)

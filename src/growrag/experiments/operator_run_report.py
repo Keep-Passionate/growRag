@@ -13,6 +13,8 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
+from .operator_profiles import STRUCTURED, profile_from_protocol
+
 PROTOCOL = "growrag-operator-study-v1"
 
 
@@ -126,8 +128,12 @@ def build_report(directory: Path) -> str:
         raise ValueError("launch plan must be an object")
     if launch.get("phase") not in {"source", "calibration"}:
         raise ValueError("evaluation reporting is locked; source/calibration only")
-    if launch.get("protocol") != PROTOCOL:
-        raise ValueError("unknown operator study protocol")
+    try:
+        profile = profile_from_protocol(launch.get("protocol"))
+    except ValueError as error:
+        raise ValueError("unknown operator study protocol") from error
+    if profile == STRUCTURED and launch["phase"] != "calibration":
+        raise ValueError("structured-v2 is calibration-only")
     ids, arms = launch.get("question_ids"), launch.get("arms")
     if (
         type(ids) is not list

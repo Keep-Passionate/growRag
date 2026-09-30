@@ -24,9 +24,10 @@ from growrag.operator_bank import (
 )
 
 from .operator_model import canonical_operator
+from .operator_profiles import LEGACY, study_profile
 from .protocol import Evidence
 
-SOURCE_PROTOCOL = "growrag-operator-study-v1"
+SOURCE_PROTOCOL = LEGACY.protocol
 METRICS = ("answer_em", "answer_f1", "raw_support_recall")
 _ARMS = ("base", "fresh", "static")
 _QUESTION_WORDS = frozenset(
@@ -203,8 +204,9 @@ def build_source_bank(
     reports: Iterable[dict],
     feedback: Mapping,
     *,
-    protocol_id: str = SOURCE_PROTOCOL,
+    protocol_id: str | None = None,
     retrieval_budget: int = 3,
+    profile=LEGACY.name,
 ):
     """Return (immutable bank, audit dict); no input mutation or persistent writes.
 
@@ -212,7 +214,14 @@ def build_source_bank(
     supplied report must still declare the source phase and this exact protocol.
     A published candidate is experimentally executable, never automatically trusted.
     """
-    if protocol_id != SOURCE_PROTOCOL or type(retrieval_budget) is not int or retrieval_budget != 3:
+    selected = study_profile(profile)
+    if protocol_id is None:
+        protocol_id = selected.protocol
+    if (
+        protocol_id != selected.protocol
+        or type(retrieval_budget) is not int
+        or retrieval_budget != 3
+    ):
         raise ValueError("this extractor requires the frozen source protocol and budget 3")
     builder = MemoryBuilder(source_prefix, protocol_id)
     if not isinstance(feedback, Mapping):

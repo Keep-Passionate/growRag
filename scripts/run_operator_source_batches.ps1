@@ -7,6 +7,10 @@ param(
     [ValidateRange(1, 25)][int]$BatchSize = 25,
     # Keep the legacy default. A larger value must reflect explicit user approval.
     [ValidateRange(0.01, 300)][double]$ProjectCapCny = 50,
+    [ValidateSet('legacy-v1', 'action-list-v3')][string]$Profile = 'legacy-v1',
+    [string]$Manifest = 'data/hotpotqa/operator_scale_sep30_v1/manifest.json',
+    [ValidatePattern('^[0-9a-f]{64}$')]
+    [string]$ExpectedManifest = 'd8596fd830c3cfe04255f18678a0a0454662aefa76b75ff8556f3cccb57c9225',
     [ValidatePattern('^[0-9a-f]{64}$')]
     [string]$ExpectedMethod = 'e9122473d934e50a6800d909e6e90fe0db97dfd15f49b51d9a549655f7089836',
     [switch]$AllowNetwork
@@ -15,6 +19,11 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 if ($End -le $Start) { throw 'End must be greater than Start.' }
+if ($Profile -ne 'legacy-v1' -and (
+    -not $PSBoundParameters.ContainsKey('Manifest') -or
+    -not $PSBoundParameters.ContainsKey('ExpectedManifest') -or
+    -not $PSBoundParameters.ContainsKey('ExpectedMethod')
+)) { throw 'A new profile requires explicit Manifest, ExpectedManifest and ExpectedMethod.' }
 $taskWorkspace = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $taskPython = Join-Path $taskWorkspace '.venv\Scripts\python.exe'
 $taskOldPath = $env:PYTHONPATH
@@ -27,8 +36,8 @@ try {
         $taskCount = [Math]::Min($BatchSize, $End - $taskOffset)
         $taskArguments = @(
             '-X', 'utf8', '-m', 'growrag.experiments.run_operator_study',
-            '--manifest', 'data/hotpotqa/operator_scale_sep30_v1/manifest.json',
-            '--expected-manifest-sha256', 'd8596fd830c3cfe04255f18678a0a0454662aefa76b75ff8556f3cccb57c9225',
+            '--profile', $Profile, '--manifest', $Manifest,
+            '--expected-manifest-sha256', $ExpectedManifest,
             '--expected-execution-sha256', $ExpectedMethod,
             '--phase', 'source', '--start', [string]$taskOffset,
             '--count', [string]$taskCount, '--arms', 'base', 'fresh', 'static',

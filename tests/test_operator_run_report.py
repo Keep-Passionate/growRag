@@ -136,6 +136,25 @@ def test_report_distinguishes_planned_involved_complete_and_failed(run):
     assert "| q7 | 未启动 | 未启动 | 未启动 |" in report
 
 
+def test_action_list_report_accepts_new_protocol_without_scoring(run):
+    from growrag.experiments.operator_profiles import ACTION_LIST
+
+    plan = json.loads((run / "launch_plan.json").read_text())
+    plan["protocol"] = ACTION_LIST.protocol
+    dump(run / "launch_plan.json", plan)
+    assert "未判断任何答案正确与否" in build_report(run)
+
+
+def test_calibration_only_protocol_cannot_claim_source_report(run):
+    from growrag.experiments.operator_profiles import STRUCTURED
+
+    plan = json.loads((run / "launch_plan.json").read_text())
+    plan.update(protocol=STRUCTURED.protocol, phase="source")
+    dump(run / "launch_plan.json", plan)
+    with pytest.raises(ValueError):
+        build_report(run)
+
+
 def test_actual_queries_and_origins_appear_without_reason_or_answer(run):
     report = build_report(run)
     assert "原 query / 初检：Question q0?" in report

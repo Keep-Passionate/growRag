@@ -13,10 +13,17 @@ from pathlib import Path
 
 from .fresh_dev_manifest import _sha
 from .hotpot import _answer_f1, _normalize
-from .operator_execution_signature import validate_execution_signature
+from .operator_profiles import (
+    ACTION_LIST,
+    LEGACY,
+    study_profile,
+    validate_profile_execution_signature,
+)
 from .pre_pilot import write_json
 from .representation_runner import fingerprint
-from .run_operator_study import PREFIX, PROTOCOL, load_inputs
+from .run_operator_study import PREFIX as PREFIX
+from .run_operator_study import PROTOCOL as PROTOCOL
+from .run_operator_study import load_inputs
 from .shared_hotpot_dev import document_id
 
 ARMS = ("base", "fresh", "static")
@@ -34,17 +41,26 @@ def _inside(root: Path, path: Path) -> Path:
     return path
 
 
-def collect_frozen_sources(manifest: dict, manifest_sha: str, runs_root: Path) -> tuple:
+def collect_frozen_sources(
+    manifest: dict, manifest_sha: str, runs_root: Path, *, profile=LEGACY.name
+) -> tuple:
     """No labels are accessed here. Missing/unstarted source IDs fail closed."""
+    selected = study_profile(profile)
     runs_root = Path(runs_root).resolve(strict=True)
     sources = manifest["roles"]["source"]
     wanted = set(sources)
     records, models, inputs, methods = {}, set(), [], set()
-    for launch in sorted(runs_root.glob(f"{PREFIX}*/launch_plan.json")):
+    for launch in sorted(runs_root.glob(f"{selected.prefix}*/launch_plan.json")):
         launch = _inside(runs_root, launch)
         plan = _read(launch)
-        if plan.get("protocol") != PROTOCOL or plan.get("phase") != "source":
+        if plan.get("phase") != "source":
             continue
+        if plan.get("protocol") != selected.protocol:
+            if selected == LEGACY:
+                continue
+            raise ValueError("source launch prefix/protocol mismatch")
+        if selected != LEGACY and plan.get("profile") != selected.name:
+            raise ValueError("source launch profile mismatch")
         if (
             plan.get("manifest_sha256") != manifest_sha
             or not isinstance(plan.get("model"), str)
@@ -53,7 +69,7 @@ def collect_frozen_sources(manifest: dict, manifest_sha: str, runs_root: Path) -
             or plan.get("memory_updates") is not False
         ):
             raise ValueError("source launch manifest/model/gold policy mismatch")
-        methods.add(validate_execution_signature(plan.get("execution_signature")))
+        methods.add(validate_profile_execution_signature(plan.get("execution_signature"), selected))
         planned_ids, planned_arms = plan.get("question_ids"), plan.get("arms")
         if (
             type(planned_ids) is not list
@@ -92,7 +108,8 @@ def collect_frozen_sources(manifest: dict, manifest_sha: str, runs_root: Path) -
             if type(arms) is not dict or not arms or not set(arms) <= set(planned_arms):
                 raise ValueError("source report has invalid arms")
             merged = records.setdefault(
-                qid, {"question_id": qid, "phase": "source", "protocol": PROTOCOL, "arms": {}}
+                qid,
+                {"question_id": qid, "phase": "source", "protocol": selected.protocol, "arms": {}},
             )
             for arm, report in arms.items():
                 if arm in merged["arms"]:
@@ -305,7 +322,9 @@ def score_operator_sources(
     output_dir: Path,
     *,
     write: bool = False,
+    profile=LEGACY.name,
 ) -> dict:
+    selected = study_profile(profile)
     project_root = Path(project_root).resolve(strict=True)
     manifest_path = _inside(project_root, Path(manifest_path))
     runs_root = Path(runs_root).resolve(strict=True)
@@ -321,10 +340,13 @@ def score_operator_sources(
         raise FileExistsError("feedback output exists; never overwrite")
     manifest, _ = load_inputs(manifest_path, "source")
     manifest_sha = _sha(manifest_path)
-    reports, model, audited = collect_frozen_sources(manifest, manifest_sha, runs_root)
+    profile_options = {"profile": selected.name} if selected != LEGACY else {}
+    reports, model, audited = collect_frozen_sources(
+        manifest, manifest_sha, runs_root, **profile_options
+    )
     audit = {
         "schema_version": SCHEMA,
-        "protocol": PROTOCOL,
+        "protocol": selected.protocol,
         "phase": "source",
         "model": model,
         "manifest_sha256": manifest_sha,
@@ -338,8 +360,24 @@ def score_operator_sources(
         "coverage_notice": "Exact annotated support coverage is not textual entailment. "
         "Paragraph Evidence.sentence_id is never interpreted as a raw sentence reference.",
     }
+    if selected != LEGACY:
+        signatures = {
+            validate_profile_execution_signature(
+                _read(Path(item["path"]))["execution_signature"], selected
+            )
+            for item in audited
+            if Path(item["path"]).name == "launch_plan.json"
+        }
+        if len(signatures) != 1:
+            raise ValueError("source launches must share one fixed execution signature")
+        audit.update(profile=selected.name, execution_signature_sha256=signatures.pop())
     if not write:
         return audit
+    if selected != LEGACY and (
+        any(_sha(Path(item["path"])) != item["sha256"] for item in audited)
+        or _sha(manifest_path) != manifest_sha
+    ):
+        raise ValueError("source input changed before label gate; labels remain sealed")
     # This is the first point at which ANY labels may enter memory.
     gold, gold_inputs = _load_source_gold(project_root, manifest)
     scoring_audits = {
@@ -387,10 +425,16 @@ def main(argv=None):
     parser.add_argument("--runs", type=Path, default=Path("runs"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--score-new", action="store_true")
+    parser.add_argument("--profile", choices=[LEGACY.name, ACTION_LIST.name], default=LEGACY.name)
     args = parser.parse_args(argv)
     root = args.root.resolve(strict=True)
     result = score_operator_sources(
-        root, root / args.manifest, root / args.runs, root / args.output_dir, write=args.score_new
+        root,
+        root / args.manifest,
+        root / args.runs,
+        root / args.output_dir,
+        write=args.score_new,
+        **({"profile": args.profile} if args.profile != LEGACY.name else {}),
     )
     print(
         json.dumps(
