@@ -28,6 +28,7 @@ experiments = [
   "rich>=13.9,<15",
 ]
 dev = [
+  "numpy>=1.26,<3",
   "pytest>=8.3,<9",
   "pytest-cov>=5,<7",
   "ruff>=0.8,<1",

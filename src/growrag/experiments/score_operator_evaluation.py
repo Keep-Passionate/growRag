@@ -363,13 +363,21 @@ def score_operator_evaluation(
     expected_certificate_sha256: str,
     write: bool = False,
 ) -> dict:
-    from . import hotpot, operator_evaluation_summary, score_operator_sources, shared_hotpot_dev
+    from . import (
+        hotpot,
+        operator_evaluation_inference,
+        operator_evaluation_summary,
+        score_operator_sources,
+        shared_hotpot_dev,
+    )
+    from .operator_evaluation_freeze import analysis_signature
 
     implementation_inputs = [
         {"path": str(path), "sha256": _sha(path)}
         for path in (
             Path(__file__).resolve(),
             Path(operator_evaluation_summary.__file__).resolve(),
+            Path(operator_evaluation_inference.__file__).resolve(),
             Path(score_operator_sources.__file__).resolve(),
             Path(hotpot.__file__).resolve(),
             Path(shared_hotpot_dev.__file__).resolve(),
@@ -384,6 +392,10 @@ def score_operator_evaluation(
     if write and output_dir.exists():
         raise FileExistsError("evaluation feedback exists; never overwrite or select a rerun")
     freeze = _validate_freeze(root, certificate_path, expected_certificate_sha256)
+    # Check the code actually imported by this scorer, not only declared workspace bytes.
+    actual_analysis = analysis_signature(Path(__file__).resolve().parents[3])
+    if freeze.get("analysis") != actual_analysis:
+        raise ValueError("scoring policy/code/library differs from before-evaluation freeze")
     if _inside(root, Path(freeze["paths"]["runs"]), directory=True) != runs_root:
         raise ValueError("runs root differs from evaluation freeze")
     manifest_path = _inside(root, Path(freeze["paths"]["manifest"]))
@@ -416,13 +428,14 @@ def score_operator_evaluation(
         ),
         "execution_counts": execution_counts,
         "scoring_implementation": implementation_inputs,
+        "analysis": actual_analysis,
         "prediction_inputs": inputs,
         "gold_loaded": False,
         "api_calls": 0,
         "memory_updated": False,
         "raw_predictions_modified": False,
         "failure_policy": (
-            "failed and failure_induced_unstarted metrics remain unknown; no resampling"
+            "failed and failure_induced_unstarted metrics remain unknown; no replacement questions"
         ),
     }
     if not write:
@@ -443,6 +456,12 @@ def score_operator_evaluation(
                     caused_by_arm=report.get("caused_by_arm"),
                 )
     summary = operator_evaluation_summary.summarize_evaluation(reports, feedback)
+    inference = operator_evaluation_inference.infer_evaluation(reports, feedback)
+    if (
+        inference.get("policy") != actual_analysis["policy"]
+        or inference.get("numpy_version") != actual_analysis["numpy_version"]
+    ):
+        raise ValueError("inference used a different analysis policy or loaded library")
     for entry in inputs + gold_inputs:
         if _sha(_inside(root, Path(entry["path"]))) != entry["sha256"]:
             raise ValueError("evaluation input changed during offline scoring")
@@ -450,10 +469,13 @@ def score_operator_evaluation(
         raise ValueError("evaluation bank/method/freeze changed while scoring")
     if any(_sha(Path(entry["path"])) != entry["sha256"] for entry in implementation_inputs):
         raise ValueError("scoring implementation changed during scoring")
+    if analysis_signature(Path(__file__).resolve().parents[3]) != actual_analysis:
+        raise ValueError("analysis policy/code/library changed during scoring")
     output_dir.mkdir(parents=True, exist_ok=False)
     write_json(output_dir / "feedback.json", feedback)
     write_json(output_dir / "evaluation_reports.json", reports)
     write_json(output_dir / "summary.json", summary)
+    write_json(output_dir / "inference.json", inference)
     audit.update(
         gold_loaded=True,
         gold_inputs=gold_inputs,
@@ -461,7 +483,12 @@ def score_operator_evaluation(
         reports_sha256=fingerprint(reports),
         artifacts={
             name: {"sha256": _sha(output_dir / name)}
-            for name in ("feedback.json", "evaluation_reports.json", "summary.json")
+            for name in (
+                "feedback.json",
+                "evaluation_reports.json",
+                "summary.json",
+                "inference.json",
+            )
         },
     )
     write_json(output_dir / "audit.json", audit)

@@ -23,7 +23,11 @@ def _qid(number):
 @pytest.fixture
 def frozen(tmp_path, monkeypatch):
     # These are inert text fixtures hashed by execution_signature, never imported.
-    for name in (*METHOD_FILES, "src/growrag/experiments/run_operator_study.py"):
+    for name in (
+        *METHOD_FILES,
+        "src/growrag/experiments/run_operator_study.py",
+        *module.ANALYSIS_FILES,
+    ):
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("synthetic frozen code\n", encoding="utf-8")
@@ -192,6 +196,7 @@ def test_dry_freeze_checks_full_source_and_binds_500_order_seven_arms_without_wr
     assert body["runner_unlock_performed"] is False
     assert body["memory_fallback_policy"] == "empty-visible-library-is-fresh-v1"
     assert body["evaluation_runtime_decoded"] is False and body["new_gold_decoded"] is False
+    assert body["analysis"] == module.analysis_signature(frozen["root"])
 
 
 def test_issue_once_then_revalidate_every_dependency(frozen):
@@ -238,6 +243,22 @@ def test_changed_method_is_detected(frozen):
     module.create_evaluation_freeze(**frozen, write=True)
     (frozen["root"] / METHOD_FILES[0]).write_text("changed method")
     with pytest.raises(ValueError, match="method differs"):
+        _validate(frozen)
+
+
+@pytest.mark.parametrize("name", module.ANALYSIS_FILES)
+def test_analysis_code_is_frozen_before_any_evaluation(frozen, name):
+    module.create_evaluation_freeze(**frozen, write=True)
+    (frozen["root"] / name).write_text("changed analysis", encoding="utf-8")
+    assert execution_signature(frozen["root"])["sha256"] == frozen["expected_execution_sha256"]
+    with pytest.raises(ValueError, match="dependencies changed"):
+        _validate(frozen)
+
+
+def test_analysis_library_version_change_invalidates_freeze(frozen, monkeypatch):
+    module.create_evaluation_freeze(**frozen, write=True)
+    monkeypatch.setattr(module, "version", lambda name: "different-version")
+    with pytest.raises(ValueError, match="dependencies changed"):
         _validate(frozen)
 
 

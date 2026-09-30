@@ -11,6 +11,7 @@ import json
 import re
 from collections import Counter
 from datetime import UTC, datetime
+from importlib.metadata import version
 from pathlib import Path
 
 from growrag.operator_bank import FrozenOperatorBank
@@ -27,6 +28,29 @@ from .score_operator_sources import collect_frozen_sources
 
 SCHEMA = "growrag-operator-evaluation-freeze-v1"
 _SHA = re.compile(r"[0-9a-f]{64}")
+ANALYSIS_FILES = tuple(
+    f"src/growrag/experiments/{name}.py"
+    for name in (
+        "score_operator_evaluation",
+        "operator_evaluation_summary",
+        "operator_evaluation_inference",
+        "score_operator_sources",
+        "hotpot",
+        "shared_hotpot_dev",
+    )
+)
+
+
+def analysis_signature(root: Path) -> dict:
+    """Pin the analysis before evaluation; do not infer or read any observations."""
+    from .operator_evaluation_inference import analysis_policy
+
+    root = root.resolve(strict=True)
+    return {
+        "policy": analysis_policy(),
+        "files": {name: _sha(_path(root, root / name)) for name in ANALYSIS_FILES},
+        "numpy_version": version("numpy"),
+    }
 
 
 def _path(root: Path, value: str | Path, *, directory: bool = False) -> Path:
@@ -99,6 +123,9 @@ def _freeze_body(
     # empty-memory fallback and evaluation dispatch must not change after freeze.
     wrapper_path = _path(root, root / "src/growrag/experiments/run_operator_study.py")
     wrapper_sha = pin(wrapper_path)
+    analysis = analysis_signature(root)
+    for name, digest in analysis["files"].items():
+        pin(root / name, digest)
 
     reports, model, prediction_inputs = collect_frozen_sources(
         manifest, expected["manifest"], runs_root
@@ -245,6 +272,7 @@ def _freeze_body(
         "expected": expected,
         "execution_signature": signature,
         "runner_sha256": wrapper_sha,
+        "analysis": analysis,
         "memory_fallback_policy": "empty-visible-library-is-fresh-v1",
         "evaluation_ids": manifest["roles"]["evaluation"],
         "evaluation_order_sha256": fingerprint(manifest["roles"]["evaluation"]),

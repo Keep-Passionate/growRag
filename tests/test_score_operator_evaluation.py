@@ -3,10 +3,12 @@
 import hashlib
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
 from growrag.experiments import score_operator_evaluation as module
+from growrag.experiments.operator_evaluation_freeze import ANALYSIS_FILES, analysis_signature
 from growrag.experiments.operator_execution_signature import METHOD_FILES, execution_signature
 from growrag.macro_operators import GapField, OperatorSpec, QueryStep
 from growrag.operator_bank import FrozenOperatorBank, OperatorRecord, operator_to_dict
@@ -56,6 +58,12 @@ def _setup(tmp_path, monkeypatch, count=3):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("synthetic code", encoding="utf-8")
     signature = execution_signature(tmp_path)
+    # The scorer verifies its actually imported analysis against the frozen copy.
+    actual_root = Path(module.__file__).resolve().parents[3]
+    for name in ANALYSIS_FILES:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((actual_root / name).read_bytes())
     ids = [_qid(i) for i in range(1000, 1000 + count)]
     source = [_qid(i) for i in range(500)]
     manifest = {
@@ -95,6 +103,7 @@ def _setup(tmp_path, monkeypatch, count=3):
         "runner_sha256": hashlib.sha256(b"synthetic code").hexdigest(),
         "paths": {"runs": "runs", "manifest": "data/manifest.json", "banks": "banks"},
         "banks": banks,
+        "analysis": analysis_signature(tmp_path),
     }
     certificate = tmp_path / "certificate.json"
     _write(certificate, {"freeze": freeze})
@@ -228,13 +237,14 @@ def test_default_preflight_never_loads_gold_or_writes(data, monkeypatch):
     assert result["gold_loaded"] is False and result["arm_count"] == 7
     assert result["all_questions_terminal"] is True
     assert result["all_arm_predictions_completed"] is True
-    assert len(result["scoring_implementation"]) == 5
+    assert len(result["scoring_implementation"]) == 6
     assert {
         entry["path"].replace("\\", "/").rsplit("/", 1)[-1]
         for entry in result["scoring_implementation"]
     } == {
         "score_operator_evaluation.py",
         "operator_evaluation_summary.py",
+        "operator_evaluation_inference.py",
         "score_operator_sources.py",
         "hotpot.py",
         "shared_hotpot_dev.py",
@@ -248,6 +258,20 @@ def test_missing_unstarted_question_cannot_unlock_labels(data, monkeypatch):
     monkeypatch.setattr(module, "_load_dev_gold", lambda *args: pytest.fail("gold opened"))
     with pytest.raises(ValueError, match="need terminal reports"):
         _score(data, write=True)
+
+
+@pytest.mark.parametrize("part", ["policy", "files", "numpy_version"])
+def test_analysis_mismatch_rejected_before_labels(data, monkeypatch, part):
+    if part == "numpy_version":
+        data["freeze"]["analysis"][part] = "another-version"
+    elif part == "files":
+        data["freeze"]["analysis"][part][ANALYSIS_FILES[0]] = "f" * 64
+    else:
+        data["freeze"]["analysis"][part]["unexpected_change"] = True
+    monkeypatch.setattr(module, "_load_dev_gold", lambda *args: pytest.fail("gold opened"))
+    with pytest.raises(ValueError, match="scoring policy/code/library"):
+        _score(data, write=True)
+    assert not (data["root"] / "scored").exists()
 
 
 def test_failed_last_question_explicitly_marks_unstarted_arms_unknown(data, monkeypatch):
@@ -482,6 +506,10 @@ def test_explicit_score_preserves_bad_annotation_and_never_overwrites(data, monk
     assert feedback[data["ids"][1]]["base"]["annotation_status"] == "invalid"
     assert result["memory_updated"] is False and result["raw_predictions_modified"] is False
     assert "summary.json" in result["artifacts"]
+    assert "inference.json" in result["artifacts"]
+    inference = json.loads((data["root"] / "scored/inference.json").read_text())
+    assert inference["question_count"] == len(data["ids"])
+    assert inference["policy"] == result["analysis"]["policy"]
     with pytest.raises(FileExistsError):
         _score(data, write=True)
 
