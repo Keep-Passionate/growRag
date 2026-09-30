@@ -28,6 +28,15 @@ from .fresh_dev_manifest import _sha
 from .operator_data_plan import SCHEMA, SOURCE_SIZES
 from .operator_execution_signature import execution_configuration, execution_signature
 from .operator_model import ModelOperatorPlanner, answer_episode, seed_specs, shortlist_specs
+from .operator_profiles import (
+    LEGACY,
+    PROFILES,
+    STRUCTURED,
+    get_profile,
+    structured_execution_configuration,
+    structured_execution_signature,
+    validate_profile_options,
+)
 from .operator_resume import verify_certificate
 from .pre_pilot import write_json
 from .protocol import Evidence, RuntimeQuestion
@@ -279,17 +288,25 @@ def verify_banks(banks):
         )
 
 
-def check_unstarted(runs, phase, ids, arms, *, resume_certificate=None):
+def check_unstarted(runs, phase, ids, arms, *, resume_certificate=None, profile=LEGACY.name):
+    active_profile = get_profile(profile)
     released_parents = (
         set(resume_certificate["proof"]["ancestor_run_ids"]) if resume_certificate else set()
     )
-    paths = [*runs.glob(f"{PREFIX}*/launch_plan.json"), *runs.glob(f"{PREFIX}*.claim.json")]
-    for path in paths:
+    paths = [
+        (registered, path)
+        for registered in PROFILES
+        for path in (
+            *runs.glob(f"{registered.prefix}*/launch_plan.json"),
+            *runs.glob(f"{registered.prefix}*.claim.json"),
+        )
+    ]
+    for registered, path in paths:
         if not path.resolve().is_relative_to(runs.resolve()):
             raise ValueError("old claim escapes runs root")
         old = json.loads(path.read_bytes())
         if (
-            old.get("protocol") != PROTOCOL
+            old.get("protocol") != registered.protocol
             or old.get("phase") not in COUNTS
             or type(old.get("question_ids")) is not list
             or not old["question_ids"]
@@ -298,6 +315,13 @@ def check_unstarted(runs, phase, ids, arms, *, resume_certificate=None):
             or type(old.get("arms")) is not list
             or not old["arms"]
             or not set(old["arms"]) <= set(ARMS)
+            or (
+                registered == STRUCTURED
+                and (
+                    old["phase"] != "calibration"
+                    or not set(old["arms"]) <= {"base", "fresh", "static"}
+                )
+            )
         ):
             raise ValueError("old pending claim/launch requires offline audit")
         if set(ids) & set(old["question_ids"]):
@@ -309,18 +333,18 @@ def check_unstarted(runs, phase, ids, arms, *, resume_certificate=None):
                     if path.name == "launch_plan.json"
                     else path.name.removesuffix(".claim.json")
                 )
-                if identity in released_parents:
+                if registered == active_profile and identity in released_parents:
                     continue
                 raise ValueError("question/arm already claimed; no automatic replay")
 
 
 @contextmanager
-def serial_lock(runs):
+def serial_lock(runs, *, profile=LEGACY.name):
     """Only this runner's processes cooperate; all project paid runners must be serial."""
     runs.mkdir(parents=True, exist_ok=True)
     path = runs / ".operator-study.lock"
     # Crash leaves the exclusive lock for inspection, never silently steals it.
-    write_json(path, {"pid": os.getpid(), "protocol": PROTOCOL})
+    write_json(path, {"pid": os.getpid(), "protocol": get_profile(profile).protocol})
     digest = _sha(path)
     try:
         yield
@@ -330,8 +354,20 @@ def serial_lock(runs):
         path.unlink()
 
 
-def execute_one(question, arm, index, client, *, bank, output, trace, log):
-    configuration = execution_configuration()
+def execute_one(question, arm, index, client, *, bank, output, trace, log, profile=LEGACY.name):
+    active_profile = get_profile(profile)
+    configuration = (
+        execution_configuration()
+        if active_profile == LEGACY
+        else structured_execution_configuration()
+    )
+    planner_type, reader = ModelOperatorPlanner, answer_episode
+    if active_profile == STRUCTURED:
+        if bank is not None or arm not in {"base", "fresh", "static"}:
+            raise ValueError("structured-v2 calibration cannot use memory banks")
+        from .operator_model_v2 import ModelOperatorPlannerV2, answer_episode_v2
+
+        planner_type, reader = ModelOperatorPlannerV2, answer_episode_v2
     specs = bank.published_specs if bank else seed_specs() if arm == "static" else ()
     mode = "memory" if arm.startswith("memory") else "static" if arm == "static" else "fresh"
     start = len(client.calls)
@@ -370,7 +406,7 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log):
             }
             report["memory_context"] = memory_context
             log({"kind": "memory_context", **memory_context})
-        planner = ModelOperatorPlanner(
+        planner = planner_type(
             client,
             mode=mode,
             specs=specs,
@@ -393,8 +429,13 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log):
             on_event=log,
         )
         report["episode"] = _jsonable(result)
-        report["reader"] = answer_episode(
-            client, question, result.evidence, trace_id=f"{trace}/reader"
+        reader_options = (
+            {"on_record": lambda item: log({"kind": "reader_record", **item})}
+            if active_profile == STRUCTURED
+            else {}
+        )
+        report["reader"] = reader(
+            client, question, result.evidence, trace_id=f"{trace}/reader", **reader_options
         )
         report["status"] = "completed"
     except BaseException as error:
@@ -407,9 +448,15 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log):
 
 
 def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
+    active_profile = get_profile(getattr(args, "profile", LEGACY.name))
+    validate_profile_options(active_profile, args)
     # One lock covers history reconciliation, claim, all calls and ledger finalization.
-    with serial_lock(runs):
-        signature = execution_signature(project)
+    with serial_lock(runs, profile=active_profile.name):
+        signature = (
+            execution_signature(project)
+            if active_profile == LEGACY
+            else structured_execution_signature(project)
+        )
         if (
             args.expected_execution_sha256 is not None
             and signature["sha256"] != args.expected_execution_sha256
@@ -438,7 +485,12 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
             else None
         )
         check_unstarted(
-            runs, args.phase, [q.question_id for q in chosen], args.arms, resume_certificate=resume
+            runs,
+            args.phase,
+            [q.question_id for q in chosen],
+            args.arms,
+            resume_certificate=resume,
+            profile=active_profile.name,
         )
         history = reviewed_history(runs)
         prior = history["prior_reserved_cny"]
@@ -476,6 +528,7 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
             temperature=configuration["temperature"],
             top_p=configuration["top_p"],
             json_object_mode=configuration["json_object_mode"],
+            json_schema_mode=configuration.get("json_schema_mode", False),
         )
         limits = PriceLimits(
             budget_cny=subcap,
@@ -484,7 +537,7 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
         )
         plan = {
             **configuration,
-            "protocol": PROTOCOL,
+            "protocol": active_profile.protocol,
             "run_id": run_id,
             "phase": args.phase,
             "question_ids": [q.question_id for q in chosen],
@@ -520,6 +573,9 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
             "gold_loaded": False,
             "memory_updates": False,
         }
+        if active_profile == STRUCTURED:
+            plan["profile"] = active_profile.name
+            plan["profile_scope"] = "calibration_only_not_source_or_evaluation"
         output = runs / run_id
         if output.exists():
             raise FileExistsError("old run output requires audit; never overwrite")
@@ -571,6 +627,11 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
                             output=target,
                             trace=f"{run_id}/{question.question_id}/{arm}",
                             log=log,
+                            **(
+                                {"profile": active_profile.name}
+                                if active_profile == STRUCTURED
+                                else {}
+                            ),
                         )
                         verify_banks(banks)
                     except BaseException as error:
@@ -665,6 +726,7 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", choices=[p.name for p in PROFILES], default=LEGACY.name)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--expected-manifest-sha256")
     parser.add_argument("--expected-execution-sha256")
@@ -686,6 +748,8 @@ def main(argv=None):
     parser.add_argument("--api-config", type=Path)
     parser.add_argument("--allow-network", action="store_true")
     args = parser.parse_args(argv)
+    active_profile = get_profile(args.profile)
+    validate_profile_options(active_profile, args)
     if args.phase == "evaluation":
         if args.resume_certificate is not None and not args.evaluation_freeze:
             raise ValueError("evaluation resume requires its original evaluation freeze")
@@ -730,7 +794,8 @@ def main(argv=None):
         raise ValueError("batch exceeds frozen split")
     banks = load_banks(args.banks, args.arms, manifest)
     run_id = (
-        f"{PREFIX}{args.phase}_{'_'.join(args.arms)}_{args.start:04d}_{args.start + args.count:04d}"
+        f"{active_profile.prefix}{args.phase}_{'_'.join(args.arms)}"
+        f"_{args.start:04d}_{args.start + args.count:04d}"
     )
     if not re.fullmatch(r"[A-Za-z0-9_-]+", run_id):
         raise ValueError("invalid run identity")
@@ -751,13 +816,19 @@ def main(argv=None):
         else None
     )
     check_unstarted(
-        runs, args.phase, [q.question_id for q in chosen], args.arms, resume_certificate=resume
+        runs,
+        args.phase,
+        [q.question_id for q in chosen],
+        args.arms,
+        resume_certificate=resume,
+        profile=active_profile.name,
     )
     if not args.allow_network:
         print(
             json.dumps(
                 {
-                    "protocol": PROTOCOL,
+                    "protocol": active_profile.protocol,
+                    "profile": active_profile.name,
                     "run_id": run_id,
                     "phase": args.phase,
                     "question_ids": [q.question_id for q in chosen],

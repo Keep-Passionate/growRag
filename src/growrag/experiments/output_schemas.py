@@ -17,7 +17,9 @@ import hashlib
 import json
 from copy import deepcopy
 
-REGISTRY_VERSION = "growrag-output-schemas-v2"
+from .operator_schemas import operator_schema_registry
+
+REGISTRY_VERSION = "growrag-output-schemas-v3"
 
 
 def _object(properties: dict) -> dict:
@@ -116,6 +118,7 @@ _REGISTRY = {
     "growrag-short-supported-answer-v2": ("growrag_short_supported_answer_v2", _ANSWER),
     "s2g-author-5d842a6-judge-api-v1": ("s2g_author_5d842a6_judge_api_v1", _S2G_AUTHOR_JUDGE),
     "s2g-author-5d842a6-extract-api-v1": ("s2g_author_5d842a6_extract_api_v1", _S2G_AUTHOR_EXTRACT),
+    **operator_schema_registry(),
 }
 
 

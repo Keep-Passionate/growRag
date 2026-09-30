@@ -10,6 +10,7 @@ from growrag.controller import (
     GAP_QUERY_PROMPT_VERSION,
     ROUTE_PROMPT_VERSION,
 )
+from growrag.experiments.operator_schemas import operator_schema_registry
 from growrag.experiments.output_schemas import (
     registry_manifest,
     response_format_for,
@@ -28,6 +29,7 @@ def test_registry_tracks_exact_current_prompts_without_alias_fallback():
         READER_VERSION,
         S2G_AUTHOR_VERSIONS["judge"],
         S2G_AUTHOR_VERSIONS["extract"],
+        *operator_schema_registry(),
     }
     for version, item in manifest["schemas"].items():
         assert item["sha256"] == schema_fingerprint(version)
@@ -44,7 +46,7 @@ def test_unreviewed_prompt_has_no_default_schema(version):
 
 def check_closed_objects(node):
     kind = node.get("type")
-    if kind == "object":
+    if kind == "object" or kind == ["object", "null"]:
         assert node["additionalProperties"] is False
         assert set(node["required"]) == set(node["properties"])
         assert len(node["required"]) == len(set(node["required"]))
@@ -53,9 +55,13 @@ def check_closed_objects(node):
     elif kind == "array":
         check_closed_objects(node["items"])
     elif isinstance(kind, list):
-        assert kind in (["string", "null"], ["boolean", "null"])
+        assert kind in (
+            ["string", "null"],
+            ["boolean", "null"],
+            ["string", "integer", "boolean"],
+        )
     else:
-        assert kind in {"string", "boolean", "integer"}
+        assert kind in {"string", "boolean", "integer", "null"}
     # No unverified provider-specific length/conditional schema keywords.
     assert set(node) <= {"type", "properties", "required", "additionalProperties", "items", "enum"}
 

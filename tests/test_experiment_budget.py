@@ -98,3 +98,32 @@ def test_unknown_strict_schema_rejected_before_delegate_or_reservation():
     with pytest.raises(ValueError):
         invoke(client)
     assert delegate.attempts == 0 and client.reserved_cny == 0
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "growrag-operator-fresh-v3",
+        "growrag-operator-static-v3",
+        "growrag-operator-memory-v3",
+        "growrag-operator-reader-v2",
+    ],
+)
+def test_operator_schema_bytes_are_included_in_the_same_project_budget(version):
+    import json
+
+    from growrag.experiments.output_schemas import response_format_for
+
+    messages = [{"role": "user", "content": "Synthetic current observation"}]
+    delegate = Delegate()
+    delegate.config.json_schema_mode = True
+    size = request_input_bytes(delegate.config, messages, prompt_version=version)
+    expected = len(json.dumps(messages, ensure_ascii=False).encode("utf-8")) + len(
+        json.dumps(response_format_for(version), ensure_ascii=False).encode("utf-8")
+    )
+    assert size == expected
+    client = BudgetedChatClient(delegate, PriceLimits())
+    client.complete(messages, trace_id="operator-schema-budget", prompt_version=version)
+    assert client.report()["reserved_cny"] == pytest.approx(
+        ((expected + 1024) * 0.2 + 100 * 0.8) / 1_000_000
+    )

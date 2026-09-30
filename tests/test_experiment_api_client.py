@@ -238,6 +238,29 @@ def test_strict_schema_is_opt_in_audited_and_needs_no_json_keyword(tmp_path, mon
     assert event["output_schema_sha256"] == schema_fingerprint(version)
 
 
+@pytest.mark.parametrize(
+    "version",
+    [
+        "growrag-operator-fresh-v3",
+        "growrag-operator-static-v3",
+        "growrag-operator-memory-v3",
+        "growrag-operator-reader-v2",
+    ],
+)
+def test_operator_schemas_reach_transport_and_are_audited(tmp_path, monkeypatch, version):
+    # A synthetic provider response tests transport only; planner tests separately
+    # reject malformed contents even when the provider advertised strict output.
+    calls = fake_provider(monkeypatch, completion())
+    client = LiveChatClient(config(json_schema_mode=True), tmp_path, allow_network=True)
+    response = client.complete(messages(), trace_id="operator-schema", prompt_version=version)
+    sent = json.loads(calls[0][0].data)
+    assert sent["response_format"] == response_format_for(version)
+    assert len(calls) == 1
+    audit = json.loads(response.audit_path.read_text(encoding="utf-8"))
+    assert audit["output_schema_sha256"] == schema_fingerprint(version)
+    assert audit["retry_count"] == 0
+
+
 def test_unknown_schema_version_rejected_before_credentials_or_network(tmp_path, monkeypatch):
     calls = fake_provider(monkeypatch, completion())
     monkeypatch.delenv("GROWRAG_TEST_ONLY_KEY")
