@@ -5,6 +5,8 @@ param(
     [ValidateRange(0, 499)][int]$Start = 25,
     [ValidateRange(1, 500)][int]$End = 500,
     [ValidateRange(1, 25)][int]$BatchSize = 25,
+    # Keep the legacy default. A larger value must reflect explicit user approval.
+    [ValidateRange(0.01, 300)][double]$ProjectCapCny = 50,
     [ValidatePattern('^[0-9a-f]{64}$')]
     [string]$ExpectedMethod = 'e9122473d934e50a6800d909e6e90fe0db97dfd15f49b51d9a549655f7089836',
     [switch]$AllowNetwork
@@ -30,7 +32,8 @@ try {
             '--expected-execution-sha256', $ExpectedMethod,
             '--phase', 'source', '--start', [string]$taskOffset,
             '--count', [string]$taskCount, '--arms', 'base', 'fresh', 'static',
-            '--budget-cny', '2', '--api-config', 'qwenAPI.md'
+            '--budget-cny', '2', '--api-config', 'qwenAPI.md',
+            '--project-cap-cny', $ProjectCapCny.ToString([Globalization.CultureInfo]::InvariantCulture)
         )
         if ($AllowNetwork) { $taskArguments += '--allow-network' }
         Write-Host "Source interval [$taskOffset, $($taskOffset + $taskCount)); network=$AllowNetwork"

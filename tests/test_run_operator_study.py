@@ -165,7 +165,11 @@ def sandbox(tmp_path, monkeypatch):
     def history(runs):
         state.history_calls += 1
         assert (runs / ".operator-study.lock").exists()
-        return {"prior_reserved_cny": state.prior}
+        return {
+            "prior_reserved_cny": state.prior,
+            "authorized_total_cny": 50.0,
+            "authorization_date": "2026-09-20",
+        }
 
     monkeypatch.setattr(study, "LiveChatClient", FakeLive)
     monkeypatch.setattr(study, "SharedBM25Index", FakeIndex)
@@ -269,6 +273,7 @@ def test_two_question_main_has_immutable_checkpoints_and_budget(sandbox, monkeyp
     )
     plan = read(output / "launch_plan.json")
     assert plan["max_calls"] == 14  # 2 * (BASE1 + FRESH3 + STATIC3)
+    assert plan["project_cap_cny"] == 50.0
     assert sandbox.clients[0].attempts == 10  # Fixture planners immediately stop.
     assert sandbox.clients[0].config.max_output_tokens == 2048
     assert sandbox.clients[0].config.json_object_mode is True
@@ -374,6 +379,11 @@ def test_artifact_cannot_escape_or_mark_labels_runtime_safe(sandbox):
         ["--budget-cny", "inf"],
         ["--budget-cny", "-1"],
         ["--budget-cny", "11"],
+        ["--project-cap-cny", "nan"],
+        ["--project-cap-cny", "inf"],
+        ["--project-cap-cny", "-1"],
+        ["--project-cap-cny", "0"],
+        ["--project-cap-cny", "301"],
         ["--arms", "base", "base"],
     ],
 )
@@ -396,6 +406,51 @@ def test_remaining_project_cap_bounds_requested_subcap(sandbox):
     assert study.main(args(sandbox, count=1, arms=("base",)) + ["--budget-cny", "10"]) == 0
     plan = read(run_dir(sandbox) / "launch_plan.json")
     assert plan["subcap_cny"] == pytest.approx(0.01)
+
+
+def test_explicit_project_cap_retains_history_and_bounds_every_new_ledger(sandbox):
+    sandbox.prior = 199.99
+    command = args(sandbox, count=1, arms=("base",)) + [
+        "--budget-cny",
+        "10",
+        "--project-cap-cny",
+        "200",
+    ]
+    assert study.main(command) == 0
+    output = run_dir(sandbox)
+    plan = read(output / "launch_plan.json")
+    cumulative = read(output / "cumulative_budget.json")
+    ledger = read(output / "final_budget.json")
+    claim = read(output.parent / f"{output.name}.claim.json")
+    assert sandbox.history_calls == 1
+    assert plan["project_cap_cny"] == cumulative["project_cap_cny"] == 200.0
+    assert plan["prior_reserved_cny"] == cumulative["prior_reserved_cny"] == 199.99
+    assert plan["historical_authorized_total_cny"] == 50.0
+    assert plan["historical_authorization_date"] == "2026-09-20"
+    assert "not an additional allocation" in plan["budget_authorization_note"]
+    assert plan["subcap_cny"] == ledger["limits"]["budget_cny"] == pytest.approx(0.01)
+    assert cumulative["cumulative_reserved_cny"] == pytest.approx(
+        sandbox.prior + ledger["reserved_cny"]
+    )
+    assert cumulative["cumulative_reserved_cny"] <= 200.0
+    assert claim == {**plan, "plan_sha256": study.fingerprint(plan)}
+
+
+@pytest.mark.parametrize("prior", [200.0, 200.01, float("nan"), -1.0, True])
+def test_explicit_project_cap_cannot_reset_or_ignore_prior_costs(sandbox, prior):
+    sandbox.prior = prior
+    with pytest.raises(ValueError, match="budget"):
+        study.main(args(sandbox) + ["--project-cap-cny", "200"])
+    assert sandbox.clients == []
+    assert not list((sandbox.root / "runs").glob("*.claim.json"))
+
+
+def test_explicit_project_cap_dry_run_stays_offline(sandbox, capsys):
+    assert study.main(args(sandbox, live=False) + ["--project-cap-cny", "200"]) == 0
+    assert json.loads(capsys.readouterr().out)["project_cap_cny"] == 200.0
+    assert sandbox.clients == sandbox.indexes == []
+    assert sandbox.history_calls == 0
+    assert not (sandbox.root / "runs").exists()
 
 
 @pytest.mark.parametrize(

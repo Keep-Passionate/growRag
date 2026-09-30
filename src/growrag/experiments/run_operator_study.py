@@ -444,9 +444,9 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
         prior = history["prior_reserved_cny"]
         if type(prior) not in (int, float) or not math.isfinite(prior) or prior < 0:
             raise ValueError("invalid prior budget accounting")
-        subcap = min(args.budget_cny, 50 - prior)
+        subcap = min(args.budget_cny, args.project_cap_cny - prior)
         if subcap <= 0:
-            raise ValueError("project cumulative 50 CNY budget exhausted")
+            raise ValueError(f"project cumulative {args.project_cap_cny:g} CNY budget exhausted")
         git, snapshot = _git_state(), source_snapshot(project)
         if not args.api_config or git["worktree_dirty"] or not git.get("commit"):
             raise ValueError("live execution requires specified config and clean committed code")
@@ -505,7 +505,13 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
             "source_sha256": snapshot["sha256"],
             "bank_sha256": {a: b[0].fingerprint for a, b in banks.items()},
             "bank_file_sha256": {a: b[2] for a, b in banks.items()},
-            "project_cap_cny": 50,
+            "project_cap_cny": args.project_cap_cny,
+            "budget_authorization_note": (
+                "Effective project ceiling for this launch; includes all reconciled historical "
+                "reservations, not an additional allocation. Historical authorization is unchanged."
+            ),
+            "historical_authorized_total_cny": history.get("authorized_total_cny"),
+            "historical_authorization_date": history.get("authorization_date"),
             "subcap_cny": subcap,
             "prior_reserved_cny": prior,
             "timeout_seconds": 1800,
@@ -639,7 +645,7 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
                             "prior_reserved_cny": prior,
                             "new_reserved_cny": client.reserved_cny,
                             "cumulative_reserved_cny": prior + client.reserved_cny,
-                            "project_cap_cny": 50,
+                            "project_cap_cny": args.project_cap_cny,
                         },
                     )
                 log(
@@ -671,6 +677,12 @@ def main(argv=None):
     parser.add_argument("--arms", nargs="+", choices=ARMS, default=["base", "fresh", "static"])
     parser.add_argument("--banks", type=Path)
     parser.add_argument("--budget-cny", type=float, default=1.0)
+    parser.add_argument(
+        "--project-cap-cny",
+        type=float,
+        default=50.0,
+        help="Explicitly authorized cumulative project ceiling, including all historical costs.",
+    )
     parser.add_argument("--api-config", type=Path)
     parser.add_argument("--allow-network", action="store_true")
     args = parser.parse_args(argv)
@@ -685,6 +697,8 @@ def main(argv=None):
         raise ValueError("unique arms and a fixed batch of 1-25 questions required")
     if not math.isfinite(args.budget_cny) or not 0 < args.budget_cny <= 10:
         raise ValueError("batch cap must be finite, positive and at most 10 CNY")
+    if not math.isfinite(args.project_cap_cny) or not 0 < args.project_cap_cny <= 300:
+        raise ValueError("project cap must be finite, positive and at most 300 CNY")
     if args.phase == "source" and any(arm.startswith("memory") for arm in args.arms):
         raise ValueError("source collection cannot reuse its own future source banks")
     if args.allow_network and (
@@ -750,7 +764,7 @@ def main(argv=None):
                     "arms": args.arms,
                     "manifest_sha256": manifest_sha,
                     "requested_subcap_cny": args.budget_cny,
-                    "project_cap_cny": 50,
+                    "project_cap_cny": args.project_cap_cny,
                     "network_enabled": False,
                     "notice": "Live launch rechecks cumulative budget under "
                     "an exclusive serial lock.",
