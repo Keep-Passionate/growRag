@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import os
 import re
@@ -16,10 +17,15 @@ import sys
 from pathlib import Path
 
 from growrag.experiments.operator_profiles import ACTION_LIST, action_list_execution_signature
-from growrag.experiments.operator_resume import build_certificate, verify_certificate
+from growrag.experiments.operator_resume import (
+    _evaluation_binding,
+    _method_signature,
+    build_certificate,
+    verify_certificate,
+)
 from growrag.experiments.pre_pilot import write_json
 from growrag.experiments.representation_runner import fingerprint
-from growrag.experiments.shared_continuation import _read, _safe_file
+from growrag.experiments.shared_continuation import _read, _request_evidence, _safe_file
 
 ARMS = ["base", "fresh", "static"]
 TRANSPORT_ERRORS = {"TimeoutError", "URLError"}
@@ -36,8 +42,10 @@ def parser():
     result.add_argument("--project-cap-cny", type=float, default=50)
     result.add_argument("--api-config", type=Path, default=Path("qwenAPI.md"))
     result.add_argument("--resume-certificate", type=Path)
+    result.add_argument("--stop-file", type=Path)
     result.add_argument("--allow-network", action="store_true")
     result.add_argument("--continue-untouched-transport", action="store_true")
+    result.add_argument("--continue-untouched-recorded-model-errors", action="store_true")
     return result
 
 
@@ -171,7 +179,103 @@ def transport_progress(directory):
     )
 
 
-def audited_suffix(args, runs, name, expected_ids, *, certifier=build_certificate):
+def recorded_model_progress(directory):
+    """Recorded post-response rejection is NOT success and never authorizes a retry."""
+    budget, _ = _read(_safe_file(directory, "final_budget.json"))
+    reports, _ = _read(_safe_file(directory, "predictions.json"))
+    failures = [a for row in reports for a in row["arms"].values() if a["status"] == "failed"]
+    calls = budget["calls"]
+    if (
+        budget.get("block_reason") is not None
+        or len(failures) != 1
+        or not calls
+        or failures[0].get("error_type") not in {"ValueError", "TypeError"}
+        or any(c.get("status") != "completed" or c.get("validation_status") for c in calls)
+        or failures[0].get("calls", [])[-1:] != calls[-1:]
+    ):
+        raise ValueError("not an isolated recorded model-output rejection")
+    failed, call = failures[0], calls[-1]
+    audit_path = Path(call["audit_path"]).resolve(strict=True)
+    if audit_path.parent != (directory / "api_audit").resolve(strict=True):
+        raise ValueError("model response audit escapes run")
+    audit, _ = _read(audit_path)
+    trace = f"{directory.name}/{failed['question_id']}/{failed['arm']}"
+    kind = "reader_record" if call["trace_id"] == f"{trace}/reader" else "planner_record"
+    if (
+        kind == "planner_record"
+        and not re.fullmatch(re.escape(trace) + r"/plan/[1-9][0-9]*", call["trace_id"])
+        or audit.get("trace_id") != call["trace_id"]
+        or audit.get("status") != "completed"
+        or call.get("api_requests") != 1
+        or audit.get("http_status") != 200
+        or audit.get("network_attempted") is not True
+        or audit.get("retry_count") != 0
+        or audit.get("api_requests") != 1
+        or audit.get("transport_source") != "live_api"
+        or audit.get("response_redacted") is not False
+        or audit.get("finish_reason") != "stop"
+        or audit.get("error_type") is not None
+    ):
+        raise ValueError("missing matching completed HTTP200 live model response")
+    events = [
+        json.loads(line)
+        for line in _safe_file(directory, "events.jsonl").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    raw_indices = [
+        i
+        for i, event in enumerate(events)
+        if event.get("kind") == kind
+        and event.get("stage") == "raw_wire"
+        and event.get("question_id") == failed["question_id"]
+        and event.get("arm") == failed["arm"]
+    ]
+    if not raw_indices:
+        raise ValueError("model output has no raw planner/reader record")
+    index = raw_indices[-1]
+    record, tail = events[index], events[index + 1 :]
+    choices = audit["response"]["choices"]
+    if (
+        len(choices) != 1
+        or record.get("raw_content") != choices[0]["message"]["content"]
+        or record.get("prompt_version") != audit.get("prompt_version")
+        or record.get("prompt_version") != call.get("prompt_version")
+        or record.get("payload") != json.loads(audit["request"]["messages"][1]["content"])
+        or len(tail) not in {2, 3}
+        or len(tail) == 3
+        and (
+            kind != "planner_record"
+            or tail[0].get("kind") != kind
+            or tail[0].get("stage") != "normalized_parser_input"
+        )
+        or tail[-2].get("kind") != "failure"
+        or tail[-2].get("error_type") != failed["error_type"]
+        or tail[-1].get("kind") != "exit"
+        or tail[-1].get("status") != "failed"
+        or any(
+            e.get("question_id") != failed["question_id"] or e.get("arm") != failed["arm"]
+            for e in tail
+        )
+    ):
+        raise ValueError("raw model output/ordered failure records differ from API response")
+    return sum(
+        list(row["arms"]) == ARMS and all(a["status"] == "completed" for a in row["arms"].values())
+        for row in reports
+    )
+
+
+def continuation_progress(directory, args):
+    budget, _ = _read(_safe_file(directory, "final_budget.json"))
+    if args.continue_untouched_transport and budget.get("block_reason") == "transport_failure":
+        return transport_progress(directory)
+    if args.continue_untouched_recorded_model_errors and budget.get("block_reason") is None:
+        return recorded_model_progress(directory)
+    raise ValueError("failure class is not explicitly enabled for untouched continuation")
+
+
+def audited_suffix(
+    args, runs, name, expected_ids, *, certifier=build_certificate, classify=transport_progress
+):
     certificate = certifier(runs, name, profile=ACTION_LIST.name)
     proof = certificate["proof"]
     started, remaining = proof["started_question_ids"], proof["question_ids"]
@@ -186,7 +290,7 @@ def audited_suffix(args, runs, name, expected_ids, *, certifier=build_certificat
         or proof["source_execution_sha256"] != args.expected_execution_sha256
     ):
         raise ValueError("certificate does not prove the exact strictly advancing source suffix")
-    completed = transport_progress(runs / name)
+    completed = classify(runs / name)
     return certificate, len(started), completed
 
 
@@ -222,6 +326,172 @@ def initial_resume(args, project, ids):
     return path, args.start + len(wanted)
 
 
+def terminal_interval(args, project, name, expected_ids, *, phase="source", arms=ARMS):
+    """Fully audit a closed interval; terminal_failed is never prediction success.
+
+    No empty resume certificate is fabricated when the LAST question failed.
+    The caller must already have waited for its own child and classified any failure.
+    """
+    runs, directory = project / "runs", (project / "runs" / name).resolve(strict=True)
+    if directory.parent != runs.resolve(strict=True):
+        raise ValueError("terminal interval escapes runs")
+
+    def read(filename):
+        return _read(_safe_file(directory, filename))[0]
+
+    launch, reports, seal, budget = (
+        read(n)
+        for n in (
+            "launch_plan.json",
+            "predictions.json",
+            "predictions_frozen.json",
+            "final_budget.json",
+        )
+    )
+    claim = _read(_safe_file(runs, f"{name}.claim.json"))[0]
+    if (
+        launch.get("run_id") != name
+        or launch.get("protocol") != ACTION_LIST.protocol
+        or launch.get("profile") != ACTION_LIST.name
+        or launch.get("phase") != phase
+        or launch.get("arms") != arms
+        or launch.get("question_ids") != expected_ids
+        or launch.get("gold_loaded") is not False
+        or launch.get("memory_updates") is not False
+        or launch.get("manifest_sha256") != args.expected_manifest_sha256
+        or _method_signature(launch.get("execution_signature"), ACTION_LIST)
+        != args.expected_execution_sha256
+        or launch.get("model") != launch["execution_signature"]["configuration"]["model"]
+        or claim != {**launch, "plan_sha256": fingerprint(launch)}
+        or [row.get("question_id") for row in reports] != expected_ids
+        or seal.get("question_ids") != expected_ids
+        or seal.get("sha256") != fingerprint(reports)
+        or seal.get("phase") != phase
+        or seal.get("gold_loaded") is not False
+        or seal.get("status") not in {"completed", "failed"}
+        or seal.get("cleanup_errors") != []
+    ):
+        raise ValueError("interval is not completely and cleanly terminal under the frozen method")
+    owned, records, failed_count, complete = [], set(), 0, 0
+    for number, row in enumerate(reports):
+        qid, outcomes = row["question_id"], row["arms"]
+        checkpoint = f"checkpoint_{number:04d}.json"
+        if (
+            not outcomes
+            or list(outcomes) != arms[: len(outcomes)]
+            or read(checkpoint) != row
+            or row.get("feedback") is not None
+            or row.get("memory_updated", False)
+        ):
+            raise ValueError("terminal checkpoint or arm sequence differs")
+        records.add(checkpoint)
+        failures = []
+        for arm, outcome in outcomes.items():
+            filename = f"{qid}_{arm}.json"
+            records.add(filename)
+            if (
+                read(filename) != outcome
+                or outcome.get("question_id") != qid
+                or outcome.get("arm") != arm
+                or outcome.get("status") not in {"completed", "failed"}
+                or outcome.get("feedback") is not None
+                or outcome.get("memory_updated") is not False
+                or type(outcome.get("calls")) is not list
+                or any(
+                    not c.get("trace_id", "").startswith(f"{name}/{qid}/{arm}/")
+                    for c in outcome["calls"]
+                )
+            ):
+                raise ValueError("terminal arm report or call ownership differs")
+            owned.extend(outcome["calls"])
+            if outcome["status"] == "failed":
+                failures.append(arm)
+        if (
+            len(failures) > 1
+            or failures
+            and (number != len(reports) - 1 or failures != [list(outcomes)[-1]])
+            or not failures
+            and list(outcomes) != arms
+        ):
+            raise ValueError("only the final question may have one terminal failing arm")
+        failed_count += len(failures)
+        complete += int(not failures)
+    actual = {
+        p.name
+        for p in directory.iterdir()
+        if re.fullmatch(r"(?:[0-9a-f]{24}_.+|checkpoint_.+)\.json", p.name)
+    }
+    if (
+        records != actual
+        or budget.get("calls") != owned
+        or len({c["trace_id"] for c in owned}) != len(owned)
+        or (seal["status"] == "failed") != (failed_count == 1)
+    ):
+        raise ValueError("terminal files, final ledger or failure count differ")
+    events = [
+        json.loads(line)
+        for line in _safe_file(directory, "events.jsonl").read_bytes().splitlines()
+        if line.strip()
+    ]
+    if (
+        not events
+        or events[-1].get("kind") != "exit"
+        or events[-1].get("status") != seal["status"]
+        or events[-1].get("requests") != budget.get("api_requests")
+        or any(e.get("kind") == "exit" for e in events[:-1])
+    ):
+        raise ValueError("terminal exit and ledger differ")
+    _request_evidence(directory, budget, set(), reports, events[-4:])
+    for filename in ("live.log", "process.json", "source_snapshot.json", "cumulative_budget.json"):
+        _safe_file(directory, filename)
+    if phase == "evaluation":
+        binding = _evaluation_binding(runs, launch, read, ACTION_LIST)
+        if (
+            binding["freeze_path"] != str(args.evaluation_freeze.resolve(strict=True))
+            or binding["freeze_sha256"] != args.expected_freeze_sha256
+        ):
+            raise ValueError("terminal evaluation freeze differs")
+    if launch.get("resume_parent_run_id") is not None:
+        certificate = read("resume_certificate.json")
+        if (
+            fingerprint(certificate) != launch.get("resume_certificate_sha256")
+            or certificate["proof"]["parent_run_id"] != launch["resume_parent_run_id"]
+        ):
+            raise ValueError("terminal ancestry differs")
+        verify_certificate(
+            runs,
+            directory / "resume_certificate.json",
+            phase=phase,
+            question_ids=expected_ids,
+            arms=arms,
+            manifest_sha256=args.expected_manifest_sha256,
+            model=launch["model"],
+            signature=launch["execution_signature"],
+            profile=ACTION_LIST.name,
+            **(
+                {
+                    "evaluation_freeze": args.evaluation_freeze,
+                    "expected_freeze_sha256": args.expected_freeze_sha256,
+                }
+                if phase == "evaluation"
+                else {}
+            ),
+        )
+    return {
+        "status": "terminal_failed" if failed_count else "completed",
+        "completed_questions": complete,
+    }
+
+
+def stop_requested(args, project):
+    if args.stop_file is None:
+        return False
+    path = (project / args.stop_file).resolve()
+    if not path.is_relative_to(project):
+        raise ValueError("stop file must stay inside project")
+    return path.exists()  # Do not read contents or terminate an in-flight child.
+
+
 def collect(args, project, ids, *, execute=subprocess.run, certifier=build_certificate):
     """No detached jobs or shell commands: execute returns only when child has exited."""
     runs = project / "runs"
@@ -233,6 +503,9 @@ def collect(args, project, ids, *, execute=subprocess.run, certifier=build_certi
         certificate_path = initial_path
         initial_path, initial_end = None, None
         while start < end:
+            if stop_requested(args, project):
+                print("Stopped at audited boundary; no next child launched.", flush=True)
+                return 2
             argv = command(args, start, end, certificate_path)
             print(subprocess.list2cmdline(argv), flush=True)
             if not args.allow_network:
@@ -250,14 +523,35 @@ def collect(args, project, ids, *, execute=subprocess.run, certifier=build_certi
                 completed_batch(runs / name, ids[start:end])
                 start, zero_progress = end, 0
                 continue
-            if not args.continue_untouched_transport:
+            if not (
+                args.continue_untouched_transport or args.continue_untouched_recorded_model_errors
+            ):
                 return child.returncode
+            if (
+                _read(_safe_file(runs / name, "predictions_frozen.json"))[0].get("question_ids")
+                == ids[start:end]
+            ):
+                continuation_progress(runs / name, args)
+                terminal = terminal_interval(args, project, name, ids[start:end])
+                zero_progress = 0 if terminal["completed_questions"] else zero_progress + 1
+                print(
+                    f"Interval status: {terminal['status']}; failed question will not be replayed."
+                )
+                if zero_progress >= 3:
+                    return 1
+                start = end
+                break
             certificate, used, completed = audited_suffix(
-                args, runs, name, ids[start:end], certifier=certifier
+                args,
+                runs,
+                name,
+                ids[start:end],
+                certifier=certifier,
+                classify=lambda directory: continuation_progress(directory, args),
             )
             zero_progress = 0 if completed else zero_progress + 1
             if zero_progress >= 3:
-                print("Stopped: three consecutive transport failures without a full question.")
+                print("Stopped: three consecutive recorded failures without a full question.")
                 return 1
             certificate_path = runs / f"{name}_untouched_certificate.json"
             write_json(certificate_path, certificate)  # Exclusive; never overwrite prior proof.

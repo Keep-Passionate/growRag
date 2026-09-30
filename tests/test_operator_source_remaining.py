@@ -90,6 +90,9 @@ def failed_fixture(project, start, end, used=1, error="TimeoutError"):
     dump(directory / "predictions.json", reports)
     dump(directory / "final_budget.json", {"block_reason": "transport_failure", "calls": [call]})
     dump(
+        directory / "predictions_frozen.json", {"question_ids": [r["question_id"] for r in reports]}
+    )
+    dump(
         audit_path,
         {
             "status": "failed",
@@ -404,4 +407,199 @@ def test_explicit_certificate_does_not_override_existing_target_claim(tmp_path, 
     with pytest.raises(ValueError, match="already exists"):
         launcher.collect(
             options, tmp_path, IDS, execute=lambda *a, **kw: pytest.fail("must not replay")
+        )
+
+
+def recorded_model_fixture(project, start=0, end=5, component="reader"):
+    certificate = failed_fixture(project, start, end, error="ValueError")
+    directory = project / "runs" / launcher.run_name(start, end)
+    reports = json.loads((directory / "predictions.json").read_text())
+    failed = reports[-1]["arms"]["fresh"]
+    failed.update(question_id=IDS[start], arm="fresh")
+    call = failed["calls"][0]
+    call.update(status="completed", api_requests=1, prompt_version="frozen-fixture")
+    call["trace_id"] = f"{directory.name}/{IDS[start]}/fresh/{component}"
+    payload = {"original_question": "Synthetic fixture, no real dataset"}
+    content = '{"invalid":"frozen model output"}'
+    dump(
+        Path(call["audit_path"]),
+        {
+            "status": "completed",
+            "http_status": 200,
+            "network_attempted": True,
+            "retry_count": 0,
+            "transport_source": "live_api",
+            "api_requests": 1,
+            "response_redacted": False,
+            "finish_reason": "stop",
+            "trace_id": call["trace_id"],
+            "prompt_version": "frozen-fixture",
+            "response": {"choices": [{"message": {"content": content}}]},
+            "request": {
+                "messages": [
+                    {"role": "system", "content": "fixture"},
+                    {"role": "user", "content": json.dumps(payload)},
+                ]
+            },
+        },
+    )
+    dump(directory / "predictions.json", reports)
+    dump(directory / "final_budget.json", {"block_reason": None, "calls": [call]})
+    kind = "reader_record" if component == "reader" else "planner_record"
+    context = {"question_id": IDS[start], "arm": "fresh"}
+    events = [
+        {
+            **context,
+            "kind": kind,
+            "stage": "raw_wire",
+            "raw_content": content,
+            "prompt_version": "frozen-fixture",
+            "payload": payload,
+        }
+    ]
+    if kind == "planner_record":
+        events.append({**context, "kind": kind, "stage": "normalized_parser_input"})
+    events.extend(
+        [
+            {**context, "kind": "failure", "error_type": "ValueError"},
+            {**context, "kind": "exit", "status": "failed"},
+        ]
+    )
+    (directory / "events.jsonl").write_text(
+        "\n".join(json.dumps(e) for e in events), encoding="utf-8"
+    )
+    return certificate, directory
+
+
+@pytest.mark.parametrize("component", ["reader", "plan/2"])
+def test_recorded_model_rejection_requires_explicit_switch_and_full_suffix_audit(
+    tmp_path, component
+):
+    cert, directory = recorded_model_fixture(tmp_path, component=component)
+    assert launcher.recorded_model_progress(directory) == 0
+    with pytest.raises(ValueError, match="not explicitly enabled"):
+        launcher.continuation_progress(directory, args("--continue-untouched-transport"))
+    options = args("--continue-untouched-recorded-model-errors")
+    assert launcher.audited_suffix(
+        options,
+        tmp_path / "runs",
+        directory.name,
+        IDS[:5],
+        certifier=lambda *a, **kw: cert,
+        classify=lambda path: launcher.continuation_progress(path, options),
+    )[1:] == (1, 0)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["http", "response", "trace", "missing_raw", "budget", "later_work"]
+)
+def test_recorded_model_rejection_refuses_unproven_or_unrelated_failure(tmp_path, mutation):
+    _, directory = recorded_model_fixture(tmp_path)
+    audit_path = directory / "api_audit/failed.json"
+    if mutation in {"http", "response", "trace"}:
+        audit = json.loads(audit_path.read_text())
+        if mutation == "http":
+            audit["http_status"] = 429
+        elif mutation == "trace":
+            audit["trace_id"] += "/different"
+        else:
+            audit["response"]["choices"][0]["message"]["content"] = "different output"
+        dump(audit_path, audit)
+    elif mutation == "budget":
+        budget = json.loads((directory / "final_budget.json").read_text())
+        budget["block_reason"] = "estimated_budget_limit"
+        dump(directory / "final_budget.json", budget)
+    else:
+        path = directory / "events.jsonl"
+        events = [json.loads(line) for line in path.read_text().splitlines()]
+        if mutation == "missing_raw":
+            events.pop(0)
+        else:
+            events.insert(1, {"kind": "operator_search", "question_id": IDS[0], "arm": "fresh"})
+        path.write_text("\n".join(json.dumps(e) for e in events), encoding="utf-8")
+    with pytest.raises(ValueError):
+        launcher.recorded_model_progress(directory)
+
+
+def test_three_mixed_transport_and_recorded_model_failures_share_stop_counter(tmp_path):
+    seen, certs = [], {}
+
+    def execute(argv, **kw):
+        start, end = interval(argv)
+        seen.append((start, end))
+        if start == 1:
+            cert = failed_fixture(tmp_path, start, end)
+        else:
+            cert, _ = recorded_model_fixture(tmp_path, start, end)
+        certs[launcher.run_name(start, end)] = cert
+        return SimpleNamespace(returncode=1)
+
+    assert (
+        launcher.collect(
+            args(
+                "--allow-network",
+                "--continue-untouched-transport",
+                "--continue-untouched-recorded-model-errors",
+            ),
+            tmp_path,
+            IDS,
+            execute=execute,
+            certifier=lambda r, n, **kw: certs[n],
+        )
+        == 1
+    )
+    assert seen == [(0, 5), (1, 5), (2, 5)]
+    assert len(list((tmp_path / "runs").glob("*_untouched_certificate.json"))) == 2
+
+
+def test_source_last_question_failure_advances_only_after_full_interval_audit(
+    tmp_path, monkeypatch
+):
+    seen, audits = [], []
+
+    def execute(argv, **kw):
+        start, end = interval(argv)
+        seen.append((start, end))
+        if start == 0:
+            failed_fixture(tmp_path, start, end, used=end - start)
+            return SimpleNamespace(returncode=1)
+        seal_success(tmp_path, start, end)
+        return SimpleNamespace(returncode=0)
+
+    def terminal(options, project, name, ids):
+        audits.append(ids)
+        return {"status": "terminal_failed", "completed_questions": len(ids) - 1}
+
+    monkeypatch.setattr(launcher, "terminal_interval", terminal)
+    assert (
+        launcher.collect(
+            args("--allow-network", "--continue-untouched-transport", "--batch-size", "2"),
+            tmp_path,
+            IDS,
+            execute=execute,
+            certifier=lambda *a, **kw: pytest.fail("no fake empty suffix proof"),
+        )
+        == 0
+    )
+    assert seen == [(0, 2), (2, 4), (4, 5)] and audits == [IDS[:2]]
+
+
+def test_stop_file_is_not_read_and_prevents_next_child(tmp_path):
+    flag = tmp_path / "stop.flag"
+    flag.write_bytes(b"\xffnot text or instructions")
+    assert (
+        launcher.collect(
+            args("--allow-network", "--stop-file", str(flag)),
+            tmp_path,
+            IDS,
+            execute=lambda *a, **kw: pytest.fail("must stop before child"),
+        )
+        == 2
+    )
+    with pytest.raises(ValueError, match="stop file must stay inside"):
+        launcher.collect(
+            args("--stop-file", str(tmp_path.parent / "outside.flag")),
+            tmp_path,
+            IDS,
+            execute=lambda *a, **kw: pytest.fail("outside path"),
         )
