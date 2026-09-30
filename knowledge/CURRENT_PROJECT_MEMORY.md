@@ -11,6 +11,7 @@
 - 本次只更换独立train来源500；保持cal100/eval500/corpus的字节和题序，原source及claim不释放、不混进新版。50/100/250/500为来源题规模，非卡片数量；正式evaluation不能更新记忆。
 - 已有24道v3真实校准覆盖CREATE与SELECT。此轮仅版本和数据入口贯通、不改变规划器，因此合成端到端验收后直接进入新来源首批25，不再耗一个回合重复校准；如将来改prompt/执行语义，则需另定版本与独立校准。
 - 无需租GPU；“训练历史”仍是轨迹提炼，不是权重训练。23:42本地包仍26.924.2738.0，已验证的新26.928.2636.0包待用户退出重开完成延迟注册。
+- 实际新source已冻结：`data/hotpotqa/operator_scale_action_v3/manifest.json`，SHA `afc54ffb487b095b9cabf751cc3139fe0b84df93b7577770cb44462766488618`；排除2338旧ID/1845既有规范化hash，新旧source交集0，原cal/eval题序与cal/eval/corpus字节SHA完全保留。无API/gold/校准评价文本解码。方法SHA `4be7fdc008acb8fd6e6c7433c1b6782d96df248f4a0da5cb21b6877f7596248e`；source0:25三路dry-run已通过，待最终验收后真实启动。
 
 ## 2026-09-30再续轮：空动作协议v3
 
