@@ -1,6 +1,6 @@
 """Audited serial operator batches: predictions only, no scoring or memory writes.
 
-显式 allow-network 才调用普通按量 API。来源/校准可运行，封存评测仍硬锁。
+显式 allow-network 才调用普通按量 API。评测须先通过独立来源冻结证书。
 每条请求、每题输出、失败和预算独立保存；旧 claim 不自动释放或重试。
 """
 
@@ -27,7 +27,7 @@ from .budget import PriceLimits
 from .fresh_dev_manifest import _sha
 from .operator_data_plan import SCHEMA, SOURCE_SIZES
 from .operator_execution_signature import execution_configuration, execution_signature
-from .operator_model import ModelOperatorPlanner, answer_episode, seed_specs
+from .operator_model import ModelOperatorPlanner, answer_episode, seed_specs, shortlist_specs
 from .operator_resume import verify_certificate
 from .pre_pilot import write_json
 from .protocol import Evidence, RuntimeQuestion
@@ -116,10 +116,74 @@ def artifact(root, manifest, name):
     return path
 
 
-def load_inputs(path, phase):
-    # Lock BEFORE opening even evaluation question text; a caller cannot bypass main.
-    if phase not in {"source", "calibration"}:
+def _evaluation_gate(options, project, *, chosen_ids=None):
+    """Validate provenance before reading evaluation text or launching paid work.
+
+    Local import is essential: the offline freeze builder itself imports this
+    runner's source-only loader. This gate never scores or opens dev labels.
+    """
+    if (
+        options is None
+        or options.phase != "evaluation"
+        or not options.evaluation_freeze
+        or not isinstance(options.expected_freeze_sha256, str)
+        or not _SHA.fullmatch(options.expected_freeze_sha256)
+    ):
         raise ValueError("evaluation locked until source/calibration freeze certificates exist")
+    if (
+        tuple(options.arms) != ARMS
+        or options.banks is None
+        or options.resume_certificate is not None
+        or not isinstance(options.expected_execution_sha256, str)
+        or not _SHA.fullmatch(options.expected_execution_sha256)
+        or not isinstance(options.expected_manifest_sha256, str)
+        or not _SHA.fullmatch(options.expected_manifest_sha256)
+    ):
+        raise ValueError(
+            "evaluation requires all seven ordered arms, frozen banks and fingerprints"
+        )
+    from .operator_evaluation_freeze import validate_evaluation_freeze
+
+    project = Path(project).resolve(strict=True)
+    body = validate_evaluation_freeze(
+        project,
+        options.evaluation_freeze,
+        expected_certificate_sha256=options.expected_freeze_sha256,
+    )
+    if (
+        body["protocol"] != PROTOCOL
+        or (project / body["paths"]["manifest"]).resolve(strict=True)
+        != options.manifest.resolve(strict=True)
+        or (project / body["paths"]["banks"]).resolve(strict=True)
+        != options.banks.resolve(strict=True)
+        or (project / body["paths"]["runs"]).resolve(strict=True) != project / "runs"
+        or body["expected"]["manifest"] != options.expected_manifest_sha256
+        or body["expected"]["execution"] != options.expected_execution_sha256
+        or execution_signature(project) != body["execution_signature"]
+        or set(body["controls"]) != set(ARMS)
+    ):
+        raise ValueError("evaluation request differs from the frozen manifest/banks/method")
+    ids = body["evaluation_ids"]
+    if (
+        body["evaluation_order_sha256"] != fingerprint(ids)
+        or chosen_ids is not None
+        and chosen_ids != ids[options.start : options.start + options.count]
+    ):
+        raise ValueError("evaluation order differs from frozen question IDs")
+    return body
+
+
+def load_inputs(path, phase, *, evaluation_options=None):
+    # Lock BEFORE opening even the manifest/evaluation text for direct callers.
+    evaluation = None
+    if phase == "evaluation":
+        evaluation = _evaluation_gate(evaluation_options, Path.cwd())
+        if Path(path).resolve(strict=True) != evaluation_options.manifest.resolve(strict=True):
+            raise ValueError("evaluation loader manifest differs from the authorized request")
+    elif phase not in {"source", "calibration"}:
+        raise ValueError("unknown experiment phase")
+    elif evaluation_options is not None:
+        raise ValueError("evaluation options cannot authorize another phase")
     path = Path(path).resolve(strict=True)
     if path.name != "manifest.json":
         raise ValueError("expected frozen manifest.json")
@@ -156,6 +220,8 @@ def load_inputs(path, phase):
         str(size): roles["source"][:size] for size in SOURCE_SIZES
     }:
         raise ValueError("source scales must be exact nested prefixes")
+    if evaluation is not None and roles[phase] != evaluation["evaluation_ids"]:
+        raise ValueError("evaluation order differs from frozen question IDs")
     filename = f"{phase}_runtime_questions.jsonl"
     runtime_path = artifact(path.parent, manifest, filename)
     rows = [json.loads(line) for line in runtime_path.read_text(encoding="utf-8").splitlines()]
@@ -266,6 +332,31 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log):
         "memory_updated": False,
     }
     try:
+        if arm.startswith("memory"):
+            if bank is None:
+                raise ValueError("memory arm requires a frozen bank; missing is not empty")
+            # 空库不是额外的提示处理：让模型输入逐字等同 FRESH，避免把模式标签
+            # 或过滤掉的卡片数量造成的差异误认为经验收益。审计信息只留在日志。
+            published_count = len(specs)
+            candidate_count = len(shortlist_specs(question.text, specs))
+            fallback = candidate_count == 0
+            if fallback:
+                mode, specs = "fresh", ()
+            memory_context = {
+                "policy": "empty-visible-library-is-fresh-v1",
+                "published_count": published_count,
+                "visible_candidate_count": candidate_count,
+                "effective_planner_mode": mode,
+                "fallback_reason": (
+                    "empty_published_library"
+                    if fallback and published_count == 0
+                    else "all_specs_exceed_prompt_limit"
+                    if fallback
+                    else None
+                ),
+            }
+            report["memory_context"] = memory_context
+            log({"kind": "memory_context", **memory_context})
         planner = ModelOperatorPlanner(
             client,
             mode=mode,
@@ -311,6 +402,11 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
             and signature["sha256"] != args.expected_execution_sha256
         ):
             raise ValueError("expected execution signature mismatch; no request sent")
+        evaluation = (
+            _evaluation_gate(args, project, chosen_ids=[q.question_id for q in chosen])
+            if args.phase == "evaluation"
+            else None
+        )
         configuration = signature["configuration"]
         resume = (
             verify_certificate(
@@ -381,6 +477,13 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
             "manifest_sha256": manifest_sha,
             "max_calls": max_calls,
             "execution_signature": signature,
+            "evaluation_freeze_sha256": args.expected_freeze_sha256 if evaluation else None,
+            "evaluation_order_sha256": (
+                evaluation["evaluation_order_sha256"] if evaluation else None
+            ),
+            "evaluation_freeze_path": (
+                str(args.evaluation_freeze.resolve(strict=True)) if evaluation else None
+            ),
             "resume_parent_run_id": resume["proof"]["parent_run_id"] if resume else None,
             "resume_certificate_sha256": fingerprint(resume) if resume else None,
             "git": git,
@@ -402,6 +505,8 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
         write_json(runs / f"{run_id}.claim.json", {**plan, "plan_sha256": fingerprint(plan)})
         output.mkdir(exist_ok=False)
         write_json(output / "launch_plan.json", plan)
+        if evaluation is not None:
+            write_json(output / "evaluation_freeze_verified.json", evaluation)
         if resume:
             write_json(output / "resume_certificate.json", resume)
         write_json(output / "source_snapshot.json", snapshot)
@@ -483,6 +588,14 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
                     verify_banks(banks)
                     if _sha(args.manifest) != manifest_sha or _sha(corpus) != info["sha256"]:
                         raise ValueError("frozen input changed")
+                    if (
+                        evaluation is not None
+                        and _evaluation_gate(
+                            args, project, chosen_ids=[q.question_id for q in chosen]
+                        )
+                        != evaluation
+                    ):
+                        raise ValueError("evaluation freeze changed during execution")
                 except Exception as error:
                     cleanup_errors.append(type(error).__name__)
                 if index is not None:
@@ -535,6 +648,8 @@ def main(argv=None):
     parser.add_argument("--expected-manifest-sha256")
     parser.add_argument("--expected-execution-sha256")
     parser.add_argument("--resume-certificate", type=Path)
+    parser.add_argument("--evaluation-freeze", type=Path)
+    parser.add_argument("--expected-freeze-sha256")
     parser.add_argument("--phase", choices=tuple(COUNTS), required=True)
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--count", type=int, default=8)
@@ -545,7 +660,14 @@ def main(argv=None):
     parser.add_argument("--allow-network", action="store_true")
     args = parser.parse_args(argv)
     if args.phase == "evaluation":
-        raise ValueError("evaluation locked until source/calibration freeze certificates exist")
+        if args.resume_certificate is not None:
+            raise ValueError(
+                "evaluation resume is not supported by source/calibration certificates"
+            )
+        if not args.evaluation_freeze or not args.expected_freeze_sha256:
+            raise ValueError("evaluation locked until source/calibration freeze certificates exist")
+    elif args.evaluation_freeze is not None or args.expected_freeze_sha256 is not None:
+        raise ValueError("evaluation freeze options require the evaluation phase")
     if not 1 <= args.count <= 25 or args.start < 0 or len(set(args.arms)) != len(args.arms):
         raise ValueError("unique arms and a fixed batch of 1-25 questions required")
     if not math.isfinite(args.budget_cny) or not 0 < args.budget_cny <= 10:
@@ -571,7 +693,11 @@ def main(argv=None):
     manifest_sha = _sha(args.manifest)
     if args.expected_manifest_sha256 is not None and manifest_sha != args.expected_manifest_sha256:
         raise ValueError("expected manifest SHA256 mismatch")
-    manifest, questions = load_inputs(args.manifest, args.phase)
+    manifest, questions = (
+        load_inputs(args.manifest, args.phase, evaluation_options=args)
+        if args.phase == "evaluation"
+        else load_inputs(args.manifest, args.phase)
+    )
     chosen = questions[args.start : args.start + args.count]
     if len(chosen) != args.count:
         raise ValueError("batch exceeds frozen split")

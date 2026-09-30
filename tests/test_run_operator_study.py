@@ -2,6 +2,9 @@
 
 import json
 import os
+from copy import deepcopy
+from dataclasses import replace
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -224,12 +227,15 @@ def read(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def make_bank(state, *, protocol=study.PROTOCOL, published=True, source_ids=None):
+def make_bank(state, *, protocol=study.PROTOCOL, published=True, source_ids=None, oversized=False):
     directory = state.root / "banks"
     directory.mkdir()
     ids = tuple(source_ids or state.manifest["nested_source_ids"]["50"])
+    spec = study.seed_specs()[0]
+    if oversized:
+        spec = replace(spec, supported_intents=("假" * 1000,))
     record = OperatorRecord(
-        study.seed_specs()[0],
+        spec,
         (ids[0],),
         protocol,
         "source-audit",
@@ -535,13 +541,56 @@ def test_memory_bank_validation(sandbox, case):
         study.load_banks(directory, ("memory50",), sandbox.manifest)
 
 
-def test_empty_published_bank_is_valid_and_falls_back_without_replacement(sandbox):
-    directory, path = make_bank(sandbox, published=False)
+@pytest.mark.parametrize("oversized", [False, True])
+def test_empty_visible_bank_falls_back_with_identical_fresh_inputs(sandbox, oversized):
+    directory, path = make_bank(sandbox, published=oversized, oversized=oversized)
     digest = study._sha(path)
-    assert study.main(args(sandbox, count=1, arms=("memory50",)) + ["--banks", str(directory)]) == 0
+    assert (
+        study.main(args(sandbox, count=1, arms=("memory50", "fresh")) + ["--banks", str(directory)])
+        == 0
+    )
     assert study._sha(path) == digest
+    messages = sandbox.clients[0].messages
+    assert messages[0] == messages[2]  # Both planner roles/content, not just mode.
+    assert messages[1] == messages[3]  # Reader also sees identical inputs.
+    prompt = json.loads(messages[0][1]["content"])
+    assert prompt["mode"] == "fresh" and prompt["candidate_specs"] == []
+    assert prompt["candidate_shortlist_omitted_count"] == 0
+    report = read(run_dir(sandbox) / "predictions.json")[0]
+    context = report["arms"]["memory50"]["memory_context"]
+    assert context["published_count"] == int(oversized)
+    assert context["visible_candidate_count"] == 0
+    assert context["fallback_reason"] == (
+        "all_specs_exceed_prompt_limit" if oversized else "empty_published_library"
+    )
+    assert "memory_context" not in report["arms"]["fresh"]
+
+
+def test_nonempty_memory_keeps_memory_mode_and_candidate_input(sandbox):
+    directory, _ = make_bank(sandbox)
+    assert study.main(args(sandbox, count=1, arms=("memory50",)) + ["--banks", str(directory)]) == 0
     prompt = json.loads(sandbox.clients[0].messages[0][1]["content"])
-    assert prompt["mode"] == "memory" and prompt["candidate_specs"] == []
+    assert prompt["mode"] == "memory" and len(prompt["candidate_specs"]) == 1
+    report = read(run_dir(sandbox) / "predictions.json")[0]["arms"]["memory50"]
+    assert report["memory_context"]["fallback_reason"] is None
+
+
+def test_missing_bank_is_not_treated_as_valid_empty_library(tmp_path):
+    client = SimpleNamespace(calls=[])
+    output = tmp_path / "failure.json"
+    with pytest.raises(ValueError, match="missing is not empty"):
+        study.execute_one(
+            study.RuntimeQuestion("fixture", "Synthetic question", "synthetic"),
+            "memory50",
+            None,
+            client,
+            bank=None,
+            output=output,
+            trace="synthetic",
+            log=lambda event: None,
+        )
+    assert read(output)["status"] == "failed"
+    assert client.calls == []
 
 
 def test_source_memory_arm_rejected_before_bank_or_manifest_read(tmp_path, monkeypatch):
@@ -672,3 +721,205 @@ def test_certificate_continues_only_unstarted_qids_and_cannot_be_reused(sandbox)
         study.main(command)
     with pytest.raises(ValueError, match="untouched"):
         study.main(args(sandbox, count=1) + ["--start", "1", "--resume-certificate", str(path)])
+
+
+@pytest.fixture
+def evaluation(sandbox, monkeypatch):
+    """Synthetic gate contract; real provenance validation has its own test module."""
+    from growrag.experiments import operator_evaluation_freeze as freeze
+
+    runtime = sandbox.path.parent / "evaluation_runtime_questions.jsonl"
+    rows = [
+        {"question_id": qid, "text": f"Synthetic evaluation {qid}", "dataset": "fixture-evaluation"}
+        for qid in sandbox.manifest["roles"]["evaluation"]
+    ]
+    runtime.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+    sandbox.manifest["artifacts"][runtime.name] = {
+        "sha256": study._sha(runtime),
+        "rows": 500,
+        "contains_gold": False,
+        "runtime_safe": True,
+    }
+    seal(sandbox.path, sandbox.manifest)
+    banks = sandbox.root / "banks"
+    banks.mkdir()
+    for size in study.SOURCE_SIZES:
+        bank = FrozenOperatorBank(
+            study.PROTOCOL, tuple(sandbox.manifest["nested_source_ids"][str(size)]), ()
+        )
+        (banks / f"bank_{size}.json").write_text(bank.to_json(), encoding="utf-8")
+    (sandbox.root / "runs").mkdir()
+    certificate = sandbox.root / "evaluation-certificate.json"
+    dump(certificate, {"synthetic": True})
+    dependency = sandbox.root / "source-scoring-dependency.json"
+    dump(dependency, {"synthetic": "frozen scalar feedback, no labels"})
+    signature = study.execution_signature(sandbox.root)
+    body = {
+        "protocol": study.PROTOCOL,
+        "paths": {"manifest": "data/manifest.json", "banks": "banks", "runs": "runs"},
+        "expected": {"manifest": study._sha(sandbox.path), "execution": signature["sha256"]},
+        "execution_signature": signature,
+        "evaluation_ids": sandbox.manifest["roles"]["evaluation"],
+        "evaluation_order_sha256": study.fingerprint(sandbox.manifest["roles"]["evaluation"]),
+        "controls": {arm: {"memory_updates": False} for arm in study.ARMS},
+    }
+    state = SimpleNamespace(
+        certificate=certificate,
+        banks=banks,
+        runtime=runtime,
+        dependency=dependency,
+        body=body,
+        validations=[],
+        fail_validation_at=None,
+    )
+    pinned = {p: study._sha(p) for p in (certificate, dependency, sandbox.path, runtime)}
+
+    def validate(root, path, *, expected_certificate_sha256):
+        state.validations.append((sandbox.root / "runs/.operator-study.lock").exists())
+        assert root == sandbox.root
+        if (
+            Path(path).resolve() != certificate
+            or study._sha(certificate) != expected_certificate_sha256
+            or any(study._sha(p) != digest for p, digest in pinned.items())
+            or len(state.validations) == state.fail_validation_at
+        ):
+            raise ValueError("synthetic freeze dependencies changed")
+        return deepcopy(state.body)
+
+    monkeypatch.setattr(freeze, "validate_evaluation_freeze", validate)
+    return state
+
+
+def evaluation_args(sandbox, evaluation, *, live=True):
+    return args(sandbox, phase="evaluation", count=1, arms=study.ARMS, live=live) + [
+        "--evaluation-freeze",
+        str(evaluation.certificate),
+        "--expected-freeze-sha256",
+        study._sha(evaluation.certificate),
+        "--expected-execution-sha256",
+        study.execution_signature(sandbox.root)["sha256"],
+        "--expected-manifest-sha256",
+        study._sha(sandbox.path),
+        "--banks",
+        str(evaluation.banks),
+    ]
+
+
+def test_certified_evaluation_dry_run_only_loads_synthetic_runtime(sandbox, evaluation):
+    assert study.main(evaluation_args(sandbox, evaluation, live=False)) == 0
+    assert evaluation.validations == [False]
+    assert sandbox.clients == sandbox.indexes == []
+    assert sandbox.history_calls == 0
+    assert not list((sandbox.root / "runs").glob("*.claim.json"))
+
+
+def test_certified_evaluation_rechecks_under_lock_and_after_all_seven_arms(sandbox, evaluation):
+    assert study.main(evaluation_args(sandbox, evaluation)) == 0
+    assert evaluation.validations == [False, True, True]
+    output = run_dir(sandbox)
+    plan = read(output / "launch_plan.json")
+    assert plan["phase"] == "evaluation" and plan["arms"] == list(study.ARMS)
+    assert plan["evaluation_freeze_sha256"] == study._sha(evaluation.certificate)
+    assert plan["evaluation_order_sha256"] == evaluation.body["evaluation_order_sha256"]
+    assert plan["max_calls"] == 19
+    assert read(output / "evaluation_freeze_verified.json") == evaluation.body
+    report = read(output / "predictions.json")[0]
+    assert list(report["arms"]) == list(study.ARMS)
+    assert len(sandbox.clients[0].messages) == 13  # All planners stop after one decision.
+    for value in report["arms"].values():
+        assert value["feedback"] is None and value["memory_updated"] is False
+    for arm in study.ARMS[3:]:
+        assert report["arms"][arm]["memory_context"]["effective_planner_mode"] == "fresh"
+    with pytest.raises(ValueError, match="replay"):
+        study.main(evaluation_args(sandbox, evaluation))
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        ["--arms", "base", "fresh", "static"],
+        ["--arms", *reversed(study.ARMS)],
+        ["--expected-execution-sha256", "f" * 64],
+        ["--expected-freeze-sha256", "f" * 64],
+    ],
+)
+def test_evaluation_request_mismatch_rejected_before_runtime_read(
+    sandbox, evaluation, monkeypatch, options
+):
+    read_text = Path.read_text
+
+    def guarded(path, *args, **kwargs):
+        assert path != evaluation.runtime, "evaluation text was opened before authorization"
+        return read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", guarded)
+    with pytest.raises(ValueError):
+        study.main(evaluation_args(sandbox, evaluation) + options)
+    assert sandbox.clients == []
+
+
+@pytest.mark.parametrize("field", ["manifest", "banks", "runs", "order", "method", "controls"])
+def test_evaluation_certificate_cannot_authorize_other_inputs(sandbox, evaluation, field):
+    body = evaluation.body
+    if field in {"manifest", "banks", "runs"}:
+        other = sandbox.root / "other"
+        other.mkdir()
+        if field == "manifest":
+            path = other / "manifest.json"
+            dump(path, sandbox.manifest)
+            body["paths"][field] = "other/manifest.json"
+        else:
+            body["paths"][field] = "other"
+    elif field == "order":
+        body["evaluation_ids"] = body["evaluation_ids"][::-1]
+        body["evaluation_order_sha256"] = study.fingerprint(body["evaluation_ids"])
+    elif field == "method":
+        body["execution_signature"]["sha256"] = "f" * 64
+    else:
+        body["controls"].pop("memory500")
+    with pytest.raises(ValueError, match="evaluation"):
+        study.main(evaluation_args(sandbox, evaluation))
+    assert sandbox.clients == []
+
+
+def test_evaluation_resume_certificate_is_rejected_before_any_inputs(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(ValueError, match="evaluation resume"):
+        study.main(
+            [
+                "--manifest",
+                "missing",
+                "--phase",
+                "evaluation",
+                "--resume-certificate",
+                "old-source-certificate.json",
+            ]
+        )
+
+
+def test_evaluation_lock_recheck_rejects_change_without_calls(sandbox, evaluation):
+    evaluation.fail_validation_at = 2
+    with pytest.raises(ValueError, match="freeze dependencies"):
+        study.main(evaluation_args(sandbox, evaluation))
+    assert evaluation.validations == [False, True]
+    assert sandbox.clients == []
+    assert not list((sandbox.root / "runs").glob("*.claim.json"))
+
+
+def test_evaluation_dependency_change_marks_predictions_failed_and_preserves_spend(
+    sandbox, evaluation
+):
+    sandbox.on_complete = lambda client: dump(evaluation.dependency, {"changed": True})
+    assert study.main(evaluation_args(sandbox, evaluation)) == 1
+    output = run_dir(sandbox)
+    frozen = read(output / "predictions_frozen.json")
+    assert frozen["status"] == "failed" and frozen["cleanup_errors"] == ["ValueError"]
+    assert read(output / "final_budget.json")["api_requests"] == 13
+    assert sandbox.indexes[0].closed
+    assert study.KEY_VARIABLE not in os.environ
+
+
+def test_evaluation_options_cannot_change_source_or_calibration_phase(sandbox, evaluation):
+    with pytest.raises(ValueError, match="require the evaluation phase"):
+        study.main(args(sandbox) + ["--evaluation-freeze", str(evaluation.certificate)])
+    assert evaluation.validations == [] and sandbox.clients == []
