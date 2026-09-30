@@ -26,7 +26,9 @@ from .api_preflight import read_local_bailian_settings
 from .budget import PriceLimits
 from .fresh_dev_manifest import _sha
 from .operator_data_plan import SCHEMA, SOURCE_SIZES
+from .operator_execution_signature import execution_configuration, execution_signature
 from .operator_model import ModelOperatorPlanner, answer_episode, seed_specs
+from .operator_resume import verify_certificate
 from .pre_pilot import write_json
 from .protocol import Evidence, RuntimeQuestion
 from .representation_runner import fingerprint
@@ -183,8 +185,8 @@ def load_banks(directory, arms, manifest):
         bank = FrozenOperatorBank.from_json(path.read_text(encoding="utf-8"))
         if set(bank.allowed_source_ids) != set(manifest["nested_source_ids"][size]):
             raise ValueError("bank source scope does not match the expected prefix")
-        if bank.protocol_id != PROTOCOL or not bank.published_specs:
-            raise ValueError("bank must have reviewed protocol and published operators")
+        if bank.protocol_id != PROTOCOL:
+            raise ValueError("bank must have reviewed protocol")
         banks[arm] = (bank, path, _sha(path))
     return banks
 
@@ -198,7 +200,10 @@ def verify_banks(banks):
         )
 
 
-def check_unstarted(runs, phase, ids, arms):
+def check_unstarted(runs, phase, ids, arms, *, resume_certificate=None):
+    released_parents = (
+        set(resume_certificate["proof"]["ancestor_run_ids"]) if resume_certificate else set()
+    )
     paths = [*runs.glob(f"{PREFIX}*/launch_plan.json"), *runs.glob(f"{PREFIX}*.claim.json")]
     for path in paths:
         if not path.resolve().is_relative_to(runs.resolve()):
@@ -220,6 +225,13 @@ def check_unstarted(runs, phase, ids, arms):
             if old["phase"] != phase:
                 raise ValueError("question previously claimed in a different phase")
             if set(arms) & set(old["arms"]):
+                identity = (
+                    path.parent.name
+                    if path.name == "launch_plan.json"
+                    else path.name.removesuffix(".claim.json")
+                )
+                if identity in released_parents:
+                    continue
                 raise ValueError("question/arm already claimed; no automatic replay")
 
 
@@ -240,6 +252,7 @@ def serial_lock(runs):
 
 
 def execute_one(question, arm, index, client, *, bank, output, trace, log):
+    configuration = execution_configuration()
     specs = bank.published_specs if bank else seed_specs() if arm == "static" else ()
     mode = "memory" if arm.startswith("memory") else "static" if arm == "static" else "fresh"
     start = len(client.calls)
@@ -268,8 +281,11 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log):
             question,
             retrieve,
             planner,
-            retrieval_budget=1 if arm == "base" else 3,
-            max_decisions=2,
+            retrieval_budget=configuration["base_retrieval_budget"]
+            if arm == "base"
+            else configuration["retrieval_budget"],
+            max_decisions=configuration["max_decisions"],
+            top_k=configuration["top_k"],
             on_event=log,
         )
         report["episode"] = _jsonable(result)
@@ -289,7 +305,25 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log):
 def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
     # One lock covers history reconciliation, claim, all calls and ledger finalization.
     with serial_lock(runs):
-        check_unstarted(runs, args.phase, [q.question_id for q in chosen], args.arms)
+        signature = execution_signature(project)
+        configuration = signature["configuration"]
+        resume = (
+            verify_certificate(
+                runs,
+                args.resume_certificate,
+                phase=args.phase,
+                question_ids=[q.question_id for q in chosen],
+                arms=args.arms,
+                manifest_sha256=manifest_sha,
+                model=configuration["model"],
+                signature=signature,
+            )
+            if args.resume_certificate
+            else None
+        )
+        check_unstarted(
+            runs, args.phase, [q.question_id for q in chosen], args.arms, resume_certificate=resume
+        )
         history = reviewed_history(runs)
         prior = history["prior_reserved_cny"]
         if type(prior) not in (int, float) or not math.isfinite(prior) or prior < 0:
@@ -312,35 +346,38 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
         ):
             raise ValueError("manifest/source changed before launch")
         info = manifest["artifacts"]["corpus.jsonl"]
-        max_calls = args.count * sum(1 if arm == "base" else 3 for arm in args.arms)
+        max_calls = args.count * sum(
+            1 if arm == "base" else configuration["max_decisions"] + 1 for arm in args.arms
+        )
         config = ChatConfig(
             settings.base_url,
-            PILOT_MODEL,
+            configuration["model"],
             KEY_VARIABLE,
             max_calls=max_calls,
-            max_output_tokens=2048,
-            output_limit_parameter="max_tokens",
-            enable_thinking=False,
-            temperature=0,
-            top_p=1,
-            json_object_mode=True,
+            max_output_tokens=configuration["max_output_tokens"],
+            output_limit_parameter=configuration["output_limit_parameter"],
+            enable_thinking=configuration["enable_thinking"],
+            temperature=configuration["temperature"],
+            top_p=configuration["top_p"],
+            json_object_mode=configuration["json_object_mode"],
         )
-        limits = PriceLimits(budget_cny=subcap, max_prompt_bytes=30000, max_elapsed_seconds=1800)
+        limits = PriceLimits(
+            budget_cny=subcap,
+            max_prompt_bytes=configuration["max_prompt_bytes"],
+            max_elapsed_seconds=1800,
+        )
         plan = {
+            **configuration,
             "protocol": PROTOCOL,
             "run_id": run_id,
             "phase": args.phase,
             "question_ids": [q.question_id for q in chosen],
             "arms": args.arms,
             "manifest_sha256": manifest_sha,
-            "model": PILOT_MODEL,
-            "max_output_tokens": 2048,
             "max_calls": max_calls,
-            "json_object_mode": True,
-            "retrieval_budget": 3,
-            "base_retrieval_budget": 1,
-            "top_k": 6,
-            "max_decisions": 2,
+            "execution_signature": signature,
+            "resume_parent_run_id": resume["proof"]["parent_run_id"] if resume else None,
+            "resume_certificate_sha256": fingerprint(resume) if resume else None,
             "git": git,
             "source_sha256": snapshot["sha256"],
             "bank_sha256": {a: b[0].fingerprint for a, b in banks.items()},
@@ -360,6 +397,8 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
         write_json(runs / f"{run_id}.claim.json", {**plan, "plan_sha256": fingerprint(plan)})
         output.mkdir(exist_ok=False)
         write_json(output / "launch_plan.json", plan)
+        if resume:
+            write_json(output / "resume_certificate.json", resume)
         write_json(output / "source_snapshot.json", snapshot)
         write_json(output / "process.json", {"pid": os.getpid(), "argv": sys.argv})
         previous, client, index = os.environ.get(KEY_VARIABLE), None, None
@@ -367,7 +406,12 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
         cleanup_errors = []
         try:
             index = SharedBM25Index(
-                corpus.parent / "index.sqlite3", corpus, info["sha256"], info["rows"]
+                corpus.parent / "index.sqlite3",
+                corpus,
+                info["sha256"],
+                info["rows"],
+                k1=configuration["bm25_k1"],
+                b=configuration["bm25_b"],
             )
             os.environ[KEY_VARIABLE] = settings.api_key
             client = DurableBudgetClient(
@@ -484,6 +528,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--expected-manifest-sha256")
+    parser.add_argument("--resume-certificate", type=Path)
     parser.add_argument("--phase", choices=tuple(COUNTS), required=True)
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--count", type=int, default=8)
@@ -524,7 +569,23 @@ def main(argv=None):
     )
     if not re.fullmatch(r"[A-Za-z0-9_-]+", run_id):
         raise ValueError("invalid run identity")
-    check_unstarted(runs, args.phase, [q.question_id for q in chosen], args.arms)
+    resume = (
+        verify_certificate(
+            runs,
+            args.resume_certificate,
+            phase=args.phase,
+            question_ids=[q.question_id for q in chosen],
+            arms=args.arms,
+            manifest_sha256=manifest_sha,
+            model=PILOT_MODEL,
+            signature=execution_signature(project),
+        )
+        if args.resume_certificate
+        else None
+    )
+    check_unstarted(
+        runs, args.phase, [q.question_id for q in chosen], args.arms, resume_certificate=resume
+    )
     if not args.allow_network:
         print(
             json.dumps(

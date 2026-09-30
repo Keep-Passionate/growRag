@@ -13,6 +13,7 @@ from pathlib import Path
 
 from .fresh_dev_manifest import _sha
 from .hotpot import _answer_f1, _normalize
+from .operator_execution_signature import validate_execution_signature
 from .pre_pilot import write_json
 from .representation_runner import fingerprint
 from .run_operator_study import PREFIX, PROTOCOL, load_inputs
@@ -38,7 +39,7 @@ def collect_frozen_sources(manifest: dict, manifest_sha: str, runs_root: Path) -
     runs_root = Path(runs_root).resolve(strict=True)
     sources = manifest["roles"]["source"]
     wanted = set(sources)
-    records, models, inputs = {}, set(), []
+    records, models, inputs, methods = {}, set(), [], set()
     for launch in sorted(runs_root.glob(f"{PREFIX}*/launch_plan.json")):
         launch = _inside(runs_root, launch)
         plan = _read(launch)
@@ -52,6 +53,7 @@ def collect_frozen_sources(manifest: dict, manifest_sha: str, runs_root: Path) -
             or plan.get("memory_updates") is not False
         ):
             raise ValueError("source launch manifest/model/gold policy mismatch")
+        methods.add(validate_execution_signature(plan.get("execution_signature")))
         planned_ids, planned_arms = plan.get("question_ids"), plan.get("arms")
         if (
             type(planned_ids) is not list
@@ -120,6 +122,8 @@ def collect_frozen_sources(manifest: dict, manifest_sha: str, runs_root: Path) -
         )
     if len(models) != 1:
         raise ValueError("source launches must exist and share one fixed model")
+    if len(methods) != 1:
+        raise ValueError("source launches must share one fixed execution signature")
     if set(records) != wanted:
         raise ValueError("not all source IDs have terminal reports; labels remain sealed")
     for item in records.values():

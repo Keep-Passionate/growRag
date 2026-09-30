@@ -6,6 +6,13 @@ from copy import deepcopy
 import pytest
 
 from growrag.experiments import score_operator_sources as module
+from growrag.experiments.operator_execution_signature import (
+    METHOD_FILES,
+    execution_configuration,
+)
+from growrag.experiments.operator_execution_signature import (
+    SCHEMA as EXECUTION_SCHEMA,
+)
 from growrag.experiments.representation_runner import fingerprint
 from growrag.experiments.shared_hotpot_dev import document_id
 
@@ -73,6 +80,12 @@ def _launch(
     status="completed",
 ):
     folder = runs / f"{module.PREFIX}{name}"
+    signature = {
+        "schema": EXECUTION_SCHEMA,
+        "configuration": execution_configuration(),
+        "files": dict.fromkeys(METHOD_FILES, "a" * 64),
+    }
+    signature["sha256"] = fingerprint(signature)
     plan = {
         "protocol": module.PROTOCOL,
         "phase": phase,
@@ -82,6 +95,7 @@ def _launch(
         "arms": list(arms),
         "gold_loaded": False,
         "memory_updates": False,
+        "execution_signature": signature,
     }
     reports = (
         reports
@@ -175,6 +189,20 @@ def test_different_models_and_duplicate_retries_are_rejected(tmp_path):
         module.collect_frozen_sources(_manifest([_qid(1), _qid(2)]), "a" * 64, tmp_path)
     _launch(tmp_path, "retry", [_qid(1)])
     with pytest.raises(ValueError, match="duplicate source"):
+        module.collect_frozen_sources(_manifest([_qid(1), _qid(2)]), "a" * 64, tmp_path)
+
+
+def test_same_model_but_changed_method_is_not_pooled(tmp_path):
+    _launch(tmp_path, "a", [_qid(1)])
+    folder = _launch(tmp_path, "b", [_qid(2)])
+    path = folder / "launch_plan.json"
+    plan = json.loads(path.read_text())
+    signature = plan["execution_signature"]
+    signature["files"][METHOD_FILES[0]] = "b" * 64
+    del signature["sha256"]
+    signature["sha256"] = fingerprint(signature)
+    _write(path, plan)
+    with pytest.raises(ValueError, match="execution signature"):
         module.collect_frozen_sources(_manifest([_qid(1), _qid(2)]), "a" * 64, tmp_path)
 
 

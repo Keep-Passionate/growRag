@@ -8,7 +8,14 @@ import pytest
 
 from growrag.experiments import run_operator_study as study
 from growrag.experiments.api_client import APIRequestError, ChatResponse
+from growrag.experiments.operator_execution_signature import (
+    METHOD_FILES,
+)
+from growrag.experiments.operator_execution_signature import (
+    SCHEMA as SIGNATURE_SCHEMA,
+)
 from growrag.experiments.operator_model import PLANNER_VERSION
+from growrag.experiments.operator_resume import build_certificate
 from growrag.operator_bank import FrozenOperatorBank, OperatorRecord
 
 
@@ -86,6 +93,7 @@ def sandbox(tmp_path, monkeypatch):
     class FakeLive:
         def __init__(self, config, audit, *, allow_network):
             self.config, self.audit = config, audit
+            audit.mkdir(parents=True)
             self.attempts = 0
             self.messages = []
             self.transport_source = "synthetic_test_double_not_api"
@@ -98,6 +106,7 @@ def sandbox(tmp_path, monkeypatch):
             assert self.attempts <= self.config.max_calls
             self.messages.append(messages)
             audit = self.audit / f"{self.attempts}.json"
+            dump(audit, {"trace_id": trace_id})
             if state.failure_at == self.attempts:
                 raise APIRequestError(
                     "synthetic failure",
@@ -160,6 +169,14 @@ def sandbox(tmp_path, monkeypatch):
     monkeypatch.setattr(study, "reviewed_history", history)
     monkeypatch.setattr(study, "_git_state", lambda: {"commit": "f" * 40, "worktree_dirty": False})
     monkeypatch.setattr(study, "source_snapshot", lambda root: {"sha256": "a" * 64, "files": {}})
+    method = {
+        "schema": SIGNATURE_SCHEMA,
+        "configuration": study.execution_configuration(),
+        "files": {name: "a" * 64 for name in METHOD_FILES},
+    }
+    monkeypatch.setattr(
+        study, "execution_signature", lambda root: {**method, "sha256": study.fingerprint(method)}
+    )
     monkeypatch.setattr(
         study,
         "read_local_bailian_settings",
@@ -500,20 +517,27 @@ def test_frozen_bank_only_publishes_specs_and_is_unchanged(sandbox):
     assert "allowed_source_ids" not in prompts
 
 
-@pytest.mark.parametrize("case", ["missing", "unpublished", "protocol", "scope"])
+@pytest.mark.parametrize("case", ["missing", "protocol", "scope"])
 def test_memory_bank_validation(sandbox, case):
     directory = None
     if case != "missing":
         options = (
-            {"published": False}
-            if case == "unpublished"
-            else {"protocol": "other"}
+            {"protocol": "other"}
             if case == "protocol"
             else {"source_ids": tuple(sandbox.manifest["roles"]["calibration"][:50])}
         )
         directory, _ = make_bank(sandbox, **options)
     with pytest.raises(ValueError):
         study.load_banks(directory, ("memory50",), sandbox.manifest)
+
+
+def test_empty_published_bank_is_valid_and_falls_back_without_replacement(sandbox):
+    directory, path = make_bank(sandbox, published=False)
+    digest = study._sha(path)
+    assert study.main(args(sandbox, count=1, arms=("memory50",)) + ["--banks", str(directory)]) == 0
+    assert study._sha(path) == digest
+    prompt = json.loads(sandbox.clients[0].messages[0][1]["content"])
+    assert prompt["mode"] == "memory" and prompt["candidate_specs"] == []
 
 
 def test_source_memory_arm_rejected_before_bank_or_manifest_read(tmp_path, monkeypatch):
@@ -600,3 +624,30 @@ def test_live_requires_expected_manifest_fingerprint(sandbox):
     with pytest.raises(ValueError, match="SHA256 mismatch"):
         study.main(args(sandbox) + ["--expected-manifest-sha256", "f" * 64])
     assert sandbox.clients == []
+
+
+def test_certificate_continues_only_unstarted_qids_and_cannot_be_reused(sandbox):
+    sandbox.failure_at = 7  # Question 1 finished; question 2 starts then fails.
+    assert study.main(args(sandbox, count=3)) == 1
+    parent = run_dir(sandbox)
+    certificate = build_certificate(sandbox.root / "runs", parent.name)
+    expected = sandbox.manifest["roles"]["calibration"][2:3]
+    assert certificate["proof"]["question_ids"] == expected
+    path = sandbox.root / "resume.json"
+    dump(path, certificate)
+    sandbox.failure_at = None
+    command = args(sandbox, count=1) + ["--start", "2", "--resume-certificate", str(path)]
+    assert study.main(command) == 0
+    children = [
+        p for p in (sandbox.root / "runs").glob(f"{study.PREFIX}*") if p.is_dir() and p != parent
+    ]
+    assert len(children) == 1
+    launch = read(children[0] / "launch_plan.json")
+    assert launch["resume_parent_run_id"] == parent.name
+    assert launch["question_ids"] == expected
+    assert (children[0] / "resume_certificate.json").is_file()
+    assert (sandbox.root / "runs" / f"{parent.name}.claim.json").is_file()
+    with pytest.raises(ValueError, match="replay"):
+        study.main(command)
+    with pytest.raises(ValueError, match="untouched"):
+        study.main(args(sandbox, count=1) + ["--start", "1", "--resume-certificate", str(path)])

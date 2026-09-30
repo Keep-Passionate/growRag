@@ -11,12 +11,12 @@ from growrag.experiments.operator_model import (
     MAX_PROMPT_BYTES,
     MAX_VISIBLE_BYTES,
     MAX_VISIBLE_CHARS,
-    PLANNER_PROMPT,
     PLANNER_VERSION,
     READER_VERSION,
     ModelOperatorPlanner,
     answer_episode,
     canonical_operator,
+    planner_prompt,
     seed_specs,
     shortlist_specs,
     strict_object,
@@ -109,7 +109,7 @@ def test_fresh_constructs_same_grammar_without_reading_history(spec, observation
     assert proposal.spec == canonical_operator(spec)
     assert proposal.goal.original_question == observation.question.text
     assert payload(client)["candidate_specs"] == []
-    assert client.calls[0]["messages"][0]["content"] == PLANNER_PROMPT
+    assert client.calls[0]["messages"][0]["content"] == planner_prompt("fresh")
     assert client.calls[0]["trace_id"] == "test/run/plan/1"
     assert client.calls[0]["prompt_version"] == PLANNER_VERSION
 
@@ -169,7 +169,7 @@ def test_same_evidence_window_and_prompt_grammar_in_all_arms(spec, observation):
         client = FakeClient(stop())
         planner(client, mode=mode, specs=(spec,) if mode == "memory" else ())(state)
         visible.append(payload(client)["evidence"])
-        assert client.calls[0]["messages"][0]["content"] == PLANNER_PROMPT
+        assert client.calls[0]["messages"][0]["content"] == planner_prompt(mode)
         assert (
             len(
                 json.dumps(
@@ -379,3 +379,53 @@ def test_canonical_identity_ignores_proposed_name_but_not_content(spec):
     )
     changed = replace(spec, steps=(QueryStep("search", "{term}"),))
     assert canonical_operator(spec).operator_id != canonical_operator(changed).operator_id
+
+
+def test_v2_prompt_versions_and_mode_specific_examples_are_explicit(observation):
+    assert PLANNER_VERSION == "growrag-operator-planner-v2"
+    assert READER_VERSION == "growrag-operator-reader-v1"
+    assert MAX_PROMPT_BYTES == 30000
+    assert planner_prompt("fresh") == planner_prompt("memory")
+    static = planner_prompt("static")
+    assert "ONE\nshort sentence" in static
+    assert "EXACTLY ONE mutually exclusive" in static
+    assert "STATIC FINAL CHECK" in static
+    assert '"operator_id":"ADD_TERM"' not in static
+    examples = [
+        strict_object(line) for line in static.splitlines() if line.startswith('{"decision"')
+    ]
+    assert len(examples) == 2
+    assert all(item["operator"] is None for item in examples)
+    for item in examples:
+        planner(FakeClient(item), mode="static")(observation)
+
+
+def test_v2_dynamic_response_examples_follow_existing_parser(observation):
+    examples = [
+        strict_object(line)
+        for line in planner_prompt("fresh").splitlines()
+        if line.startswith('{"decision"')
+    ]
+    assert len(examples) == 3
+    assert examples[0]["decision"] == "stop"
+    assert examples[1]["selected_operator"] is not None
+    assert examples[2]["operator"] is not None
+    for item in (examples[0], examples[2]):
+        planner(FakeClient(item), mode="fresh")(observation)
+    planner(FakeClient(examples[1]), mode="memory", specs=seed_specs())(observation)
+
+
+def test_invalid_static_stop_plus_new_operator_is_not_guessed_into_act(spec, observation):
+    output = stop()
+    output["operator"] = operator_to_dict(spec)
+    client = FakeClient(output)
+    with pytest.raises(ValueError, match="stop cannot carry"):
+        planner(client, mode="static")(observation)
+    assert len(client.calls) == 1  # No corrective API retry and no inferred action.
+
+
+def test_short_reason_instruction_does_not_add_brittle_sentence_length_gate(observation):
+    output = stop()
+    output["reason"] = "A" * 1000
+    result = planner(FakeClient(output), mode="static")(observation)
+    assert result.reason == output["reason"]  # Existing 2000-char safety bound remains.

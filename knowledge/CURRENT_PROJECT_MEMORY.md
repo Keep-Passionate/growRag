@@ -15,6 +15,8 @@
 - 新代码模块：operator_bank规格codec/source-only builder/冻结发布视图；operator_loop实际有界检索和累计证据；operator_model同能力FRESH/STATIC/MEMORY计划器；operator_data_plan及prepare_operator_data数据隔离；run_operator_study预测与费用审计。模型自动提议接口已实现待真实兼容验证，不能把单元测试说成500题已完成。
 - 冻结对照候选BASE、FRESH-COMPOSE、STATIC、MEMORY50/100/250/500；最多3500评测路径，建库/校准另计。新循环最多3次实际检索（包含初检）与2次决策，Reader固定；旧S2G不改，另作外部baseline。选择短名单当前是词汇匹配，不是QPP。
 - 下一步：校准前8题API格式/日志测试→来源500轨迹→单独评分与谱系快照→校准冻结证书→解锁500评测。研究效应和结果待真正运行后追加，正式eval当前硬锁，不能拿其前8题调试。
+- 实际首次运行 `f72ba29`：索引已建，cal0–7第0题三路完成，第1题STATIC输出stop+operator互斥冲突，批次停止，共9真实请求；2–7未启动。未读gold，不声称8题完成。新增估算0.0045854元，累计已知1.1883004元/保守预留7.7443794元/历史3未知。完整过程见 `knowledge/experiments/2026-09-30_动态算子运行记录.md`。
+- 校准格式修正Planner v2：STOP/SELECT/CREATE显式互斥，STATIC只能选择ID；无自动猜测/重试，Reader/检索不变。来源500启动前还需核定方法签名；旧失败与未启动claim保留，显式审计证书只允许真正未启动题续跑。
 
 ## 2026-09-30：原路线上的动态动作算子增量
 
