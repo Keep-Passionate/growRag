@@ -29,9 +29,12 @@ from .operator_data_plan import SCHEMA, SOURCE_SIZES
 from .operator_execution_signature import execution_configuration, execution_signature
 from .operator_model import ModelOperatorPlanner, answer_episode, seed_specs, shortlist_specs
 from .operator_profiles import (
+    ACTION_LIST,
     LEGACY,
     PROFILES,
     STRUCTURED,
+    action_list_execution_configuration,
+    action_list_execution_signature,
     get_profile,
     structured_execution_configuration,
     structured_execution_signature,
@@ -316,7 +319,7 @@ def check_unstarted(runs, phase, ids, arms, *, resume_certificate=None, profile=
             or not old["arms"]
             or not set(old["arms"]) <= set(ARMS)
             or (
-                registered == STRUCTURED
+                registered != LEGACY
                 and (
                     old["phase"] != "calibration"
                     or not set(old["arms"]) <= {"base", "fresh", "static"}
@@ -356,18 +359,26 @@ def serial_lock(runs, *, profile=LEGACY.name):
 
 def execute_one(question, arm, index, client, *, bank, output, trace, log, profile=LEGACY.name):
     active_profile = get_profile(profile)
-    configuration = (
-        execution_configuration()
-        if active_profile == LEGACY
-        else structured_execution_configuration()
-    )
+    configuration = {
+        LEGACY: execution_configuration,
+        STRUCTURED: structured_execution_configuration,
+        ACTION_LIST: action_list_execution_configuration,
+    }[active_profile]()
     planner_type, reader = ModelOperatorPlanner, answer_episode
-    if active_profile == STRUCTURED:
+    if active_profile != LEGACY:
         if bank is not None or arm not in {"base", "fresh", "static"}:
-            raise ValueError("structured-v2 calibration cannot use memory banks")
-        from .operator_model_v2 import ModelOperatorPlannerV2, answer_episode_v2
+            raise ValueError(f"{active_profile.name} calibration cannot use memory banks")
+        from .operator_model_v2 import answer_episode_v2
 
-        planner_type, reader = ModelOperatorPlannerV2, answer_episode_v2
+        reader = answer_episode_v2
+        if active_profile == STRUCTURED:
+            from .operator_model_v2 import ModelOperatorPlannerV2
+
+            planner_type = ModelOperatorPlannerV2
+        else:
+            from .operator_model_v3 import ModelOperatorPlannerV3
+
+            planner_type = ModelOperatorPlannerV3
     specs = bank.published_specs if bank else seed_specs() if arm == "static" else ()
     mode = "memory" if arm.startswith("memory") else "static" if arm == "static" else "fresh"
     start = len(client.calls)
@@ -431,7 +442,7 @@ def execute_one(question, arm, index, client, *, bank, output, trace, log, profi
         report["episode"] = _jsonable(result)
         reader_options = (
             {"on_record": lambda item: log({"kind": "reader_record", **item})}
-            if active_profile == STRUCTURED
+            if active_profile != LEGACY
             else {}
         )
         report["reader"] = reader(
@@ -452,11 +463,11 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
     validate_profile_options(active_profile, args)
     # One lock covers history reconciliation, claim, all calls and ledger finalization.
     with serial_lock(runs, profile=active_profile.name):
-        signature = (
-            execution_signature(project)
-            if active_profile == LEGACY
-            else structured_execution_signature(project)
-        )
+        signature = {
+            LEGACY: execution_signature,
+            STRUCTURED: structured_execution_signature,
+            ACTION_LIST: action_list_execution_signature,
+        }[active_profile](project)
         if (
             args.expected_execution_sha256 is not None
             and signature["sha256"] != args.expected_execution_sha256
@@ -573,7 +584,7 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
             "gold_loaded": False,
             "memory_updates": False,
         }
-        if active_profile == STRUCTURED:
+        if active_profile != LEGACY:
             plan["profile"] = active_profile.name
             plan["profile_scope"] = "calibration_only_not_source_or_evaluation"
         output = runs / run_id
@@ -628,9 +639,7 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
                             trace=f"{run_id}/{question.question_id}/{arm}",
                             log=log,
                             **(
-                                {"profile": active_profile.name}
-                                if active_profile == STRUCTURED
-                                else {}
+                                {"profile": active_profile.name} if active_profile != LEGACY else {}
                             ),
                         )
                         verify_banks(banks)

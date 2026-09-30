@@ -27,8 +27,11 @@ def synthetic_project(tmp_path):
 def test_profiles_are_explicit_distinct_and_legacy_is_default():
     assert profiles.get_profile() == profiles.LEGACY
     assert profiles.get_profile("structured-v2") == profiles.STRUCTURED
+    assert profiles.get_profile("action-list-v3") == profiles.ACTION_LIST
     assert profiles.LEGACY.protocol != profiles.STRUCTURED.protocol
     assert profiles.LEGACY.prefix != profiles.STRUCTURED.prefix
+    assert len({p.protocol for p in profiles.PROFILES}) == 3
+    assert len({p.prefix for p in profiles.PROFILES}) == 3
 
 
 @pytest.mark.parametrize("name", [None, 1, "v2", "structured-v3", ""])
@@ -142,7 +145,7 @@ def budget_root(tmp_path, profile, *, pending=False, protocol=None):
     return root
 
 
-def test_project_history_includes_both_profile_ledgers_without_reset(tmp_path, monkeypatch):
+def test_project_history_includes_all_profile_ledgers_without_reset(tmp_path, monkeypatch):
     roots = [budget_root(tmp_path, profile) for profile in profiles.PROFILES]
     captured = {}
 

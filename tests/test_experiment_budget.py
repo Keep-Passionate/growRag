@@ -106,6 +106,9 @@ def test_unknown_strict_schema_rejected_before_delegate_or_reservation():
         "growrag-operator-fresh-v3",
         "growrag-operator-static-v3",
         "growrag-operator-memory-v3",
+        "growrag-operator-fresh-v4",
+        "growrag-operator-static-v4",
+        "growrag-operator-memory-v4",
         "growrag-operator-reader-v2",
     ],
 )

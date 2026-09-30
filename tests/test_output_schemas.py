@@ -11,6 +11,7 @@ from growrag.controller import (
     ROUTE_PROMPT_VERSION,
 )
 from growrag.experiments.operator_schemas import operator_schema_registry
+from growrag.experiments.operator_schemas_v3 import action_list_schema_registry
 from growrag.experiments.output_schemas import (
     registry_manifest,
     response_format_for,
@@ -30,6 +31,7 @@ def test_registry_tracks_exact_current_prompts_without_alias_fallback():
         S2G_AUTHOR_VERSIONS["judge"],
         S2G_AUTHOR_VERSIONS["extract"],
         *operator_schema_registry(),
+        *action_list_schema_registry(),
     }
     for version, item in manifest["schemas"].items():
         assert item["sha256"] == schema_fingerprint(version)
@@ -160,3 +162,21 @@ def test_original_schema_versions_and_wire_fingerprints_remain_unchanged():
         ),
     }
     assert {version: schema_fingerprint(version) for version in original} == original
+
+
+def test_action_list_registration_preserves_v2_operator_wire_fingerprints():
+    previous = {
+        "growrag-operator-fresh-v3": (
+            "acbcf32c136c93e9788f295fe47b22a5ca4a5065f6ddb2d034427fe8636d8d4a"
+        ),
+        "growrag-operator-memory-v3": (
+            "14fbded2d84b9c50e2ec60e7787f175021938679847e001135b51fa01bc9549e"
+        ),
+        "growrag-operator-reader-v2": (
+            "065dfb0c463294c020480289fdb9eec54570f317e5732294015f290ddde4246f"
+        ),
+        "growrag-operator-static-v3": (
+            "38d631e1841696dcd1d0323af183982956a70293de4ce9480062580ccd88e0cf"
+        ),
+    }
+    assert {version: schema_fingerprint(version) for version in previous} == previous

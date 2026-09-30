@@ -63,6 +63,7 @@ HISTORICAL_ROOTS = (
 REVIEWED_OTHER_SERIES = {
     "2026-09-30_operator_v1_": {"growrag-operator-study-v1"},
     "2026-09-30_operator_v2_": {"growrag-operator-study-structured-v2"},
+    "2026-09-30_operator_v3_": {"growrag-operator-study-action-list-v3"},
     "2026-09-27_reformer_hotpot_v1_": {"growrag-reformer-public-qwen-v1"},
     "2026-09-27_reformer_control_v1_": {"growrag-reformer-id-examples-v1"},
     "2026-09-27_memory_source_v1_": {"growrag-independent-memory-source-collection-v1"},

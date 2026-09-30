@@ -244,6 +244,9 @@ def test_strict_schema_is_opt_in_audited_and_needs_no_json_keyword(tmp_path, mon
         "growrag-operator-fresh-v3",
         "growrag-operator-static-v3",
         "growrag-operator-memory-v3",
+        "growrag-operator-fresh-v4",
+        "growrag-operator-static-v4",
+        "growrag-operator-memory-v4",
         "growrag-operator-reader-v2",
     ],
 )
