@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 from growrag.experiments.operator_profiles import ACTION_LIST, action_list_execution_signature
-from growrag.experiments.operator_resume import build_certificate
+from growrag.experiments.operator_resume import build_certificate, verify_certificate
 from growrag.experiments.pre_pilot import write_json
 from growrag.experiments.representation_runner import fingerprint
 from growrag.experiments.shared_continuation import _read, _safe_file
@@ -35,6 +35,7 @@ def parser():
     result.add_argument("--batch-size", type=int, default=25)
     result.add_argument("--project-cap-cny", type=float, default=50)
     result.add_argument("--api-config", type=Path, default=Path("qwenAPI.md"))
+    result.add_argument("--resume-certificate", type=Path)
     result.add_argument("--allow-network", action="store_true")
     result.add_argument("--continue-untouched-transport", action="store_true")
     return result
@@ -189,13 +190,48 @@ def audited_suffix(args, runs, name, expected_ids, *, certifier=build_certificat
     return certificate, len(started), completed
 
 
+def initial_resume(args, project, ids):
+    """An explicit fully reaudited suffix may shorten the FIRST batch, never later ones."""
+    if args.resume_certificate is None:
+        return None, None
+    path = (project / args.resume_certificate).resolve(strict=True)
+    if not path.is_relative_to(project):
+        raise ValueError("initial certificate must stay inside project")
+    wanted = _read(path)[0]["proof"]["question_ids"]
+    if (
+        type(wanted) is not list
+        or not 1 <= len(wanted) <= args.batch_size
+        or args.start + len(wanted) > args.end
+        or wanted != ids[args.start : args.start + len(wanted)]
+    ):
+        raise ValueError("initial certificate must cover its complete contiguous source suffix")
+    signature = action_list_execution_signature(project)
+    if signature["sha256"] != args.expected_execution_sha256:
+        raise ValueError("initial certificate method mismatch")
+    verify_certificate(
+        project / "runs",
+        path,
+        phase="source",
+        question_ids=wanted,
+        arms=ARMS,
+        manifest_sha256=args.expected_manifest_sha256,
+        model=signature["configuration"]["model"],
+        signature=signature,
+        profile=ACTION_LIST.name,
+    )
+    return path, args.start + len(wanted)
+
+
 def collect(args, project, ids, *, execute=subprocess.run, certifier=build_certificate):
     """No detached jobs or shell commands: execute returns only when child has exited."""
     runs = project / "runs"
     environment = {**os.environ, "PYTHONPATH": str(project / "src"), "PYTHONUTF8": "1"}
     start, zero_progress = args.start, 0
+    initial_path, initial_end = initial_resume(args, project, ids)
     while start < args.end:
-        end, certificate_path = min(start + args.batch_size, args.end), None
+        end = initial_end if initial_end is not None else min(start + args.batch_size, args.end)
+        certificate_path = initial_path
+        initial_path, initial_end = None, None
         while start < end:
             argv = command(args, start, end, certificate_path)
             print(subprocess.list2cmdline(argv), flush=True)

@@ -328,3 +328,80 @@ def test_success_exit_requires_clean_complete_seal(tmp_path):
 def test_budget_cap_cannot_be_bypassed(tmp_path, cap):
     with pytest.raises(ValueError, match="project cap"):
         launcher.source_ids(args("--project-cap-cny", cap), tmp_path)
+
+
+def initial_fixture(tmp_path, monkeypatch, wanted=None):
+    path = tmp_path / "runs/explicit_certificate.json"
+    dump(path, {"proof": {"question_ids": IDS[77:100] if wanted is None else wanted}})
+    signature = {"sha256": "b" * 64, "configuration": {"model": "fixture-model"}}
+    monkeypatch.setattr(launcher, "action_list_execution_signature", lambda p: signature)
+    options = args(
+        "--start", "77", "--end", "135", "--allow-network", "--resume-certificate", str(path)
+    )
+    return options, path, signature
+
+
+def test_explicit_suffix_shortens_first_batch_only_and_reaudits_all_bindings(tmp_path, monkeypatch):
+    options, path, signature = initial_fixture(tmp_path, monkeypatch)
+    checked, seen = [], []
+
+    def verify(runs, certificate, **kw):
+        assert runs == tmp_path / "runs" and certificate == path
+        assert kw == {
+            "phase": "source",
+            "question_ids": IDS[77:100],
+            "arms": launcher.ARMS,
+            "manifest_sha256": "a" * 64,
+            "model": "fixture-model",
+            "signature": signature,
+            "profile": "action-list-v3",
+        }
+        checked.append(True)
+
+    def execute(argv, **kw):
+        assert checked == [True]
+        start, end = interval(argv)
+        assert ("--resume-certificate" in argv) == (start == 77)
+        seen.append((start, end))
+        seal_success(tmp_path, start, end)
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(launcher, "verify_certificate", verify)
+    assert launcher.collect(options, tmp_path, IDS, execute=execute) == 0
+    assert seen == [(77, 100), (100, 125), (125, 135)]
+
+
+@pytest.mark.parametrize("wanted", [IDS[78:100], IDS[77:103], IDS[77:100][::-1]])
+def test_initial_certificate_cannot_skip_reorder_or_exceed_first_batch(
+    tmp_path, monkeypatch, wanted
+):
+    options, _, _ = initial_fixture(tmp_path, monkeypatch, wanted)
+    monkeypatch.setattr(launcher, "verify_certificate", lambda *a, **kw: pytest.fail("bad range"))
+    with pytest.raises(ValueError, match="complete contiguous"):
+        launcher.collect(
+            options, tmp_path, IDS, execute=lambda *a, **kw: pytest.fail("must not launch")
+        )
+
+
+def test_initial_certificate_full_audit_failure_prevents_even_dry_run(tmp_path, monkeypatch):
+    options, _, _ = initial_fixture(tmp_path, monkeypatch)
+    options.allow_network = False
+
+    def reject(*a, **kw):
+        raise ValueError("changed ancestor evidence")
+
+    monkeypatch.setattr(launcher, "verify_certificate", reject)
+    with pytest.raises(ValueError, match="changed ancestor"):
+        launcher.collect(
+            options, tmp_path, IDS, execute=lambda *a, **kw: pytest.fail("must not launch")
+        )
+
+
+def test_explicit_certificate_does_not_override_existing_target_claim(tmp_path, monkeypatch):
+    options, _, _ = initial_fixture(tmp_path, monkeypatch)
+    monkeypatch.setattr(launcher, "verify_certificate", lambda *a, **kw: None)
+    dump(tmp_path / "runs" / f"{launcher.run_name(77, 100)}.claim.json", {})
+    with pytest.raises(ValueError, match="already exists"):
+        launcher.collect(
+            options, tmp_path, IDS, execute=lambda *a, **kw: pytest.fail("must not replay")
+        )
