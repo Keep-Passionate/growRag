@@ -209,6 +209,10 @@ def args(state, *, phase="calibration", count=2, arms=("base", "fresh", "static"
                 study._sha(state.path),
             ]
         )
+        if phase == "source":
+            result.extend(
+                ["--expected-execution-sha256", study.execution_signature(state.root)["sha256"]]
+            )
     return result
 
 
@@ -624,6 +628,23 @@ def test_live_requires_expected_manifest_fingerprint(sandbox):
     with pytest.raises(ValueError, match="SHA256 mismatch"):
         study.main(args(sandbox) + ["--expected-manifest-sha256", "f" * 64])
     assert sandbox.clients == []
+
+
+def test_source_requires_pinned_execution_method_before_network(sandbox):
+    command = args(sandbox, phase="source")
+    marker = command.index("--expected-execution-sha256")
+    with pytest.raises(ValueError, match="explicit expected execution"):
+        study.main(command[:marker])
+    with pytest.raises(ValueError, match="execution signature mismatch"):
+        study.main(command + ["--expected-execution-sha256", "f" * 64])
+    assert sandbox.clients == []
+    assert not list((sandbox.root / "runs").glob("*.claim.json"))
+
+
+def test_matching_pinned_execution_source_can_run(sandbox):
+    assert study.main(args(sandbox, phase="source", count=1)) == 0
+    plan = read(run_dir(sandbox) / "launch_plan.json")
+    assert plan["execution_signature"] == study.execution_signature(sandbox.root)
 
 
 def test_certificate_continues_only_unstarted_qids_and_cannot_be_reused(sandbox):

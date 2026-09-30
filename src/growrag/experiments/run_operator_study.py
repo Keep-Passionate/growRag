@@ -306,6 +306,11 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
     # One lock covers history reconciliation, claim, all calls and ledger finalization.
     with serial_lock(runs):
         signature = execution_signature(project)
+        if (
+            args.expected_execution_sha256 is not None
+            and signature["sha256"] != args.expected_execution_sha256
+        ):
+            raise ValueError("expected execution signature mismatch; no request sent")
         configuration = signature["configuration"]
         resume = (
             verify_certificate(
@@ -528,6 +533,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--expected-manifest-sha256")
+    parser.add_argument("--expected-execution-sha256")
     parser.add_argument("--resume-certificate", type=Path)
     parser.add_argument("--phase", choices=tuple(COUNTS), required=True)
     parser.add_argument("--start", type=int, default=0)
@@ -551,6 +557,12 @@ def main(argv=None):
         or not _SHA.fullmatch(args.expected_manifest_sha256)
     ):
         raise ValueError("live launch requires explicit expected manifest SHA256")
+    if args.expected_execution_sha256 is not None and not _SHA.fullmatch(
+        args.expected_execution_sha256
+    ):
+        raise ValueError("invalid expected execution SHA256")
+    if args.allow_network and args.phase == "source" and args.expected_execution_sha256 is None:
+        raise ValueError("source launch requires explicit expected execution SHA256")
     project = Path.cwd().resolve()
     runs = (project / "runs").resolve()
     args.manifest = args.manifest.resolve(strict=True)
