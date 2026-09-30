@@ -61,6 +61,7 @@ HISTORICAL_ROOTS = (
 )
 # 新的模式库实验仍消费同一项目预算；不是重新获得一个50元额度。
 REVIEWED_OTHER_SERIES = {
+    "2026-09-30_operator_v1_": {"growrag-operator-study-v1"},
     "2026-09-27_reformer_hotpot_v1_": {"growrag-reformer-public-qwen-v1"},
     "2026-09-27_reformer_control_v1_": {"growrag-reformer-id-examples-v1"},
     "2026-09-27_memory_source_v1_": {"growrag-independent-memory-source-collection-v1"},
