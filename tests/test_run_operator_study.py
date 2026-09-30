@@ -759,9 +759,19 @@ def evaluation(sandbox, monkeypatch):
         "paths": {"manifest": "data/manifest.json", "banks": "banks", "runs": "runs"},
         "expected": {"manifest": study._sha(sandbox.path), "execution": signature["sha256"]},
         "execution_signature": signature,
+        "runner_sha256": "b" * 64,
         "evaluation_ids": sandbox.manifest["roles"]["evaluation"],
         "evaluation_order_sha256": study.fingerprint(sandbox.manifest["roles"]["evaluation"]),
         "controls": {arm: {"memory_updates": False} for arm in study.ARMS},
+        "banks": {
+            str(size): {
+                "file_sha256": study._sha(banks / f"bank_{size}.json"),
+                "fingerprint": FrozenOperatorBank.from_json(
+                    (banks / f"bank_{size}.json").read_text(encoding="utf-8")
+                ).fingerprint,
+            }
+            for size in study.SOURCE_SIZES
+        },
     }
     state = SimpleNamespace(
         certificate=certificate,
@@ -923,3 +933,82 @@ def test_evaluation_options_cannot_change_source_or_calibration_phase(sandbox, e
     with pytest.raises(ValueError, match="require the evaluation phase"):
         study.main(args(sandbox) + ["--evaluation-freeze", str(evaluation.certificate)])
     assert evaluation.validations == [] and sandbox.clients == []
+
+
+def test_evaluation_resume_runs_only_whole_unstarted_suffix_and_retains_claims(
+    sandbox, evaluation, monkeypatch
+):
+    sandbox.malformed_at = 15  # First question: 13 calls. Second BASE: 14. FRESH fails: 15.
+    command = evaluation_args(sandbox, evaluation) + ["--count", "3"]
+    assert study.main(command) == 1
+    parent = run_dir(sandbox)
+    report_before = read(parent / "predictions.json")
+    budget_before = read(parent / "final_budget.json")
+    certificate = build_certificate(sandbox.root / "runs", parent.name)
+    untouched = sandbox.manifest["roles"]["evaluation"][2:3]
+    assert certificate["proof"]["question_ids"] == untouched
+    path = sandbox.root / "evaluation-resume.json"
+    dump(path, certificate)
+    sandbox.malformed_at = None
+    assert (
+        study.main(
+            evaluation_args(sandbox, evaluation)
+            + [
+                "--start",
+                "2",
+                "--resume-certificate",
+                str(path),
+            ]
+        )
+        == 0
+    )
+    child = next(
+        p for p in (sandbox.root / "runs").glob(f"{study.PREFIX}*") if p.is_dir() and p != parent
+    )
+    launch = read(child / "launch_plan.json")
+    assert launch["question_ids"] == untouched
+    assert launch["evaluation_freeze_sha256"] == study._sha(evaluation.certificate)
+    assert launch["resume_parent_run_id"] == parent.name
+    assert read(parent / "predictions.json") == report_before
+    assert read(parent / "final_budget.json") == budget_before
+    assert read(child / "final_budget.json")["api_requests"] == 13
+    assert (sandbox.root / "runs" / f"{parent.name}.claim.json").exists()
+    assert (sandbox.root / "runs" / f"{child.name}.claim.json").exists()
+    read_text = Path.read_text
+
+    def guarded(target, *args, **kwargs):
+        assert target != evaluation.runtime, "failed evaluation question was reopened"
+        return read_text(target, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", guarded)
+    with pytest.raises(ValueError, match="untouched"):
+        study.main(
+            evaluation_args(sandbox, evaluation)
+            + [
+                "--start",
+                "1",
+                "--resume-certificate",
+                str(path),
+            ]
+        )
+
+
+@pytest.mark.parametrize("phase", ["source", "calibration"])
+def test_non_evaluation_resume_certificate_rejected_before_reading_evaluation(
+    sandbox, evaluation, monkeypatch, phase
+):
+    sandbox.malformed_at = 7
+    assert study.main(args(sandbox, phase=phase, count=3)) == 1
+    parent = run_dir(sandbox)
+    path = sandbox.root / "non-evaluation-resume.json"
+    dump(path, build_certificate(sandbox.root / "runs", parent.name))
+    read_text = Path.read_text
+
+    def guarded(target, *args, **kwargs):
+        assert target != evaluation.runtime, "foreign continuation opened evaluation text"
+        return read_text(target, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", guarded)
+    with pytest.raises(ValueError, match="approved method/role"):
+        study.main(evaluation_args(sandbox, evaluation) + ["--resume-certificate", str(path)])
+    assert len(sandbox.clients) == 1

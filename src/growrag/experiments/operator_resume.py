@@ -18,10 +18,16 @@ from .representation_runner import fingerprint
 from .shared_continuation import _event_mentions, _read, _request_evidence, _safe_file
 
 SCHEMA = "growrag-operator-unstarted-certificate-v1"
+EVALUATION_SCHEMA = "growrag-operator-evaluation-unstarted-certificate-v1"
 PROTOCOL = "growrag-operator-study-v1"
 PREFIX = "2026-09-30_operator_v1_"
 _ID = re.compile(r"[0-9a-f]{24}")
 _ARMS = {"base", "fresh", "static", "memory50", "memory100", "memory250", "memory500"}
+_EVALUATION_ARMS = ["base", "fresh", "static", "memory50", "memory100", "memory250", "memory500"]
+_SHA = re.compile(r"[0-9a-f]{64}")
+# Each evaluation batch has at most 25 questions; every failed ancestor consumes
+# at least one whole question. Support all untouched suffixes without unbounded recursion.
+_EVALUATION_DEPTH = 25
 
 
 def _ids(value):
@@ -35,12 +41,73 @@ def _ids(value):
     return value
 
 
+def _evaluation_binding(runs, launch, read):
+    """Revalidate the exact evaluation freeze, not just its copied hash string."""
+    from .operator_evaluation_freeze import validate_evaluation_freeze
+
+    project = runs.parent
+    path_value, digest = (
+        launch.get("evaluation_freeze_path"),
+        launch.get("evaluation_freeze_sha256"),
+    )
+    if (
+        not isinstance(path_value, str)
+        or not Path(path_value).is_absolute()
+        or not isinstance(digest, str)
+        or not _SHA.fullmatch(digest)
+    ):
+        raise ValueError("evaluation parent lacks its original freeze identity")
+    path = Path(path_value).resolve(strict=True)
+    if not path.is_relative_to(project):
+        raise ValueError("evaluation freeze path escapes the project")
+    body = validate_evaluation_freeze(project, path, expected_certificate_sha256=digest)
+    method = validate_execution_signature(launch.get("execution_signature"))
+    ids, planned = body["evaluation_ids"], launch["question_ids"]
+    start = ids.index(planned[0]) if planned[0] in ids else -1
+    if (
+        read("evaluation_freeze_verified.json") != body
+        or body["protocol"] != PROTOCOL
+        or (project / body["paths"]["runs"]).resolve(strict=True) != runs
+        or launch["arms"] != _EVALUATION_ARMS
+        or launch["manifest_sha256"] != body["expected"]["manifest"]
+        or launch["model"] != body["execution_signature"]["configuration"]["model"]
+        or launch["execution_signature"] != body["execution_signature"]
+        or method != body["expected"]["execution"]
+        or launch.get("evaluation_order_sha256") != body["evaluation_order_sha256"]
+        or body["evaluation_order_sha256"] != fingerprint(ids)
+        or not isinstance(body.get("runner_sha256"), str)
+        or not _SHA.fullmatch(body["runner_sha256"])
+        or not 1 <= len(planned) <= 25
+        or start < 0
+        or ids[start : start + len(planned)] != planned
+        or launch.get("bank_sha256")
+        != {
+            f"memory{size}": body["banks"][size]["fingerprint"]
+            for size in ("50", "100", "250", "500")
+        }
+        or launch.get("bank_file_sha256")
+        != {
+            f"memory{size}": body["banks"][size]["file_sha256"]
+            for size in ("50", "100", "250", "500")
+        }
+    ):
+        raise ValueError("evaluation parent differs from its frozen method/banks/order")
+    return {
+        "freeze_path": str(path),
+        "freeze_sha256": digest,
+        "freeze_body_sha256": fingerprint(body),
+        "execution_sha256": method,
+        "runner_sha256": body["runner_sha256"],
+        "evaluation_order_sha256": body["evaluation_order_sha256"],
+    }
+
+
 def _audit(runs, parent_id, *, visited=()):
     if (
         not isinstance(parent_id, str)
         or not re.fullmatch(re.escape(PREFIX) + r"[A-Za-z0-9_]+", parent_id)
         or parent_id in visited
-        or len(visited) >= 16
+        or len(visited) >= _EVALUATION_DEPTH
     ):
         raise ValueError("unsafe parent identity or continuation ancestry")
     root = Path(runs).resolve(strict=True)
@@ -68,7 +135,7 @@ def _audit(runs, parent_id, *, visited=()):
     if (
         launch.get("run_id") != parent_id
         or launch.get("protocol") != PROTOCOL
-        or launch.get("phase") not in {"source", "calibration"}
+        or launch.get("phase") not in {"source", "calibration", "evaluation"}
         or launch.get("gold_loaded") is not False
         or launch.get("memory_updates") is not False
         or type(launch.get("arms")) is not list
@@ -78,6 +145,8 @@ def _audit(runs, parent_id, *, visited=()):
         or claim != {**launch, "plan_sha256": fingerprint(launch)}
     ):
         raise ValueError("parent launch/claim identity mismatch")
+    if launch["phase"] != "evaluation" and len(visited) >= 16:
+        raise ValueError("unsafe parent identity or continuation ancestry")
     planned = _ids(launch.get("question_ids"))
     if (
         type(reports) is not list
@@ -163,6 +232,9 @@ def _audit(runs, parent_id, *, visited=()):
     source_signature = None
     if launch["phase"] == "source":
         source_signature = validate_execution_signature(signature)
+    evaluation_binding = (
+        _evaluation_binding(root, launch, read) if launch["phase"] == "evaluation" else None
+    )
     ancestors = [parent_id]
     if launch.get("resume_parent_run_id") is not None:
         certificate = read("resume_certificate.json")
@@ -180,10 +252,17 @@ def _audit(runs, parent_id, *, visited=()):
                 source_signature is not None
                 and previous["source_execution_sha256"] != source_signature
             )
+            or (
+                evaluation_binding is not None
+                and (
+                    previous.get("evaluation_binding") != evaluation_binding
+                    or planned != previous["question_ids"]
+                )
+            )
         ):
             raise ValueError("parent continuation ancestry is inconsistent")
         ancestors.extend(previous["ancestor_run_ids"])
-    return {
+    proof = {
         "parent_run_id": parent_id,
         "phase": launch["phase"],
         "model": launch["model"],
@@ -196,10 +275,16 @@ def _audit(runs, parent_id, *, visited=()):
         "evidence_files": files,
         "request_evidence": requests,
     }
+    # Do not add nullable keys to legacy proofs: historical v1 fingerprints stay valid.
+    if evaluation_binding is not None:
+        proof["evaluation_binding"] = evaluation_binding
+    return proof
 
 
 def build_certificate(runs, parent_run_id):
-    body = {"schema": SCHEMA, "protocol": PROTOCOL, "proof": _audit(runs, parent_run_id)}
+    proof = _audit(runs, parent_run_id)
+    schema = EVALUATION_SCHEMA if proof["phase"] == "evaluation" else SCHEMA
+    body = {"schema": schema, "protocol": PROTOCOL, "proof": proof}
     return {**body, "sha256": fingerprint(body)}
 
 
@@ -213,7 +298,8 @@ def _validate(runs, certificate, *, visited=()):
         raise ValueError("invalid explicit resume certificate")
     body = {k: certificate[k] for k in ("schema", "protocol", "proof")}
     if (
-        certificate["schema"] != SCHEMA
+        certificate["schema"]
+        != (EVALUATION_SCHEMA if certificate["proof"].get("phase") == "evaluation" else SCHEMA)
         or certificate["protocol"] != PROTOCOL
         or fingerprint(body) != certificate["sha256"]
     ):
@@ -224,7 +310,19 @@ def _validate(runs, certificate, *, visited=()):
     return proof
 
 
-def verify_certificate(runs, path, *, phase, question_ids, arms, manifest_sha256, model, signature):
+def verify_certificate(
+    runs,
+    path,
+    *,
+    phase,
+    question_ids,
+    arms,
+    manifest_sha256,
+    model,
+    signature,
+    evaluation_freeze=None,
+    expected_freeze_sha256=None,
+):
     certificate, _ = _read(Path(path).resolve(strict=True))
     proof = _validate(runs, certificate)
     if (
@@ -239,6 +337,18 @@ def verify_certificate(runs, path, *, phase, question_ids, arms, manifest_sha256
         )
     ):
         raise ValueError("resume only permits untouched questions under the approved method/role")
+    if phase == "evaluation":
+        binding = proof["evaluation_binding"]
+        if (
+            evaluation_freeze is None
+            or binding["freeze_path"] != str(Path(evaluation_freeze).resolve(strict=True))
+            or binding["freeze_sha256"] != expected_freeze_sha256
+            or binding["execution_sha256"] != validate_execution_signature(signature)
+            or list(question_ids) != proof["question_ids"]
+        ):
+            raise ValueError(
+                "evaluation resume requires the same freeze and complete untouched suffix"
+            )
     return certificate
 
 

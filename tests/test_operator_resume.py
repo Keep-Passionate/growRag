@@ -2,6 +2,7 @@
 
 import json
 from copy import deepcopy
+from types import SimpleNamespace
 
 import pytest
 
@@ -33,7 +34,9 @@ def signature(marker="a"):
     return {**body, "sha256": fingerprint(body)}
 
 
-def closed_run(root, *, name=None, phase="calibration", ids=None, sig=None, parent=None):
+def closed_run(
+    root, *, name=None, phase="calibration", ids=None, sig=None, parent=None, evaluation=None
+):
     name = name or f"{resume.PREFIX}{phase}_base_0000_0004"
     ids = ids or [f"{n:024x}" for n in range(4)]
     directory = root / name
@@ -53,6 +56,21 @@ def closed_run(root, *, name=None, phase="calibration", ids=None, sig=None, pare
     }
     if sig:
         launch["execution_signature"] = sig
+    if evaluation is not None:
+        launch.update(
+            arms=list(resume._EVALUATION_ARMS),
+            model=evaluation.body["execution_signature"]["configuration"]["model"],
+            evaluation_freeze_path=str(evaluation.path),
+            evaluation_freeze_sha256=evaluation.sha,
+            evaluation_order_sha256=evaluation.body["evaluation_order_sha256"],
+            bank_sha256={
+                f"memory{n}": row["fingerprint"] for n, row in evaluation.body["banks"].items()
+            },
+            bank_file_sha256={
+                f"memory{n}": row["file_sha256"] for n, row in evaluation.body["banks"].items()
+            },
+        )
+        dump(directory / "evaluation_freeze_verified.json", evaluation.body)
     if parent:
         launch["resume_parent_run_id"] = parent["proof"]["parent_run_id"]
         launch["resume_certificate_sha256"] = fingerprint(parent)
@@ -281,3 +299,177 @@ def test_cli_certificate_is_exclusive_and_offline(tmp_path, capsys):
     assert read(path)["proof"]["question_ids"] == ids[1:]
     with pytest.raises(FileExistsError):
         resume.main(command)
+
+
+@pytest.fixture
+def eval_context(tmp_path, monkeypatch):
+    from growrag.experiments import operator_evaluation_freeze as freeze
+
+    runs = tmp_path / "runs"
+    runs.mkdir()
+    runner = tmp_path / "runner-fixture.py"
+    runner.write_text("synthetic immutable runner\n", encoding="utf-8")
+    ids = [f"{n:024x}" for n in range(500)]
+    body = {
+        "protocol": resume.PROTOCOL,
+        "paths": {"runs": "runs"},
+        "expected": {"manifest": "c" * 64, "execution": signature()["sha256"]},
+        "execution_signature": signature(),
+        "evaluation_ids": ids,
+        "evaluation_order_sha256": fingerprint(ids),
+        "runner_sha256": freeze._sha(runner),
+        "banks": {
+            str(n): {"fingerprint": "d" * 64, "file_sha256": "e" * 64} for n in (50, 100, 250, 500)
+        },
+    }
+    path = tmp_path / "evaluation-freeze.json"
+    dump(path, {"freeze": body})
+
+    def validate(root, certificate_path, *, expected_certificate_sha256):
+        assert root == tmp_path
+        if (
+            certificate_path != path
+            or freeze._sha(path) != expected_certificate_sha256
+            or freeze._sha(runner) != body["runner_sha256"]
+        ):
+            raise ValueError("synthetic evaluation freeze dependencies changed")
+        return deepcopy(body)
+
+    monkeypatch.setattr(freeze, "validate_evaluation_freeze", validate)
+    return SimpleNamespace(
+        root=tmp_path, runs=runs, path=path, sha=freeze._sha(path), body=body, runner=runner
+    )
+
+
+def eval_run(context, *, start=0, end=4, parent=None):
+    return closed_run(
+        context.runs,
+        name=f"{resume.PREFIX}evaluation_all_{start:04d}_{end:04d}",
+        phase="evaluation",
+        ids=context.body["evaluation_ids"][start:end],
+        sig=signature(),
+        parent=parent,
+        evaluation=context,
+    )
+
+
+def verify_eval(context, path, ids, **changes):
+    arguments = {
+        "phase": "evaluation",
+        "question_ids": ids,
+        "arms": resume._EVALUATION_ARMS,
+        "manifest_sha256": "c" * 64,
+        "model": signature()["configuration"]["model"],
+        "signature": signature(),
+        "evaluation_freeze": context.path,
+        "expected_freeze_sha256": context.sha,
+    }
+    arguments.update(changes)
+    return resume.verify_certificate(context.runs, path, **arguments)
+
+
+def test_evaluation_has_separate_schema_and_requires_whole_untouched_suffix(eval_context):
+    directory, ids = eval_run(eval_context)
+    cert = resume.build_certificate(eval_context.runs, directory.name)
+    assert cert["schema"] == resume.EVALUATION_SCHEMA
+    binding = cert["proof"]["evaluation_binding"]
+    assert binding["freeze_sha256"] == eval_context.sha
+    assert binding["runner_sha256"] == eval_context.body["runner_sha256"]
+    path = eval_context.root / "resume.json"
+    dump(path, cert)
+    assert verify_eval(eval_context, path, ids[1:]) == cert
+    for chosen in (ids[:1], ids[2:], ids[1:][::-1], ids[1:2]):
+        with pytest.raises(ValueError, match="untouched"):
+            verify_eval(eval_context, path, chosen)
+
+
+@pytest.mark.parametrize("field", ["freeze", "path", "method", "arms"])
+def test_evaluation_cannot_resume_under_other_freeze_or_method(eval_context, field):
+    directory, ids = eval_run(eval_context)
+    path = eval_context.root / "resume.json"
+    dump(path, resume.build_certificate(eval_context.runs, directory.name))
+    changes = {
+        "freeze": {"expected_freeze_sha256": "f" * 64},
+        "path": {"evaluation_freeze": eval_context.runner},
+        "method": {"signature": signature("b")},
+        "arms": {"arms": ["base"]},
+    }[field]
+    with pytest.raises(ValueError):
+        verify_eval(eval_context, path, ids[1:], **changes)
+
+
+@pytest.mark.parametrize("field", ["freeze", "copy", "runner", "order", "banks", "arms"])
+def test_evaluation_original_freeze_and_bindings_are_reaudited(eval_context, field):
+    directory, _ = eval_run(eval_context)
+    if field == "freeze":
+        dump(eval_context.path, {"changed": True})
+    elif field == "copy":
+        dump(directory / "evaluation_freeze_verified.json", {"changed": True})
+    elif field == "runner":
+        eval_context.runner.write_text("changed", encoding="utf-8")
+    else:
+        launch = read(directory / "launch_plan.json")
+        if field == "order":
+            launch["evaluation_order_sha256"] = "f" * 64
+        elif field == "banks":
+            launch["bank_file_sha256"]["memory50"] = "f" * 64
+        else:
+            launch["arms"] = ["base"]
+        dump(directory / "launch_plan.json", launch)
+        dump(
+            eval_context.runs / f"{directory.name}.claim.json",
+            {**launch, "plan_sha256": fingerprint(launch)},
+        )
+    with pytest.raises(ValueError, match="evaluation"):
+        resume.build_certificate(eval_context.runs, directory.name)
+
+
+def test_evaluation_ancestry_supports_worst_case_25_question_batch(eval_context):
+    certificate = None
+    for start in range(24):
+        directory, ids = eval_run(eval_context, start=start, end=25, parent=certificate)
+        certificate = resume.build_certificate(eval_context.runs, directory.name)
+        assert certificate["proof"]["question_ids"] == ids[1:]
+    assert len(certificate["proof"]["ancestor_run_ids"]) == 24
+    assert certificate["proof"]["question_ids"] == eval_context.body["evaluation_ids"][24:25]
+    assert len(list(eval_context.runs.glob("*.claim.json"))) == 24
+
+
+def test_source_calibration_proof_shape_stays_legacy_and_depth_16(tmp_path):
+    certificate = None
+    ids = [f"{n:024x}" for n in range(18)]
+    for start in range(17):
+        directory, _ = closed_run(
+            tmp_path,
+            name=f"{resume.PREFIX}calibration_chain_{start}",
+            ids=ids[start:],
+            parent=certificate,
+        )
+        if start == 16:
+            with pytest.raises(ValueError, match="ancestry"):
+                resume.build_certificate(tmp_path, directory.name)
+        else:
+            certificate = resume.build_certificate(tmp_path, directory.name)
+            assert certificate["schema"] == resume.SCHEMA
+            assert "evaluation_binding" not in certificate["proof"]
+
+
+def test_source_certificate_never_authorizes_evaluation(eval_context):
+    directory, ids = closed_run(eval_context.runs, phase="source", sig=signature())
+    path = eval_context.root / "source-resume.json"
+    dump(path, resume.build_certificate(eval_context.runs, directory.name))
+    with pytest.raises(ValueError, match="approved method/role"):
+        verify_eval(eval_context, path, ids[1:])
+
+
+def test_evaluation_schema_cannot_be_downgraded_to_legacy(eval_context):
+    directory, ids = eval_run(eval_context)
+    certificate = resume.build_certificate(eval_context.runs, directory.name)
+    certificate["schema"] = resume.SCHEMA
+    certificate["sha256"] = fingerprint(
+        {k: certificate[k] for k in ("schema", "protocol", "proof")}
+    )
+    path = eval_context.root / "downgraded.json"
+    dump(path, certificate)
+    with pytest.raises(ValueError, match="schema"):
+        verify_eval(eval_context, path, ids[1:])

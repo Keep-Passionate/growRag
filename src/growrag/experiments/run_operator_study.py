@@ -133,7 +133,6 @@ def _evaluation_gate(options, project, *, chosen_ids=None):
     if (
         tuple(options.arms) != ARMS
         or options.banks is None
-        or options.resume_certificate is not None
         or not isinstance(options.expected_execution_sha256, str)
         or not _SHA.fullmatch(options.expected_execution_sha256)
         or not isinstance(options.expected_manifest_sha256, str)
@@ -170,6 +169,20 @@ def _evaluation_gate(options, project, *, chosen_ids=None):
         and chosen_ids != ids[options.start : options.start + options.count]
     ):
         raise ValueError("evaluation order differs from frozen question IDs")
+    if options.resume_certificate is not None:
+        # Reject source/calibration certificates before decoding any evaluation text.
+        verify_certificate(
+            project / "runs",
+            options.resume_certificate,
+            phase="evaluation",
+            question_ids=ids[options.start : options.start + options.count],
+            arms=options.arms,
+            manifest_sha256=options.expected_manifest_sha256,
+            model=body["execution_signature"]["configuration"]["model"],
+            signature=body["execution_signature"],
+            evaluation_freeze=options.evaluation_freeze,
+            expected_freeze_sha256=options.expected_freeze_sha256,
+        )
     return body
 
 
@@ -418,6 +431,8 @@ def _live(args, project, runs, manifest, chosen, banks, run_id, manifest_sha):
                 manifest_sha256=manifest_sha,
                 model=configuration["model"],
                 signature=signature,
+                evaluation_freeze=args.evaluation_freeze,
+                expected_freeze_sha256=args.expected_freeze_sha256,
             )
             if args.resume_certificate
             else None
@@ -660,10 +675,8 @@ def main(argv=None):
     parser.add_argument("--allow-network", action="store_true")
     args = parser.parse_args(argv)
     if args.phase == "evaluation":
-        if args.resume_certificate is not None:
-            raise ValueError(
-                "evaluation resume is not supported by source/calibration certificates"
-            )
+        if args.resume_certificate is not None and not args.evaluation_freeze:
+            raise ValueError("evaluation resume requires its original evaluation freeze")
         if not args.evaluation_freeze or not args.expected_freeze_sha256:
             raise ValueError("evaluation locked until source/calibration freeze certificates exist")
     elif args.evaluation_freeze is not None or args.expected_freeze_sha256 is not None:
@@ -717,6 +730,8 @@ def main(argv=None):
             manifest_sha256=manifest_sha,
             model=PILOT_MODEL,
             signature=execution_signature(project),
+            evaluation_freeze=args.evaluation_freeze,
+            expected_freeze_sha256=args.expected_freeze_sha256,
         )
         if args.resume_certificate
         else None
