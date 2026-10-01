@@ -23,6 +23,7 @@ from .run_shared_s2g import PREFIX as SHARED_PREFIX
 
 PREFIX = "2026-10-01_history_base_"
 PROTOCOL = "growrag-history-calibration-v1"
+REVIEWED_HISTORY_PROTOCOLS = frozenset({PROTOCOL, "growrag-history-calibration-v2"})
 
 
 def reviewed_history(runs: Path) -> dict:
@@ -36,7 +37,7 @@ def reviewed_history(runs: Path) -> dict:
     series = {
         SHARED_PREFIX: frozenset(REVIEWED_PROTOCOLS),
         **{prefix: frozenset(protocols) for prefix, protocols in REVIEWED_OTHER_SERIES.items()},
-        PREFIX: frozenset({PROTOCOL}),
+        PREFIX: REVIEWED_HISTORY_PROTOCOLS,
     }
     extra = list(HISTORICAL_ROOTS)
     for prefix, protocols in series.items():

@@ -30,6 +30,33 @@ def test_new_claim_is_not_replayed_under_another_arm(tmp_path, monkeypatch):
         study.check_claims(tmp_path, ["synthetic-q"])
 
 
+@pytest.mark.parametrize("version,start,count", [("v2", 40, 5), ("v2", 65, 20), ("v1", 65, 5)])
+def test_versions_cannot_reuse_each_others_question_ranges(tmp_path, version, start, count):
+    with pytest.raises(ValueError, match="predeclares"):
+        study.prepare(tmp_path, start=start, count=count, version=version)
+
+
+def test_v2_changes_only_registered_fill_interface_and_question_range():
+    old, new = study.profile_for("v1"), study.profile_for("v2")
+    assert new["batches"] == ((65, 5), (70, 20))
+    assert new["protocol"] == "growrag-history-calibration-v2"
+    assert new["configuration"].pop("fill_prompt_version") == study.FILL_VERSION_V2
+    assert new["configuration"] == old["configuration"]
+    assert old["configuration"] == study.CONFIGURATION
+    with pytest.raises(ValueError, match="unregistered"):
+        study.profile_for("v3")
+
+
+def test_v2_claim_also_prevents_any_future_version_replay(tmp_path, monkeypatch):
+    monkeypatch.setattr(study, "check_unstarted", lambda *args: None)
+    write_json(
+        tmp_path / f"{study.PREFIX}v2.claim.json",
+        {"protocol": "growrag-history-calibration-v2", "question_ids": ["synthetic-q"]},
+    )
+    with pytest.raises(ValueError, match="previously claimed"):
+        study.check_claims(tmp_path, ["synthetic-q"])
+
+
 class FakeClient:
     def __init__(self, *, fail=False):
         self.fail = fail

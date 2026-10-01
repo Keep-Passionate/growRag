@@ -93,6 +93,26 @@ def test_collects_every_reviewed_series_once_without_mutating_legacy_registry(
     assert budget.PREFIX not in run_shared_s2g.REVIEWED_OTHER_SERIES
 
 
+def test_v1_and_v2_share_one_cumulative_reconciliation(tmp_path, monkeypatch):
+    for version in ("v1", "v2"):
+        root = _root(tmp_path, protocol=f"growrag-history-calibration-{version}", suffix=version)
+        _minimal_ledger(root)
+    received = []
+    monkeypatch.setattr(
+        budget,
+        "reconcile_history",
+        lambda runs, *, reviewed_extra_ledgers: received.append(reviewed_extra_ledgers) or {},
+    )
+    budget.reviewed_history(tmp_path)
+    assert received == [
+        (
+            *budget.HISTORICAL_ROOTS,
+            f"{budget.PREFIX}v1/final_budget.json",
+            f"{budget.PREFIX}v2/final_budget.json",
+        )
+    ]
+
+
 @pytest.mark.parametrize(
     ("protocol", "model"),
     [("unreviewed", None), (budget.PROTOCOL, "unreviewed-model")],

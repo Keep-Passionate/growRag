@@ -20,8 +20,10 @@ from .api_client import ChatConfig, LiveChatClient
 from .api_preflight import read_local_bailian_settings
 from .budget import PriceLimits
 from .fresh_dev_manifest import _sha
-from .history_budget import PREFIX, PROTOCOL, reviewed_history
+from .history_budget import PREFIX, PROTOCOL, REVIEWED_HISTORY_PROTOCOLS, reviewed_history
 from .history_runtime import HistoryContractClient, HistoryPlanner
+from .history_runtime_v2 import FILL_VERSION as FILL_VERSION_V2
+from .history_runtime_v2 import HistoryPlannerV2
 from .operator_model_v3 import ModelOperatorPlannerV3, answer_episode
 from .pre_pilot import write_json
 from .protocol import Evidence
@@ -58,14 +60,33 @@ CONFIGURATION = {
 }
 
 
-def prepare(project, *, start, count):
+def profile_for(version="v1"):
+    """显式版本决定题目范围和填参接口；失败旧题不因修接口而重跑。"""
+    if version == "v1":
+        return {
+            "protocol": PROTOCOL,
+            "batches": ((40, 5), (45, 20)),
+            "configuration": dict(CONFIGURATION),
+            "planner_class": HistoryPlanner,
+        }
+    if version == "v2":
+        return {
+            "protocol": "growrag-history-calibration-v2",
+            "batches": ((65, 5), (70, 20)),
+            "configuration": {**CONFIGURATION, "fill_prompt_version": FILL_VERSION_V2},
+            "planner_class": HistoryPlannerV2,
+        }
+    raise ValueError("unregistered history calibration version")
+
+
+def prepare(project, *, start, count, version="v1"):
     """锁住角色和字节后才解码无标签校准题；本版本只允许既定25题。"""
     if (
         type(start) is not int
         or type(count) is not int
-        or (start, count) not in {(40, 5), (45, 20)}
+        or (start, count) not in profile_for(version)["batches"]
     ):
-        raise ValueError("this version predeclares only calibration[40:45] and [45:65]")
+        raise ValueError("this version predeclares only its registered calibration batches")
     manifest_path = project / "data/hotpotqa/operator_scale_action_v3/manifest.json"
     library_path = project / "runs/history_foundation_20261001_v1/combined.json"
     if _sha(manifest_path) != MANIFEST_SHA256 or _sha(library_path) != LIBRARY_SHA256:
@@ -96,28 +117,32 @@ def check_claims(runs, ids):
     check_unstarted(runs, "calibration", list(ids), ("base", "fresh"))
     for path in runs.glob(f"{PREFIX}*.claim.json"):
         claim = json.loads(path.read_bytes())
-        if claim.get("protocol") != PROTOCOL or not isinstance(claim.get("question_ids"), list):
+        if claim.get("protocol") not in REVIEWED_HISTORY_PROTOCOLS or not isinstance(
+            claim.get("question_ids"), list
+        ):
             raise ValueError("unreviewed history claim")
         if set(ids) & set(claim["question_ids"]):
             raise ValueError("question previously claimed by history series; no automatic replay")
 
 
-def verify_first_batch(runs, snapshot_sha):
+def verify_first_batch(runs, snapshot_sha, version="v1"):
     """扩题前核对完整预测字节；不能只相信一个手写completed字段。"""
-    root = runs / f"{PREFIX}v1_0040_0045"
+    profile = profile_for(version)
+    start, count = profile["batches"][0]
+    root = runs / f"{PREFIX}{version}_{start:04d}_{start + count:04d}"
     previous = json.loads((root / "SUMMARY.json").read_bytes())
     launch = json.loads((root / "launch_plan.json").read_bytes())
     if (
         previous.get("status") != "completed"
         or previous.get("completed_questions") != 5
         or previous.get("source_sha256") != snapshot_sha
-        or launch.get("protocol") != PROTOCOL
+        or launch.get("protocol") != profile["protocol"]
         or launch.get("manifest_sha256") != MANIFEST_SHA256
         or launch.get("library_sha256") != LIBRARY_SHA256
         or launch.get("source_sha256") != snapshot_sha
         or len(launch.get("question_ids", [])) != 5
         or launch.get("arms") != list(ARMS)
-        or any(launch.get(key) != value for key, value in CONFIGURATION.items())
+        or any(launch.get(key) != value for key, value in profile["configuration"].items())
     ):
         raise ValueError("first five must complete under the same frozen method before expansion")
     expected = {f"{qid}_{arm}.json" for qid in launch["question_ids"] for arm in ARMS}
@@ -131,7 +156,19 @@ def verify_first_batch(runs, snapshot_sha):
     return _sha(root / "SUMMARY.json")
 
 
-def execute_arm(question, arm, index, client, *, library, reference, trace, log, target):
+def execute_arm(
+    question,
+    arm,
+    index,
+    client,
+    *,
+    library,
+    reference,
+    trace,
+    log,
+    target,
+    planner_class=HistoryPlanner,
+):
     """四路共享检索与Reader；异常先落盘再向上停止整个批次。"""
     if arm not in ARMS:
         raise ValueError("unknown arm")
@@ -155,7 +192,7 @@ def execute_arm(question, arm, index, client, *, library, reference, trace, log,
                 on_record=lambda event: log({"kind": "planner_record", **event}),
             )
         else:
-            planner = HistoryPlanner(
+            planner = planner_class(
                 client,
                 reference if arm == "static_rules" else library,
                 trace_prefix=trace,
@@ -198,16 +235,18 @@ def execute_arm(question, arm, index, client, *, library, reference, trace, log,
 def run(args):
     project = Path.cwd().resolve(strict=True)
     runs = project / "runs"
+    version = getattr(args, "version", "v1")
+    profile = profile_for(version)
     manifest, chosen, library, reference, corpus = prepare(
-        project, start=args.start, count=args.count
+        project, start=args.start, count=args.count, version=version
     )
     ids = [question.question_id for question in chosen]
     check_claims(runs, ids)
     snapshot = source_snapshot(project)
-    run_id = f"{PREFIX}v1_{args.start:04d}_{args.start + args.count:04d}"
+    run_id = f"{PREFIX}{version}_{args.start:04d}_{args.start + args.count:04d}"
     plan = {
-        **CONFIGURATION,
-        "protocol": PROTOCOL,
+        **profile["configuration"],
+        "protocol": profile["protocol"],
         "run_id": run_id,
         "phase": "calibration",
         "question_ids": ids,
@@ -241,8 +280,10 @@ def run(args):
         subcap = min(3.0 - series_reserved, 200.0 - history["prior_reserved_cny"])
         if subcap <= 0:
             raise ValueError("series or cumulative project reservation exhausted")
-        if args.start == 45:
-            plan["first_batch_summary_sha256"] = verify_first_batch(runs, snapshot["sha256"])
+        if (args.start, args.count) == profile["batches"][1]:
+            plan["first_batch_summary_sha256"] = verify_first_batch(
+                runs, snapshot["sha256"], version
+            )
         settings = read_local_bailian_settings(project / "qwenAPI.md")
         endpoint_host = urlsplit(settings.base_url).hostname or ""
         if endpoint_host != "dashscope.aliyuncs.com" and not endpoint_host.endswith(
@@ -311,6 +352,7 @@ def run(args):
                         trace=f"{run_id}/{question.question_id}/{arm}",
                         log=log,
                         target=target,
+                        planner_class=profile["planner_class"],
                     )
                     reports.append(report)
                     prediction_hashes[target.name] = _sha(target)
@@ -354,7 +396,7 @@ def run(args):
                 }
             )
             summary = {
-                "protocol": PROTOCOL,
+                "protocol": profile["protocol"],
                 "run_id": run_id,
                 "status": "failed" if failure else "completed",
                 "failure_type": failure,
@@ -382,6 +424,7 @@ def run(args):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start", required=True, type=int)
+    parser.add_argument("--version", choices=("v1", "v2"), default="v1")
     parser.add_argument("--count", required=True, type=int)
     parser.add_argument("--allow-network", action="store_true")
     return run(parser.parse_args(argv))

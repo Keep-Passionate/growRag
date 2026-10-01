@@ -28,7 +28,12 @@ def update(path, **fields):
 
 
 @pytest.fixture
-def sealed(tmp_path, monkeypatch):
+def sealed(tmp_path, monkeypatch, request):
+    version = getattr(request, "param", "v1")
+    profile = scoring.profile_for(version)
+    batches, configuration, protocol = (
+        profile[k] for k in ("batches", "configuration", "protocol")
+    )
     project = tmp_path
     src = project / "src/example.py"
     src.parent.mkdir()
@@ -81,17 +86,17 @@ def sealed(tmp_path, monkeypatch):
             "context": {"title": ["Synthetic"], "sentences": [["Synthetic answer."]]},
             "supporting_facts": {"title": ["Synthetic"], "sent_id": [0]},
         }
-        for qid in ids[40:65]
+        for qid in scoring._scope(manifest, version)
     }
     directories = []
-    for start, count in scoring.BATCHES:
-        run_id = f"{scoring.PREFIX}v1_{start:04d}_{start + count:04d}"
+    for batch_number, (start, count) in enumerate(batches):
+        run_id = f"{scoring.PREFIX}{version}_{start:04d}_{start + count:04d}"
         directory = project / "runs" / run_id
         directory.mkdir(parents=True)
         directories.append(directory)
         plan = {
-            **scoring.CONFIGURATION,
-            "protocol": scoring.PROTOCOL,
+            **configuration,
+            "protocol": protocol,
             "phase": "calibration",
             "run_id": run_id,
             "start": start,
@@ -107,7 +112,7 @@ def sealed(tmp_path, monkeypatch):
             "gold_loaded": False,
             "memory_updates": False,
         }
-        if start == 45:
+        if batch_number:
             plan["first_batch_summary_sha256"] = scoring._sha(directories[0] / "SUMMARY.json")
         write(directory / "launch_plan.json", plan)
         write(
@@ -119,7 +124,7 @@ def sealed(tmp_path, monkeypatch):
 
         def request(trace, version, messages, value, directory=directory):
             payload = {
-                "model": scoring.CONFIGURATION["model"],
+                "model": configuration["model"],
                 "max_tokens": 2048,
                 "stream": False,
                 "enable_thinking": False,
@@ -136,13 +141,13 @@ def sealed(tmp_path, monkeypatch):
                 "api_requests": 1,
                 "input_tokens": 100,
                 "output_tokens": 20,
-                "returned_model": scoring.CONFIGURATION["model"],
+                "returned_model": configuration["model"],
                 "audit_path": str(path),
                 "reserved_cny": 0.001,
                 "estimated_actual_cny": 0.000036,
             }
             response = {
-                "model": scoring.CONFIGURATION["model"],
+                "model": configuration["model"],
                 "usage": {"prompt_tokens": 100, "completion_tokens": 20},
                 "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(value)}}],
             }
@@ -248,7 +253,7 @@ def sealed(tmp_path, monkeypatch):
             directory / "SUMMARY.json",
             {
                 **totals,
-                "protocol": scoring.PROTOCOL,
+                "protocol": protocol,
                 "run_id": run_id,
                 "status": "completed",
                 "failure_type": None,
@@ -276,7 +281,9 @@ def sealed(tmp_path, monkeypatch):
 
 def test_complete_preflight_does_not_open_gold(sealed, monkeypatch):
     project, _, _, _ = sealed
-    monkeypatch.setattr(scoring, "_load_calibration_gold", lambda *a: pytest.fail("gold opened"))
+    monkeypatch.setattr(
+        scoring, "_load_calibration_gold", lambda *a, **kw: pytest.fail("gold opened")
+    )
     result = scoring.run(project)
     assert result["status"] == "preflight_passed"
     assert result["totals"]["api_requests"] == 150
@@ -308,7 +315,9 @@ def test_fail_closed_before_gold(sealed, monkeypatch, failure):
     else:
         value = scoring._read(next((directory / "api_audit").glob("*.json")))
         write(project / "runs/unaccounted/api_audit/extra.json", value)
-    monkeypatch.setattr(scoring, "_load_calibration_gold", lambda *a: pytest.fail("gold opened"))
+    monkeypatch.setattr(
+        scoring, "_load_calibration_gold", lambda *a, **kw: pytest.fail("gold opened")
+    )
     with pytest.raises(ValueError):
         scoring.run(project, score=True)
     assert not (project / scoring.OUTPUT).exists()
@@ -335,7 +344,7 @@ def test_scoring_separates_same_reader_input_changes_and_preserves_inputs(sealed
         for path in directory.rglob("*")
         if path.is_file()
     }
-    monkeypatch.setattr(scoring, "_load_calibration_gold", lambda p, m, ids: (gold, {}))
+    monkeypatch.setattr(scoring, "_load_calibration_gold", lambda p, m, ids, **kw: (gold, {}))
     result = scoring.run(project, score=True)
     output = project / scoring.OUTPUT
     summary = scoring._read(output / "SUMMARY.json")
@@ -426,7 +435,8 @@ def test_unknown_annotations_stay_null_in_summary(sealed):
     assert summary["arms"]["history"]["answer_em"]["valid_n"] == 24
 
 
-def test_gold_projection_is_fixed_train25_and_shard_pinned(tmp_path):
+@pytest.mark.parametrize("version", ["v1", "v2"])
+def test_gold_projection_is_fixed_train25_and_shard_pinned(tmp_path, version):
     pa = pytest.importorskip("pyarrow")
     pq = pytest.importorskip("pyarrow.parquet")
     project = tmp_path
@@ -463,10 +473,85 @@ def test_gold_projection_is_fixed_train25_and_shard_pinned(tmp_path):
             for p in (shard, provenance)
         ],
     }
-    rows, inputs = scoring._load_calibration_gold(project, manifest, ids[40:65])
-    assert list(rows) == ids[40:65] and len(inputs) == 2
+    selected_ids = scoring._scope(manifest, version)
+    rows, inputs = scoring._load_calibration_gold(project, manifest, selected_ids, version=version)
+    assert list(rows) == selected_ids and len(inputs) == 2
     with pytest.raises(ValueError, match="exactly predeclared"):
-        scoring._load_calibration_gold(project, manifest, ids[:25])
+        scoring._load_calibration_gold(project, manifest, ids[:25], version=version)
+    if version == "v2":
+        with pytest.raises(ValueError, match="exactly predeclared"):
+            scoring._load_calibration_gold(project, manifest, ids[40:65], version=version)
     manifest["input_files"][0]["sha256"] = "0" * 64
     with pytest.raises(ValueError, match="train shard"):
-        scoring._load_calibration_gold(project, manifest, ids[40:65])
+        scoring._load_calibration_gold(project, manifest, selected_ids, version=version)
+
+
+@pytest.mark.parametrize("sealed", ["v2"], indirect=True)
+def test_v2_full_gate_and_separate_feedback(sealed, monkeypatch):
+    project, _, ids, gold = sealed
+    checked = scoring.collect(project, version="v2")
+    assert checked["ids"] == ids[65:90]
+    assert checked["protocol"] == "growrag-history-calibration-v2"
+
+    def labels(p, manifest, selected, *, version):
+        assert version == "v2" and selected == ids[65:90]
+        return gold, {}
+
+    monkeypatch.setattr(scoring, "_load_calibration_gold", labels)
+    result = scoring.run(project, version="v2", score=True)
+    output = project / "runs/history_base25_feedback_v2"
+    assert result["output"] == str(output)
+    assert scoring._read(output / "SUMMARY.json")["split"] == "official_train_calibration_65_90"
+    assert not (project / scoring.OUTPUT).exists()
+    # A v2 result cannot accidentally satisfy the unchanged v1 gate.
+    with pytest.raises(FileNotFoundError):
+        scoring.collect(project)
+
+
+@pytest.mark.parametrize("sealed", ["v2"], indirect=True)
+@pytest.mark.parametrize("failure", ["failed", "protocol"])
+def test_v2_failure_or_wrong_profile_cannot_open_gold(sealed, monkeypatch, failure):
+    project, directories, _, _ = sealed
+    path = directories[-1] / ("SUMMARY.json" if failure == "failed" else "launch_plan.json")
+    update(
+        path, **({"status": "failed"} if failure == "failed" else {"protocol": scoring.PROTOCOL})
+    )
+    monkeypatch.setattr(
+        scoring, "_load_calibration_gold", lambda *a, **kw: pytest.fail("gold opened")
+    )
+    with pytest.raises(ValueError):
+        scoring.run(project, version="v2", score=True)
+    assert not (project / "runs/history_base25_feedback_v2").exists()
+
+
+@pytest.mark.parametrize("sealed", ["v2"], indirect=True)
+def test_v2_audit_rejects_v1_fill_wire(sealed):
+    project, directories, ids, _ = sealed
+    directory, qid = directories[-1], ids[70]
+    report = scoring._read(directory / f"{qid}_history.json")
+    call = report["calls"][0]
+    call["prompt_version"] = scoring.FILL_VERSION
+    path = Path(call["audit_path"])
+    audit = scoring._read(path)
+    audit["prompt_version"] = scoring.FILL_VERSION
+    audit["response"]["choices"][0]["message"]["content"] = json.dumps(
+        {"intent": "lookup", "constraints": [], "gap_entries": [], "bindings": []}
+    )
+    write(path, audit)
+    library = FrozenHistoryLibrary.from_json((project / scoring.LIBRARY).read_text())
+    with pytest.raises(ValueError, match="old FILL version"):
+        scoring._audit_arm(
+            report,
+            directory,
+            scoring._read(directory / "launch_plan.json"),
+            [],
+            library,
+            {},
+            set(),
+            version="v2",
+        )
+
+
+def test_unregistered_version_is_rejected_before_reading_files(tmp_path):
+    with pytest.raises(ValueError):
+        scoring.collect(tmp_path, version="v3")

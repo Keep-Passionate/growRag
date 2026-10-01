@@ -20,15 +20,21 @@ from .fresh_dev_manifest import _sha
 from .history_budget import reviewed_history
 from .history_calibration import (
     ARMS,
-    CONFIGURATION,
     LIBRARY_FINGERPRINT,
     LIBRARY_SHA256,
     MANIFEST_SHA256,
     PREFIX,
-    PROTOCOL,
+    profile_for,
+)
+from .history_calibration import (
+    CONFIGURATION as CONFIGURATION,
+)
+from .history_calibration import (
+    PROTOCOL as PROTOCOL,
 )
 from .history_context import REWRITE_PROMPT_VERSION, SELECT_PROMPT_VERSION
 from .history_runtime import FILL_VERSION, schema_for
+from .history_runtime_v2 import schema_for_v2
 from .operator_model import READER_PROMPT, _messages, strict_object, visible_evidence
 from .operator_schemas import READER_VERSION, validate_wire_shape
 from .protocol import Evidence
@@ -77,8 +83,11 @@ def _totals(calls):
     }
 
 
-def _audit_arm(report, directory, plan, events, library, inputs, seen):
+def _audit_arm(report, directory, plan, events, library, inputs, seen, *, version="v1"):
     """逐臂对齐原HTTP、原回答与选择事件；不是重新运行模型。"""
+    configuration = profile_for(version)["configuration"]
+    fill_version = configuration.get("fill_prompt_version", FILL_VERSION)
+    wire_schema = schema_for_v2 if version == "v2" else schema_for
     qid, arm = report["question_id"], report["arm"]
     prefix = f"{plan['run_id']}/{qid}/{arm}/"
     calls = report.get("calls")
@@ -159,7 +168,7 @@ def _audit_arm(report, directory, plan, events, library, inputs, seen):
             "completion is truncated or not unique",
         )
         value = strict_object(choices[0]["message"]["content"])
-        validate_wire_shape(value, schema_for(call["prompt_version"]))
+        validate_wire_shape(value, wire_schema(call["prompt_version"]))
         cost = (call["input_tokens"] * 0.2 + call["output_tokens"] * 0.8) / 1_000_000
         _require(
             math.isclose(_money(call.get("estimated_actual_cny")), cost, abs_tol=1e-10)
@@ -218,13 +227,13 @@ def _audit_arm(report, directory, plan, events, library, inputs, seen):
             )
             if identity is not None:
                 template = cards[identity].card.operator_spec is not None
-                suffix, version = (
-                    ("fill", FILL_VERSION) if template else ("rewrite", REWRITE_PROMPT_VERSION)
+                suffix, prompt_version = (
+                    ("fill", fill_version) if template else ("rewrite", REWRITE_PROMPT_VERSION)
                 )
                 _require(
                     number + 1 < len(calls)
                     and calls[number + 1]["trace_id"] == trace.removesuffix("select") + suffix
-                    and calls[number + 1]["prompt_version"] == version,
+                    and calls[number + 1]["prompt_version"] == prompt_version,
                     "selected card has no matching fill/rewrite request",
                 )
             selected.append(value)
@@ -273,8 +282,24 @@ def _audit_arm(report, directory, plan, events, library, inputs, seen):
     }
 
 
-def collect(project):
+def _scope(manifest, version):
+    """题段来自runner显式登记，不允许通过评分CLI自选题/拼接旧失败批次。"""
+    profile = profile_for(version)
+    ids = [
+        qid
+        for start, count in profile["batches"]
+        for qid in manifest["roles"]["calibration"][start : start + count]
+    ]
+    _require(len(ids) == len(set(ids)) == 25, "registered calibration scope must contain 25 IDs")
+    return ids
+
+
+def collect(project, version="v1"):
     """只读取预测/无标签题/账本。全25题正常才返回，失败时绝不打开gold。"""
+    profile = profile_for(version)
+    batches, configuration, protocol = (
+        profile[k] for k in ("batches", "configuration", "protocol")
+    )
     project = Path(project).resolve(strict=True)
     inputs = {}
 
@@ -290,7 +315,7 @@ def collect(project):
     )
     manifest = _read(manifest_path)
     roles = manifest["roles"]
-    ids = roles["calibration"][40:65]
+    ids = _scope(manifest, version)
     _require(
         len(roles["calibration"]) == 100
         and len(ids) == len(set(ids)) == 25
@@ -321,7 +346,9 @@ def collect(project):
         tuple(r for r in library.records if r.source_kind == "reference"),
     )
     runs = project / "runs"
-    expected_runs = {f"{PREFIX}v1_{start:04d}_{start + count:04d}" for start, count in BATCHES}
+    expected_runs = {
+        f"{PREFIX}{version}_{start:04d}_{start + count:04d}" for start, count in batches
+    }
     for claim_path in runs.glob("*.claim.json"):
         claim = _read(_inside(project, claim_path))
         if set(ids) & set(claim.get("question_ids", [])):
@@ -334,8 +361,8 @@ def collect(project):
             _require(launch.parent.name in expected_runs, "duplicate question launch")
     snapshot_sha = source_snapshot(project)["sha256"]
     records, seen, all_calls = [], set(), []
-    for start, count in BATCHES:
-        run_id = f"{PREFIX}v1_{start:04d}_{start + count:04d}"
+    for batch_number, (start, count) in enumerate(batches):
+        run_id = f"{PREFIX}{version}_{start:04d}_{start + count:04d}"
         directory = runs / run_id
         plan = _read(tracked(f"runs/{run_id}/launch_plan.json"))
         claim = _read(tracked(f"runs/{run_id}.claim.json"))
@@ -350,8 +377,8 @@ def collect(project):
         ]
         expected_ids = roles["calibration"][start : start + count]
         expected = {
-            **CONFIGURATION,
-            "protocol": PROTOCOL,
+            **configuration,
+            "protocol": protocol,
             "phase": "calibration",
             "run_id": run_id,
             "start": start,
@@ -367,10 +394,10 @@ def collect(project):
             "gold_loaded": False,
             "memory_updates": False,
         }
-        if start == 45:
-            expected["first_batch_summary_sha256"] = _sha(
-                runs / f"{PREFIX}v1_0040_0045/SUMMARY.json"
-            )
+        if batch_number:
+            first_start, first_count = batches[0]
+            first_run = f"{PREFIX}{version}_{first_start:04d}_{first_start + first_count:04d}"
+            expected["first_batch_summary_sha256"] = _sha(runs / first_run / "SUMMARY.json")
         _require(
             all(plan.get(k) == v for k, v in expected.items())
             and claim == {**plan, "plan_sha256": fingerprint(plan)},
@@ -384,7 +411,7 @@ def collect(project):
             all(
                 summary.get(k) == v
                 for k, v in {
-                    "protocol": PROTOCOL,
+                    "protocol": protocol,
                     "run_id": run_id,
                     "status": "completed",
                     "failure_type": None,
@@ -437,7 +464,7 @@ def collect(project):
                     "prediction hash/status/identity/feedback mismatch",
                 )
                 row["usage"][arm] = _audit_arm(
-                    report, directory, plan, events, library, inputs, seen
+                    report, directory, plan, events, library, inputs, seen, version=version
                 )
                 row["arms"][arm] = report
                 batch_calls.extend(report["calls"])
@@ -471,17 +498,18 @@ def collect(project):
         "inputs": inputs,
         "totals": _totals(all_calls),
         "source_sha256": snapshot_sha,
-        "model": CONFIGURATION["model"],
-        "protocol": PROTOCOL,
+        "model": configuration["model"],
+        "protocol": protocol,
+        "version": version,
     }
 
 
-def _load_calibration_gold(project, manifest, ids):
+def _load_calibration_gold(project, manifest, ids, *, version="v1"):
     """仅在collect成功后调用；标签投影固定25个train ID，不读source/dev答案。"""
     import pyarrow.dataset as ds
 
     _require(
-        ids == manifest["roles"]["calibration"][40:65] and len(ids) == len(set(ids)) == 25,
+        ids == _scope(manifest, version) and len(ids) == len(set(ids)) == 25,
         "gold projection must be exactly predeclared calibration 25",
     )
     recorded = {x["path"].replace("\\", "/"): x["sha256"] for x in manifest["input_files"]}
@@ -663,15 +691,18 @@ def _markdown(rows):
     return "\n".join(lines)
 
 
-def run(project, *, score=False):
+def run(project, *, score=False, version="v1"):
+    profile = profile_for(version)
     project = Path(project).resolve(strict=True)
-    output = (project / OUTPUT).resolve()
+    output_name = OUTPUT if version == "v1" else "runs/history_base25_feedback_v2"
+    output = (project / output_name).resolve()
     _require(output.is_relative_to(project / "runs"), "feedback output escapes runs")
     if score and output.exists():
         raise FileExistsError("feedback output exists; never overwrite or choose another subset")
-    checked = collect(project)
+    checked = collect(project, version=version)
     public = {
-        "protocol": PROTOCOL,
+        "protocol": checked["protocol"],
+        "version": version,
         "questions": 25,
         "arms": list(ARMS),
         "status": "preflight_passed",
@@ -682,7 +713,9 @@ def run(project, *, score=False):
     }
     if not score:
         return public
-    gold, gold_inputs = _load_calibration_gold(project, checked["manifest"], checked["ids"])
+    gold, gold_inputs = _load_calibration_gold(
+        project, checked["manifest"], checked["ids"], version=version
+    )
     rows, summary = summarize(checked["records"], gold)
     inputs = {**checked["inputs"], **gold_inputs}
     _require(
@@ -690,8 +723,10 @@ def run(project, *, score=False):
         "inputs changed during offline scoring; no output published",
     )
     summary.update(
-        protocol=PROTOCOL,
-        split="official_train_calibration_40_65",
+        protocol=checked["protocol"],
+        version=version,
+        split=f"official_train_calibration_{profile['batches'][0][0]}_"
+        f"{sum(profile['batches'][-1])}",
         model=checked["model"],
         totals=checked["totals"],
         api_calls=0,
@@ -728,14 +763,16 @@ def run(project, *, score=False):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--version", choices=("v1", "v2"), default="v1")
     parser.add_argument(
         "--score",
         action="store_true",
         help="after complete preflight, read train25 gold and write feedback",
     )
+    args = parser.parse_args(argv)
     print(
         json.dumps(
-            run(Path.cwd(), score=parser.parse_args(argv).score), ensure_ascii=False, indent=2
+            run(Path.cwd(), score=args.score, version=args.version), ensure_ascii=False, indent=2
         )
     )
     return 0
