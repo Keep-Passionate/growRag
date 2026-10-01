@@ -67,7 +67,11 @@ def build_demo():
             "candidate_view": context.payload["candidate_cards"][0],
             "selection_is_scripted_not_model_generated": True,
             "compiled_queries": [request.query for request in plan.requests],
-            "selection_request_utf8_bytes": len(json.dumps(context.messages()).encode("utf-8")),
+            "selection_request_utf8_bytes": len(
+                json.dumps(
+                    context.messages(), ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                ).encode("utf-8")
+            ),
         }
     return {"execution_kind": "synthetic", "api_calls": 0, "hotpot_questions": 0, "views": views}
 
