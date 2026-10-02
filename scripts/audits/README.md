@@ -1,5 +1,18 @@
 # GrowRAG 离线审计工具
 
+## A路线45题透明部分评分（2026-10-02）
+
+`score_history_candidate_partial.py`独立于原50题评分器。先验证标签前的分析修订、45题终态封存、全部输入指纹与逐请求回放，再只读取固定前45题的gold。5题缺失单列，不补0、不重跑、不更新记忆、不新增API。
+
+```powershell
+.venv/Scripts/python.exe -X utf8 scripts/audits/score_history_candidate_partial.py
+.venv/Scripts/python.exe -X utf8 scripts/audits/score_history_candidate_partial.py --score
+```
+
+默认只审计；`--score`只创建独占的`runs/history_candidates45_feedback_v1/`，已有结果不可覆盖。原50×5完整性门禁不变，不把部分成绩叫完整50题或官方test。输出含raw/controlled EM、F1、证据覆盖、历史净收益、两组候选策略对照及缺失结果数学范围。controlled仅分析时固定相同输入回答，不是上线缓存，所有原调用仍计费。
+
+专项合成测试：`tests/test_history_candidate_partial.py`。实际结果与下一步见[45题结果报告](../../knowledge/experiments/2026-10-02_A路线_45题结果与下一步.md)；标签前[分析修订](../../knowledge/experiments/2026-10-02_A路线_45题分析修订.md)不再编辑。
+
 ## A路线候选诊断终态（2026-10-02）
 
 `audit_history_candidate_terminal.py`只审计本次固定50题计划的实际中断状态：45题五路完整、1个BASE Reader引用失败、24条未执行路径。原方法源码及三份SUMMARY硬钉，复用原完整路径的逐请求合同回放，并核对失败HTTP、意图日志、费用和未启动题；不修补引用，不读gold，不输出Reader答案，不修改记忆，也不授权续跑。

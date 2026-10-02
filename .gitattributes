@@ -1,0 +1,5 @@
+# These audit inputs are SHA-pinned by sealed feedback. Preserve their exact bytes
+# across Windows checkouts; do not apply a repository-wide line-ending rewrite.
+scripts/audits/audit_history_candidate_terminal.py -text
+scripts/audits/score_history_candidate_partial.py -text
+knowledge/experiments/2026-10-02_A路线_45题分析修订.md -text
