@@ -1,5 +1,18 @@
 # GrowRAG 离线审计工具
 
+## A路线候选诊断终态（2026-10-02）
+
+`audit_history_candidate_terminal.py`只审计本次固定50题计划的实际中断状态：45题五路完整、1个BASE Reader引用失败、24条未执行路径。原方法源码及三份SUMMARY硬钉，复用原完整路径的逐请求合同回放，并核对失败HTTP、意图日志、费用和未启动题；不修补引用，不读gold，不输出Reader答案，不修改记忆，也不授权续跑。
+
+```powershell
+.venv/Scripts/python.exe -X utf8 scripts/audits/audit_history_candidate_terminal.py
+.venv/Scripts/python.exe -X utf8 scripts/audits/audit_history_candidate_terminal.py --write
+```
+
+默认只读预检；`--write`只创建独占的`runs/history_candidates45_terminal_audit_v1/`，已有结果禁止覆盖。这不是原50×5评分器的替代品，不缩小原评分分母、不产生准确率。实际记录见[执行与停止诊断](../../knowledge/experiments/2026-10-02_A路线_实际执行与阶段诊断.md)。
+
+专项合成测试：`tests/test_history_candidate_terminal.py`。测试不调用模型、不读取密钥或真实标签；合成fixture结果不当作真实题成绩。
+
 ## ReFormeR续轮（2026-09-27）
 
 `analyze_reformer_pilot.py`读取已封口的ReFormeR固定100题迁移记录和旧500题BASE/S2G缓存，核对每次调用归属，并用相同完整题交集比较质量、费用和oracle额外机会。不是原ReFormeR论文TREC复现；未执行/失败不补0，旧缓存不重复计费。
