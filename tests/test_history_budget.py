@@ -71,6 +71,7 @@ def test_collects_every_reviewed_series_once_without_mutating_legacy_registry(
         budget.SHARED_PREFIX: budget.REVIEWED_PROTOCOLS,
         **budget.REVIEWED_OTHER_SERIES,
         budget.PREFIX: {budget.PROTOCOL},
+        budget.CANDIDATE_PREFIX: budget.CANDIDATE_PROTOCOLS,
     }
     expected = []
     for prefix, protocols in series.items():
@@ -91,6 +92,7 @@ def test_collects_every_reviewed_series_once_without_mutating_legacy_registry(
     assert calls[0] == (tmp_path.resolve(), (*budget.HISTORICAL_ROOTS, *expected))
     assert run_shared_s2g.REVIEWED_OTHER_SERIES == before
     assert budget.PREFIX not in run_shared_s2g.REVIEWED_OTHER_SERIES
+    assert budget.CANDIDATE_PREFIX not in run_shared_s2g.REVIEWED_OTHER_SERIES
 
 
 def test_v1_and_v2_share_one_cumulative_reconciliation(tmp_path, monkeypatch):

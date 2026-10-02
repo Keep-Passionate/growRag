@@ -168,10 +168,14 @@ class HistoryPlanner:
         self.trace_prefix, self.origin = trace_prefix, origin
         self.on_record = on_record or (lambda event: None)
 
+    def candidate_ranking(self, state: Observation):
+        """候选检索的独立扩展点；默认逐字保持原top-3算法，执行路径不变。"""
+        return shortlist_cards(state.question, self.library)
+
     def __call__(self, state: Observation):
         if type(state) is not Observation:
             raise TypeError("a gold-free runtime Observation is required")
-        ranking = shortlist_cards(state.question, self.library)
+        ranking = self.candidate_ranking(state)
         context = prepare_history_context(
             self.library,
             state.question,
