@@ -1,5 +1,15 @@
 # GrowRAG 离线审计工具
 
+## A1两阶段只读准入门（2026-10-03）
+
+`check_a1_two_stage_gate.py`要求从报告外部固定freeze、terminal、feedback封签三SHA，验证输入文件、原始HTTP、阶段顺序、逐行反馈、用量及原门槛。只读，不准备自然题、不调用API、不写评分或记忆；未过门返回`gate_closed`且退出码1，封存不一致返回`integrity_error`且退出码2。批次完成不等于门已通过。
+
+```powershell
+.venv/Scripts/python.exe scripts/audits/check_a1_two_stage_gate.py --expected-freeze-sha256 29bea1658cdfd158a06f32b93716f7921830f954ca0ab8f5781ba3bfc3347070 --expected-terminal-sha256 1e2a446ea63710c102a60c95285b38e6b2168f4787624c923ab596906c2ab974 --expected-feedback-sha256 045231810a039e79692ef4e22e75dc67726e201af45d0aee77bb7f7768e68039
+```
+
+本批已真实核验并拒绝准入：5有效/27定位格式失败，37请求归属完整。这是接口开发诊断，不是HotpotQA效果。已有自然prepare入口尚未被统一包装，必须先独立调用并检查门，不可把脚本存在等同于不可绕过的强制门。完整原因见[真实验收与下一步](../../knowledge/experiments/2026-10-03_A1两阶段真实验收与下一步.md)。测试仅使用临时合成档案：`tests/test_a1_two_stage_gate.py`。
+
 ## A路线45题透明部分评分（2026-10-02）
 
 `score_history_candidate_partial.py`独立于原50题评分器。先验证标签前的分析修订、45题终态封存、全部输入指纹与逐请求回放，再只读取固定前45题的gold。5题缺失单列，不补0、不重跑、不更新记忆、不新增API。
