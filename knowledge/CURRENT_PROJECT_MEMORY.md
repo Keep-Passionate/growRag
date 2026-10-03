@@ -1,5 +1,13 @@
 # GrowRAG 当前项目记忆
 
+## 2026-10-03最新：严格结构引用仍失败，建立dot协作入口
+
+- 干净7d69337下冻结schema-v1首行11A一次探针，dry API0后实际1call：外壳locations数组与字段类型已符合，但T/P1的candidate_ref_ids用了E1/E2，不是目录r编号，local unknown_ref_id，终态model_output_error。没有补映射、重试、judge、检索、建库或训练。
+- 858input/132output tokens，已知估价0.0002772元、永久预留0.0027284元、新未知0。只读审计重放probe_failed_audited/format_valid=false/natural_prepare_allowed=false；运行前原181根/17840call/估费7.7970522/预留53.7234394/20未知保留，估价不是账单。本次单call预算同时小于200元范围；probe累计None不是通用200代码守卫。
+- freeze bac811c0…d517，terminal fedad08a…6af，原始HTTP/journal另有SHA清单保存在[实际结果报告](experiments/2026-10-03_严格结构探针真实结果与协作交接.md)。src冻结版本不改；下一版考虑合法ID菜单，仍是工程提案，不称核心科学贡献。
+- 新16角色fixture已独立审阅无明确错标，运行器scripts-only离线开发，当前前置探针失败不付费启动。作者构造理想target_role，不是自然盲测或自动抽取成果。16诊断不能替代原32自然准入门；新40题仍未准备/调用/读gold。
+- 用户要求GitHub作为与dot的沟通媒介；沿用Keep-Passionate/growRag，当前分支codex/a1-structured-contract，入口[DOT_START_HERE](../docs/collaboration/DOT_START_HERE.md)，to_dot交接/from_dot回复约定。仓库公开，仅代码/笔记/脱敏摘要同步；没有已收到的dot回复，不发送密钥、原始API、全聊天记录。
+
 ## 2026-10-03真实A1两阶段已封存：测量门未过，自然题保持关闭
 
 - 用户取消累计API费用上限后，固定代码提交87d2dc0、模型/prompt/fixture/原门槛，首次真实32行一次性采集及零API评分完成。32均取得终态，但仅5行有效观察，27行定位`checks_not_array`；只对5有效行发judge，没有重试或后台补跑。真实37次HTTP、输入34551/输出6020tokens，估费0.0117262元、永久预留0.100502元，新增未知0；这些不等于供应商账单。
