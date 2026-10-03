@@ -191,6 +191,7 @@ def archive(
     fatal_stage=(0, "judge"),
     tamper=None,
     guard_failure_at=None,
+    prior_reserved=0,
 ):
     rows = study.load_fixture(PROJECT)
     source_hash = study.fingerprint({})
@@ -204,13 +205,13 @@ def archive(
         **study.CONFIG,
         "run_id": study.RUN_ID,
         "freeze_sha256": FREEZE_SHA,
-        "prior_reserved_cny": 0,
-        "subcap_cny": 1,
+        "prior_reserved_cny": prior_reserved,
+        "subcap_cny": study.available_subcap(prior_reserved),
         "row_ids": frozen["row_ids"],
         "question_ids": [],
     }
     study.write_json(directory / "launch_plan.json", plan)
-    study.write_json(directory / "prior_budget.json", {"prior_reserved_cny": 0})
+    study.write_json(directory / "prior_budget.json", {"prior_reserved_cny": prior_reserved})
     study.write_json(directory / "source_snapshot.json", {"files": {}, "sha256": source_hash})
     claim = tmp_path / "runs" / f"{study.RUN_ID}.claim.json"
     study.write_json(claim, {**plan, "plan_sha256": study.fingerprint(plan)})
@@ -272,6 +273,48 @@ def test_full_two_stage_archive_replays_64_requests_without_claiming_nominal_pas
     assert set(sealed) == {"SUMMARY.json", "per_row.json", "audit.json"}
     with pytest.raises(FileExistsError):
         feedback.score(tmp_path, FREEZE_SHA, terminal_sha)
+
+
+def test_uncapped_nonzero_history_launch_and_feedback_share_budget_contract(tmp_path, monkeypatch):
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", None)
+    monkeypatch.setitem(study.CONFIG, "series_cap_cny", 1.0)
+    terminal_sha = archive(tmp_path, monkeypatch, prior_reserved=53.6229374)
+    directory = tmp_path / study.OUTPUT
+    prior_path = directory / "prior_budget.json"
+    prior_bytes = prior_path.read_bytes()
+    plan = json.loads((directory / "launch_plan.json").read_bytes())
+    assert plan["subcap_cny"] == study.available_subcap(53.6229374) == 1.0
+    assert plan["project_cap_cny"] is None
+    result = feedback.score(tmp_path, FREEZE_SHA, terminal_sha)
+    assert result["batch_status"] == "completed"
+    assert result["totals"]["api_requests"] == 64
+    assert result["totals"]["reserved_cny"] == pytest.approx(64 * 0.005)
+    assert prior_path.read_bytes() == prior_bytes
+    assert json.loads(prior_bytes)["prior_reserved_cny"] == 53.6229374
+
+
+def test_resealed_archive_cannot_claim_larger_batch_budget_under_uncapped_project(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", None)
+    archive(tmp_path, monkeypatch, prior_reserved=53.6229374)
+    directory = tmp_path / study.OUTPUT
+    plan_path = directory / "launch_plan.json"
+    plan = json.loads(plan_path.read_bytes())
+    plan["subcap_cny"] = 2.0
+    save_json(plan_path, plan)
+    claim_path = tmp_path / "runs" / f"{study.RUN_ID}.claim.json"
+    save_json(claim_path, {**plan, "plan_sha256": study.fingerprint(plan)})
+    terminal_path = directory / "TERMINAL.json"
+    terminal = json.loads(terminal_path.read_bytes())
+    terminal.update(
+        launch_sha256=study._sha(plan_path),
+        claim_sha256=study._sha(claim_path),
+    )
+    save_json(terminal_path, terminal)
+    with pytest.raises(ValueError, match="subcap differs"):
+        feedback.score(tmp_path, FREEZE_SHA, study._sha(terminal_path))
+    assert not (tmp_path / study.FEEDBACK).exists()
 
 
 @pytest.mark.parametrize("stage,count", [("locate", 63), ("judge", 64)])

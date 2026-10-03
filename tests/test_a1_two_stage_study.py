@@ -190,6 +190,135 @@ def test_unverified_budget_stops_before_key_or_claim(monkeypatch, tmp_path):
     assert not (tmp_path / study.OUTPUT).exists()
 
 
+def test_uncapped_project_preserves_finite_batch_cap_with_nonzero_history(monkeypatch):
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", None)
+    monkeypatch.setitem(study.CONFIG, "series_cap_cny", 1.0)
+    assert study.available_subcap(53.6229374) == 1.0
+    assert study.available_subcap(0) == 1.0
+    assert study.CONFIG["handoff_cap_cny"] is None
+    encoded = json.dumps(study.CONFIG, allow_nan=False)
+    restored = json.loads(encoded)
+    assert restored["project_cap_cny"] is None
+    assert restored["handoff_cap_cny"] is None
+
+
+@pytest.mark.parametrize("prior", [None, True, "53.62", -1, float("nan"), float("inf")])
+def test_uncapped_project_still_rejects_invalid_historical_reservations(monkeypatch, prior):
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", None)
+    with pytest.raises(ValueError, match="historical reservation"):
+        study.available_subcap(prior)
+
+
+@pytest.mark.parametrize("cap", [True, "50", 0, -1, float("nan"), float("inf")])
+def test_invalid_finite_project_cap_is_not_treated_as_uncapped(monkeypatch, cap):
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", cap)
+    with pytest.raises(ValueError, match="project cap"):
+        study.available_subcap(53.6229374)
+
+
+@pytest.mark.parametrize("cap", [None, True, "1", 0, -1, float("nan"), float("inf")])
+def test_uncapped_project_still_requires_a_positive_finite_batch_cap(monkeypatch, cap):
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", None)
+    monkeypatch.setitem(study.CONFIG, "series_cap_cny", cap)
+    with pytest.raises(ValueError, match="batch reservation limit"):
+        study.available_subcap(53.6229374)
+
+
+def test_finite_project_contract_remains_available(monkeypatch):
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", 50.0)
+    monkeypatch.setitem(study.CONFIG, "series_cap_cny", 1.0)
+    assert study.available_subcap(53.6229374) < 0
+    assert study.available_subcap(49.5) == 0.5
+    assert study.available_subcap(48) == 1.0
+
+
+def test_freeze_anchors_authorization_and_json_null_contract(monkeypatch, tmp_path):
+    """Only synthetic temporary files are written; no actual freeze is changed."""
+    rows = study.load_fixture(PROJECT)[:1]
+    monkeypatch.setattr(study, "load_fixture", lambda *a: rows)
+    monkeypatch.setattr(study, "source_snapshot", lambda *a: {"sha256": "offline-source"})
+    monkeypatch.setattr(study, "_git_state", lambda: {"commit": "offline", "worktree_dirty": False})
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", None)
+    for path, content in (
+        (tmp_path / study.NOTE, "offline protocol note"),
+        (tmp_path / study.AUTHORIZATION, "offline user authorization fixture"),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+    (tmp_path / "runs").mkdir()
+    result = study.freeze(tmp_path)
+    frozen_path = tmp_path / study.FREEZE
+    frozen = json.loads(frozen_path.read_bytes())
+    assert frozen["budget_authorization_sha256"] == study._sha(tmp_path / study.AUTHORIZATION)
+    assert frozen["configuration"]["project_cap_cny"] is None
+    assert study.load_freeze(tmp_path, result["freeze_sha256"]) == frozen
+    (tmp_path / study.AUTHORIZATION).write_text("changed authorization", encoding="utf-8")
+    with pytest.raises(ValueError, match="protocol differs"):
+        study.load_freeze(tmp_path, result["freeze_sha256"])
+
+
+def test_uncapped_launch_preserves_prior_ledger_and_uses_one_yuan_batch(monkeypatch, tmp_path):
+    """Real budget/journal wrapper, synthetic transport: never a network request."""
+    rows = study.load_fixture(PROJECT)[:1]
+    history = {"prior_reserved_cny": 53.6229374, "offline_existing_ledger": "unchanged"}
+    original_history = json.dumps(history, sort_keys=True)
+    frozen = {"row_ids": [row["row_id"] for row in rows]}
+    delegates = []
+
+    class FakeTransport:
+        transport_source = "offline_test"
+
+        def __init__(self, config, audit_path, **kwargs):
+            self.config, self.attempts = config, 0
+            delegates.append(self)
+
+        def complete(self, messages, **kwargs):
+            self.attempts += 1
+            prepared = study.prepare_payload(rows[0]["input"])
+            stage = kwargs["trace_id"].rsplit("/", 1)[-1]
+            return SimpleNamespace(
+                content=locator_wire(prepared) if stage == "locate" else unknown_wire(prepared),
+                input_tokens=10,
+                output_tokens=5,
+                returned_model=self.config.model,
+                audit_path=tmp_path / "offline_response.json",
+                request_id="offline_test_only",
+            )
+
+    monkeypatch.setitem(study.CONFIG, "project_cap_cny", None)
+    monkeypatch.setitem(study.CONFIG, "series_cap_cny", 1.0)
+    monkeypatch.setattr(study, "load_freeze", lambda *a: frozen)
+    monkeypatch.setattr(study, "load_fixture", lambda *a: rows)
+    monkeypatch.setattr(study, "_git_state", lambda: {"worktree_dirty": False})
+    monkeypatch.setattr(study, "reviewed_history", lambda *a: history)
+    monkeypatch.setattr(study, "source_snapshot", lambda *a: {"files": {}, "sha256": "offline"})
+    monkeypatch.setattr(study, "LiveChatClient", FakeTransport)
+    monkeypatch.setattr(
+        study,
+        "read_local_bailian_settings",
+        lambda *a: SimpleNamespace(
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1", api_key="offline-dummy"
+        ),
+    )
+    (tmp_path / "runs").mkdir()
+    prior_path = tmp_path / "runs" / "offline_prior_ledger.json"
+    study.write_json(prior_path, history)
+    prior_bytes = prior_path.read_bytes()
+    result = study.run(tmp_path, "a" * 64, allow_network=True)
+    assert result["status"] == "completed"
+    directory = tmp_path / study.OUTPUT
+    plan = json.loads((directory / "launch_plan.json").read_bytes())
+    ledger = json.loads((directory / "final_budget.json").read_bytes())
+    assert delegates[0].attempts == ledger["api_requests"] == 2
+    assert plan["project_cap_cny"] is None
+    assert plan["prior_reserved_cny"] == history["prior_reserved_cny"]
+    assert plan["subcap_cny"] == study.available_subcap(history["prior_reserved_cny"]) == 1.0
+    assert ledger["limits"]["budget_cny"] == 1.0
+    assert 0 < ledger["reserved_cny"] < 1.0
+    assert json.dumps(history, sort_keys=True) == original_history
+    assert prior_path.read_bytes() == prior_bytes
+
+
 def test_cli_score_cannot_enable_network():
     with pytest.raises(SystemExit):
         study.main(["--score", "--allow-network", "--expected-terminal-sha256", "a" * 64])

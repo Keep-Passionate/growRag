@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import re
 import time
@@ -34,6 +35,7 @@ FIXTURE = "experiments/fixtures/a1_conditions_two_stage_v1.json"
 # The manifest references the immutable parent instead of duplicating its 32 rows.
 FIXTURE_SHA = "5343a17d2c63f1cf8577eca730a8d209c3c54481ab3d7bc79a098453b3fbf1fc"
 NOTE = "docs/experiments/2026-10-03_A1两阶段观察预登记.md"
+AUTHORIZATION = "knowledge/decisions/2026-10-03_取消项目累计API费用上限_用户确认.md"
 FREEZE = "runs/a1_two_stage_freeze_v1.json"
 RUN_ID = PREFIX + "synthetic_v1"
 OUTPUT = "runs/" + RUN_ID
@@ -51,9 +53,11 @@ CONFIG = {
     "output_limit_parameter": "max_tokens",
     "locator_prompt_version": observer.LOCATOR_PROMPT_VERSION,
     "judge_prompt_version": observer.JUDGE_PROMPT_VERSION,
-    "project_cap_cny": 50.0,
+    # None只取消用户已明确撤销的项目累计上限；批次规模和安全拒绝不变。
+    "project_cap_cny": None,
+    "project_budget_policy": "user_authorized_uncapped_20261003",
     "series_cap_cny": 1.0,
-    "handoff_cap_cny": 5.0,
+    "handoff_cap_cny": None,
     "planned_rows": 32,
     "unique_inputs": 30,
     "max_calls": 64,
@@ -93,6 +97,7 @@ def protocol_identity(project):
         "parent_fixture_sha256": previous.FIXTURE_SHA,
         "source_sha256": source_snapshot(project)["sha256"],
         "protocol_note_sha256": _sha(project / NOTE),
+        "budget_authorization_sha256": _sha(project / AUTHORIZATION),
         "locator_prompt_sha256": observer.LOCATOR_PROMPT_SHA256,
         "judge_prompt_sha256": observer.JUDGE_PROMPT_SHA256,
         "row_ids": [r["row_id"] for r in rows],
@@ -272,6 +277,25 @@ def observe_rows(rows, client, directory, guard, *, terminal=None):
     return terminal, stop
 
 
+def available_subcap(prior_reserved):
+    """共享运行/评分的预算合同；None不是把未知费用清零或写入Infinity。"""
+    if (
+        type(prior_reserved) not in (int, float)
+        or not math.isfinite(prior_reserved)
+        or prior_reserved < 0
+    ):
+        raise ValueError("invalid historical reservation")
+    project_cap = CONFIG["project_cap_cny"]
+    series_cap = CONFIG["series_cap_cny"]
+    if type(series_cap) not in (int, float) or not math.isfinite(series_cap) or series_cap <= 0:
+        raise ValueError("invalid batch reservation limit")
+    if project_cap is None:
+        return series_cap
+    if type(project_cap) not in (int, float) or not math.isfinite(project_cap) or project_cap <= 0:
+        raise ValueError("invalid project cap")
+    return min(series_cap, project_cap - prior_reserved)
+
+
 def run(project, sha, *, allow_network=False):
     frozen = load_freeze(project, sha)
     rows = load_fixture(project)
@@ -284,12 +308,10 @@ def run(project, sha, *, allow_network=False):
     if _git_state()["worktree_dirty"]:
         raise ValueError("commit reviewed implementation before paid calls")
     with serial_lock(project / "runs"):
-        # 保守50元为当前代码默认值；只有真实用户授权核实后才能新登记更高值。
+        # 2026-10-03用户取消累计上限；完整核账、未知用量与批次安全限制仍保留。
         print(json.dumps({"event": "budget_reconciliation_started", "run_id": RUN_ID}), flush=True)
         history = reviewed_history(project / "runs")
-        cap = min(
-            CONFIG["series_cap_cny"], CONFIG["project_cap_cny"] - history["prior_reserved_cny"]
-        )
+        cap = available_subcap(history["prior_reserved_cny"])
         if cap <= 0:
             raise ValueError("verified project conservative budget exhausted; authorization needed")
         settings = read_local_bailian_settings(project / "qwenAPI.md")

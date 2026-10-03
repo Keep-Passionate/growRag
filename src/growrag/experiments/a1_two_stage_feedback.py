@@ -146,10 +146,7 @@ def _metadata(project, freeze_sha, terminal_sha, track):
     _same_amount(plan.get("prior_reserved_cny"), prior["prior_reserved_cny"], "prior differs")
     _same_amount(
         plan.get("subcap_cny"),
-        min(
-            study.CONFIG["series_cap_cny"],
-            study.CONFIG["project_cap_cny"] - prior["prior_reserved_cny"],
-        ),
+        study.available_subcap(prior["prior_reserved_cny"]),
         "subcap differs",
     )
     snapshot = json.loads((directory / "source_snapshot.json").read_bytes())
