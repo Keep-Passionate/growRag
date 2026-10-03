@@ -1,0 +1,15 @@
+{
+  "schema_version": "growrag-a1-two-stage-fixture-manifest-v1",
+  "version": "a1_conditions_two_stage_v1",
+  "parent_fixture": "experiments/fixtures/a1_conditions_v3.json",
+  "parent_fixture_sha256": "c42a1aaa2428fac192fad9964eba0094cca8d8e7767e2bd12da03b7870d14454",
+  "rows_policy": "Reuse every parent row, input, expected annotation and order without modification.",
+  "planned_rows": 32,
+  "unique_inputs": 30,
+  "suite_role": "development_interface_regression_not_blind_test",
+  "prior_exposure": "The quote-v2 and catalog-v3 runs each attempted 11A and 07A; their failures and sealed results remain unchanged. All fixtures and expected labels are previously exposed development material.",
+  "observer_receives": "Only prepared current input, catalog, model_checks, and stage-one candidate locations at stage two. No row IDs, expected annotations or historical outcomes.",
+  "retry": false,
+  "collection_policy": "Continue the next planned row after a local output-contract error with complete known billing. Stop for integrity, transport, unaccounted billing, budget or timeout errors.",
+  "admission_policy": "Unchanged: 32 valid observations, 29 main matches, 15 A retained, 12 conflict B rejected, 3 unknown B preserved, complete HTTP and billing replay."
+}

@@ -16,3 +16,5 @@ docs/experiments/2026-10-03_A1_wire_v2实施修订.md -text
 experiments/fixtures/a1_conditions_v3.json -text
 docs/experiments/2026-10-03_A1_catalog_v3预登记.md -text
 src/growrag/experiments/prepare_a1_data.py -text
+experiments/fixtures/a1_conditions_two_stage_v1.json -text
+docs/experiments/2026-10-03_A1两阶段观察预登记.md -text
