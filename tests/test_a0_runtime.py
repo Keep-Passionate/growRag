@@ -495,8 +495,14 @@ def test_focused_two_decisions_use_initial_plus_two_retrievals_only(tmp_path):
         return [SimpleNamespace(doc_id=f"doc/{len(searches)}", title="Source", text="Evidence.")]
 
     report = a0.execute_arm(
-        QUESTION, "fresh_focused", index, client, library=None, trace="two-decisions",
-        log=events.append, target=tmp_path / "two-decisions.json",
+        QUESTION,
+        "fresh_focused",
+        index,
+        client,
+        library=None,
+        trace="two-decisions",
+        log=events.append,
+        target=tmp_path / "two-decisions.json",
     )
     assert len(report["episode"]["searches"]) == 3
     assert len(report["episode"]["proposals"]) == 2
@@ -521,8 +527,14 @@ def test_executor_rejection_marks_failed_arm_and_never_falls_back_to_reader(tmp_
     target = tmp_path / "rejected-plan.json"
     with pytest.raises(a0.A0LocalOutputError, match="rejected by unchanged executor"):
         a0.execute_arm(
-            QUESTION, "fresh_focused", index, client, library=None, trace="rejected-plan",
-            log=events.append, target=target,
+            QUESTION,
+            "fresh_focused",
+            index,
+            client,
+            library=None,
+            trace="rejected-plan",
+            log=events.append,
+            target=target,
         )
     report = json.loads(target.read_text(encoding="utf-8"))
     assert report["status"] == "failed" and report["error_stage"] == "episode"
@@ -581,26 +593,40 @@ def test_retrieval_integrity_errors_after_completed_planner_are_not_local_output
 
     with pytest.raises(ValueError) as caught:
         a0.execute_arm(
-            QUESTION, "fresh_original", index, client, library=None, trace="retrieval-failed",
-            log=lambda event: None, target=tmp_path / "retrieval-failed.json",
+            QUESTION,
+            "fresh_original",
+            index,
+            client,
+            library=None,
+            trace="retrieval-failed",
+            log=lambda event: None,
+            target=tmp_path / "retrieval-failed.json",
         )
     assert not isinstance(caught.value, a0.A0LocalOutputError)
     assert len(delegate.calls) == 1 and delegate.block_reason is None
 
 
 def test_history_fill_semantic_failure_gets_local_output_marker(tmp_path):
-    client, delegate = contract([
-        {"selected_card_id": "T00", "reason": "condition_match"},
-        {"intent": "lookup", "constraints": [], "gap_entries": [], "bindings": []},
-    ])
+    client, delegate = contract(
+        [
+            {"selected_card_id": "T00", "reason": "condition_match"},
+            {"intent": "lookup", "constraints": [], "gap_entries": [], "bindings": []},
+        ]
+    )
 
     def index(query, top_k):
         return [SimpleNamespace(doc_id="doc/1", title="Source", text="Evidence.")]
 
     with pytest.raises(a0.A0LocalOutputError):
         a0.execute_arm(
-            QUESTION, "history_body8", index, client, library=library(), trace="invalid-gap",
-            log=lambda event: None, target=tmp_path / "invalid-gap.json",
+            QUESTION,
+            "history_body8",
+            index,
+            client,
+            library=library(),
+            trace="invalid-gap",
+            log=lambda event: None,
+            target=tmp_path / "invalid-gap.json",
         )
     assert len(delegate.calls) == 2 and delegate.block_reason is None
 
