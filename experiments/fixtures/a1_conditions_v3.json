@@ -1,0 +1,3474 @@
+{
+  "schema_version": "growrag-a1-conditions-fixture-v3",
+  "version": "a1_conditions_v3",
+  "seed": "growrag-a1-conditions-20261003-v1",
+  "authoring_provenance": "Prospective catalog-reference interface regression of the unchanged v2 development suite. Old quote-v2 first pass observed 11A and 07A before stopping mechanically. This is not an unseen semantic benchmark, and old outcomes remain sealed. No row input, expected annotation, seed or order is changed.",
+  "source_plan": {
+    "path": "docs/experiments/2026-10-02_A1_适用条件最小实验草案.md",
+    "section": "4",
+    "sha256_at_authoring": "7f378a81b3052b9c1940c7e50c8ad2c84fa212006874372fba507361b9b76e58"
+  },
+  "ordering": {
+    "algorithm": "ascending SHA256(UTF-8(seed + ':' + row_id)); row_id breaks a digest tie",
+    "observer_receives": "input plus deterministic source catalog and explicit model_checks derived only from input",
+    "excluded_from_observer": [
+      "row_id",
+      "pair_id",
+      "variant",
+      "expected",
+      "pair_notes",
+      "nominal_truth",
+      "parent_fixture",
+      "revision",
+      "integrity"
+    ],
+    "order_policy": "Preserve the exact parent row order and seed by explicit instruction; do not reshuffle this revision."
+  },
+  "canonicalization": {
+    "input_hash": "SHA256 of UTF-8 canonical JSON with sorted object keys, no ASCII escaping, compact separators and no NaN. Materialized for every row at integrity.input_sha256_by_row_id; local request/snapshot binding only, never sent for model echo.",
+    "spans": "Half-open Unicode character offsets; Q.text is original_question; Ei.text/Ei.title are visible fields; Ai.query is a compiled query. Action query text is never P0/P1 provenance.",
+    "window_policy": "Only visible_evidence.text is available to the observer. original_text_chars is length metadata, not permission to read the full document. Pair08 B contains no hidden-tail author evidence.",
+    "spec_scope": "All proposals use the frozen synthetic template {entity} {relation}; the compact fixture is an observer input, not executor authority.",
+    "source_priority": "All evidence rows have equal priority; list order provides no authority ranking.",
+    "observer_wire": "growrag-a1-observer-catalog-v3: exact ref_ids select deterministic whole-visible-field references. Local catalog/audit contains full quote, request catalog only ref_id/source_id/field. No model quote/SHA/offset echo, no automatic missing references. Coarser evidence granularity than quote-v2; two distinct sentences within one field cannot form two catalog references."
+  },
+  "boundaries": [
+    "No natural questions, old A0 outputs, benchmark answers, target birth years or target birthplaces are used.",
+    "R is a semantic subgoal-contract judgment, not proof of retrieval uselessness. A birth-year query may still fetch a biography containing birthplace; natural A1 shadow execution must measure false rejection and net retrieval value.",
+    "Pairs01-03 intentionally contain false premises; their nominal type conflicts do not characterize natural-query plausibility.",
+    "Pairs07-09 jointly change P0 and the ability to establish T/P1; the four dimensions are not orthogonal causal interventions.",
+    "Pairs10/12/13 include identical, input-visible exclusivity assertions in both variants; role omission alone is not a contradiction.",
+    "Ann is not matched inside Joanne; P0 is computed locally with normalized token-boundary matching and cannot be overwritten by a semantic observer.",
+    "Pair14 shares explicit Nora Venn person evidence in A and B; only B adds a conflicting equal-priority author source. T is supported independently of P1; all nominal expected values remain unchanged.",
+    "This version has no results yet; old quote-v2 first pass made two calls on these development inputs. Do not present the new diagnostic as unseen/blind independent accuracy.",
+    "Full-field references change citation granularity, not T/R/P0/P1 definitions or decision thresholds. No semantic status, reason or missing source is repaired by translation."
+  ],
+  "nominal_truth": {
+    "pairs": 16,
+    "rows": 32,
+    "all_supported_A": 16,
+    "contradicted_B": 13,
+    "unknown_B": 3,
+    "contradiction_only": {
+      "allow": 16,
+      "reject": 13,
+      "allow_uncertain": 3
+    }
+  },
+  "execution_status": {
+    "semantic_observer_run": false,
+    "retrieval_executed": false,
+    "model_results_present": false,
+    "api_calls": 0,
+    "gold_access": false
+  },
+  "freeze_policy": "Do not modify this version after any semantic batch. Revisions require a new fixture version, filename and frozen seed; never replace first-run outcomes.",
+  "pair_notes": [
+    {
+      "pair_id": "01",
+      "intervention": "Replace only the current entity-type assertion."
+    },
+    {
+      "pair_id": "02",
+      "intervention": "Replace only the current entity-type assertion."
+    },
+    {
+      "pair_id": "03",
+      "intervention": "Replace only the current entity-type assertion."
+    },
+    {
+      "pair_id": "04",
+      "intervention": "Change only gap.relation and its deterministically compiled query."
+    },
+    {
+      "pair_id": "05",
+      "intervention": "Change only the action relation; the author lookup is an allowed necessary bridge."
+    },
+    {
+      "pair_id": "06",
+      "intervention": "Change only the action relation; querying one comparison side is allowed."
+    },
+    {
+      "pair_id": "07",
+      "intervention": "Remove only the author sentence from current evidence; this ordinary gap still requires provenance."
+    },
+    {
+      "pair_id": "08",
+      "intervention": "Change only the visible window boundary; B contains no omitted-tail author sentence."
+    },
+    {
+      "pair_id": "09",
+      "intervention": "Replace only Ann with Joanne in visible evidence; substring matching is not provenance."
+    },
+    {
+      "pair_id": "10",
+      "intervention": "Swap only the two people's roles; shared exclusivity makes the contradiction explicit."
+    },
+    {
+      "pair_id": "11",
+      "intervention": "Insert only role negation; person evidence remains unchanged."
+    },
+    {
+      "pair_id": "12",
+      "intervention": "Swap only directed/starred roles; shared single-director evidence applies to both variants."
+    },
+    {
+      "pair_id": "13",
+      "intervention": "Swap only the people assigned to the two years; shared uniqueness is scoped per year."
+    },
+    {
+      "pair_id": "14",
+      "intervention": "Add one conflicting same-priority source; A and B share identical explicit person evidence. No source priority or majority rule is supplied."
+    },
+    {
+      "pair_id": "15",
+      "intervention": "Replace only wrote with discussed; role absence is unknown, not a contradiction."
+    },
+    {
+      "pair_id": "16",
+      "intervention": "Replace only the type-support sentence with an untyped name mention."
+    }
+  ],
+  "parent_fixture": {
+    "path": "experiments/fixtures/a1_conditions_v2.json",
+    "sha256": "5f90a45422daec2eaea63bee06d1b79d0c646df09dd7880bf3b299f88088af14",
+    "version": "a1_conditions_v2"
+  },
+  "revision": {
+    "kind": "prospective_catalog_interface_development_regression",
+    "observer_wire_version": "growrag-a1-observer-catalog-v3",
+    "changed_row_ids": [],
+    "changed_input_fields": [],
+    "expected_unchanged": true,
+    "all_row_inputs_unchanged": true,
+    "row_order_unchanged": true,
+    "seed_inherited_unchanged": true,
+    "thresholds_and_unknown_policy_unchanged": true,
+    "old_first_pass_observed_rows": [
+      "11A",
+      "07A"
+    ],
+    "old_first_pass_terminal_sha256": "eb2b2e583e3b085794c86c452b3b9712e0d3d4162782c6fb8988f80667cbb124",
+    "interpretation": "Same development suite, not an independent holdout or a causal comparison between observer versions. Never replace or rescore the old failure."
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "canonicalization": "UTF-8 JSON; recursively sorted object keys; ensure_ascii=false; compact separators; reject non-finite numbers.",
+    "canonical_payload_scope": "Entire fixture excluding the top-level integrity object.",
+    "metadata_scope": "Entire fixture excluding the top-level rows and integrity objects.",
+    "canonical_payload_sha256": "5a07ffb8d3a68c22e81f21424edacb5a99e664143477f44ba8de4aa348628ba6",
+    "metadata_sha256": "17d7ab1a0801e97725ad25c0a1ff3bab4191a3b74606b25b93d44ebfe4ae310d",
+    "rows_sha256": "6b4cf91fa61770e222cc2e5174fc24fa7e94c0cee5fd2fa57d3d28219c1d3d02",
+    "row_order_sha256": "875549988569caff1a892d649e462ba88f9b4562b750120c3cf2889a215d8ca4",
+    "expected_by_row_id_sha256": "f9a2dde5fa47c858401df551db6de9db85a49517a97a74f7bf1be6d1a92a215b",
+    "input_sha256_by_row_id": {
+      "11A": "c7b9dd35602b777e2ebef980ba2ced0582c46f46a67ed3791c8cd04b2b804dfa",
+      "07A": "a874e926669c418d6a94c075cb3ae03e1b6ad395fea52ca6abacdcf81da29424",
+      "05A": "0b72dedd3484c92924fe825bc583ba208f2281ea89bbe8d1fb5db7befeea582b",
+      "16B": "447cbb5cba64e9cffd29392047bec9d63bd2f7c105c5330b6112348bf1324191",
+      "12B": "5ff14419e2ef0c1f6d29649d83af4a0f8a9ec41fb0bbbcde97ba847de8a26ee7",
+      "01B": "121f6bf1a3ad2213cb16db2b5d42e4db2d1fe1c190b810a6d27b45658812824f",
+      "04A": "ec93aba8dae78db0c3ea4b1bb7d80c8f93d971439fb386bca782f3f9e8ca0fda",
+      "01A": "f733742800d837caf740deaef5c2fcf6b9e6fbded8e3375c752fc18cbab144b0",
+      "15A": "f32bcfa6a1ad73a29bc80da9d8f265fc4b935b704c15e45978e4a721dba76385",
+      "06A": "d3ed395ccee6225e5c51ee9a70c63ab69125af42a82b3d9ec5bac503d8e8a4c7",
+      "13A": "c9aa29c22acb5b31f3818ae01874fc24157601e57a5ec0d0a3c08d27cc200800",
+      "16A": "f733742800d837caf740deaef5c2fcf6b9e6fbded8e3375c752fc18cbab144b0",
+      "03B": "a350b1a8dd29e2af81101301867096cb8bf46722765d4e0ff3143cba5f110847",
+      "02B": "0b8acffcaf4022404dbe1ff5e2aa95af205906ff5ae68d7090c2000201fc7d6f",
+      "09A": "4aaa20217f9b778fa9bf023efb39f931226ffa4c4e646e72f935e068dd70a69d",
+      "08A": "a874e926669c418d6a94c075cb3ae03e1b6ad395fea52ca6abacdcf81da29424",
+      "03A": "6a277c2c715ea22827c2679c3a3c275861c2e5ffd2e80bc5f5af3ac775c73d06",
+      "11B": "c08c4d7a12a8e40e8711344fbb59583e9521e025c8c0d5b0e1d546999294cecc",
+      "10A": "82e383d9a4ad28b062b0c85bfade60fbc5a3736acbdcbc9d05254e69aa6b0fce",
+      "07B": "9c1ca8809aa3501b67c74b0a3c50a6ad7d3b5693f6c8970f3ee3d65a59e48963",
+      "14A": "9ac6968d857133019d220db9eea80914b4be7541318a2ab948b3a59dd518efc8",
+      "15B": "a5d220f54db34b8c059a8a71d8d371587a4b3512a70de959b3a081d1e0dfd9c4",
+      "09B": "d5e8e5e0caf105473057905234d911ffb2f2bd8e62a4b181890fe26fd636088b",
+      "04B": "4bd27689f8952cee2db1bfbfec15f95240fd61250e590ba13ce869c0134f67ed",
+      "13B": "b7f0dbaaace6928adc85ba5b3a132c68f0a460cb63ebd445b83d4a04432286d0",
+      "02A": "96adcdb960453ca273e6d66921f251f3f2c37065f5affba851b4830d872743ce",
+      "14B": "17dbab6b6bb9681520c0ef582947bbb657057e419b97551fea9d1b7cbb992abc",
+      "06B": "7126ac5a62ced03307f9a96badb8471630f1c21a90c94430c337b1ebe79d5dc1",
+      "12A": "123c35807b24998926f1f6d91ef4a220c201e16c614dcc22875f56ef86b7b71c",
+      "05B": "126a52f75a9f78f4e76ce59b82fdaf150394249c4f2b95233b5d06a7fd5f9387",
+      "08B": "1f478dbe6517f80b3ceee248f161c9a419660ffd127fe8d8681da1dd74e8a2ba",
+      "10B": "fae9eb6bf0b71a3f70f6be4eb9a6b75f8597f937430e7ee2efd6cfcf298cb478"
+    },
+    "counts": {
+      "rows": 32,
+      "pairs": 16,
+      "unique_inputs": 30
+    },
+    "duplicate_input_groups": [
+      [
+        "01A",
+        "16A"
+      ],
+      [
+        "07A",
+        "08A"
+      ]
+    ]
+  },
+  "rows": [
+    {
+      "row_id": "11A",
+      "pair_id": "11",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is a novelist.",
+            "window": {
+              "text_start": 0,
+              "text_end": 24,
+              "original_text_chars": 24
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is the author of Glass Harbor.",
+            "window": {
+              "text_start": 0,
+              "text_end": 40,
+              "original_text_chars": 40
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "07A",
+      "pair_id": "07",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Glass Harbor is a novel. Its cover is blue. Glass Harbor was written by the novelist Nora Venn.",
+            "window": {
+              "text_start": 0,
+              "text_end": 95,
+              "original_text_chars": 95
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "05A",
+      "pair_id": "05",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Glass Harbor is a novel.",
+            "window": {
+              "text_start": 0,
+              "text_end": 24,
+              "original_text_chars": 24
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Glass Harbor",
+            "relation": "author"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Glass Harbor author"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "book",
+            "requires_current_source": true,
+            "target_role": "work whose author is requested in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "16B",
+      "pair_id": "16",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was Rowan born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "The name Rowan is mentioned in this catalog.",
+            "window": {
+              "text_start": 0,
+              "text_end": 44,
+              "original_text_chars": 44
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Rowan",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Rowan birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "USSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "unknown"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow_uncertain",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "12B",
+      "pair_id": "12",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the director of Silver Bridge born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Ivo Reed directed Silver Bridge; Nora Venn starred in it.",
+            "window": {
+              "text_start": 0,
+              "text_end": 57,
+              "original_text_chars": 57
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people. Silver Bridge has exactly one director.",
+            "window": {
+              "text_start": 0,
+              "text_end": 74,
+              "original_text_chars": 74
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "director of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSC",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "01B",
+      "pair_id": "01",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was Rowan born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Rowan is a song title, not a person.",
+            "window": {
+              "text_start": 0,
+              "text_end": 36,
+              "original_text_chars": 36
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Rowan",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Rowan birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "CSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "04A",
+      "pair_id": "04",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "Where was Nora Venn born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is a novelist.",
+            "window": {
+              "text_start": 0,
+              "text_end": 24,
+              "original_text_chars": 24
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth place"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth place"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "01A",
+      "pair_id": "01",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was Rowan born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Rowan is a novelist.",
+            "window": {
+              "text_start": 0,
+              "text_end": 20,
+              "original_text_chars": 20
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Rowan",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Rowan birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "15A",
+      "pair_id": "15",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "The novelist Nora Venn wrote Glass Harbor.",
+            "window": {
+              "text_start": 0,
+              "text_end": 42,
+              "original_text_chars": 42
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "06A",
+      "pair_id": "06",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "Who was born earlier, Nora Venn or Ivo Reed?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people.",
+            "window": {
+              "text_start": 0,
+              "text_end": 34,
+              "original_text_chars": 34
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "one explicitly named subject of the requested birth-time comparison"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "13A",
+      "pair_id": "13",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the 1990 producer of Silver Bridge born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "The 1990 producer was Nora Venn; the 2010 producer was Ivo Reed.",
+            "window": {
+              "text_start": 0,
+              "text_end": 64,
+              "original_text_chars": 64
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people. Silver Bridge had exactly one producer in 1990 and exactly one producer in 2010.",
+            "window": {
+              "text_start": 0,
+              "text_end": 115,
+              "original_text_chars": 115
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "producer of Silver Bridge for the 1990 period specified in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "16A",
+      "pair_id": "16",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was Rowan born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Rowan is a novelist.",
+            "window": {
+              "text_start": 0,
+              "text_end": 20,
+              "original_text_chars": 20
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Rowan",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Rowan birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "03B",
+      "pair_id": "03",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "When was Kepler founded?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Kepler is a person's surname, not an organization.",
+            "window": {
+              "text_start": 0,
+              "text_end": 50,
+              "original_text_chars": 50
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Kepler",
+            "relation": "founding year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Kepler founding year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "organization",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "CSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "02B",
+      "pair_id": "02",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "Which event does Aurora reenact?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Aurora is a mountain, not a film.",
+            "window": {
+              "text_start": 0,
+              "text_end": 33,
+              "original_text_chars": 33
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Aurora",
+            "relation": "historical event reenacted"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Aurora historical event reenacted"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "film",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "CSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "09A",
+      "pair_id": "09",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Pine Steps born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Pine Steps was written by the novelist Ann.",
+            "window": {
+              "text_start": 0,
+              "text_end": 43,
+              "original_text_chars": 43
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Ann",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Ann birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "08A",
+      "pair_id": "08",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Glass Harbor is a novel. Its cover is blue. Glass Harbor was written by the novelist Nora Venn.",
+            "window": {
+              "text_start": 0,
+              "text_end": 95,
+              "original_text_chars": 95
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "03A",
+      "pair_id": "03",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "When was Kepler founded?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Kepler is a research institute.",
+            "window": {
+              "text_start": 0,
+              "text_end": 31,
+              "original_text_chars": 31
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Kepler",
+            "relation": "founding year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Kepler founding year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "organization",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "11B",
+      "pair_id": "11",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is a novelist.",
+            "window": {
+              "text_start": 0,
+              "text_end": 24,
+              "original_text_chars": 24
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is not the author of Glass Harbor.",
+            "window": {
+              "text_start": 0,
+              "text_end": 44,
+              "original_text_chars": 44
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSC",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "10A",
+      "pair_id": "10",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn wrote Glass Harbor. Ivo Reed designed its cover.",
+            "window": {
+              "text_start": 0,
+              "text_end": 58,
+              "original_text_chars": 58
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people. Glass Harbor has exactly one author and exactly one cover designer.",
+            "window": {
+              "text_start": 0,
+              "text_end": 102,
+              "original_text_chars": 102
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "07B",
+      "pair_id": "07",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Glass Harbor is a novel. Its cover is blue.",
+            "window": {
+              "text_start": 0,
+              "text_end": 43,
+              "original_text_chars": 43
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "USCU",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "unknown"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "unknown"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "14A",
+      "pair_id": "14",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is the sole author of Glass Harbor. Nora Venn is a person.",
+            "window": {
+              "text_start": 0,
+              "text_end": 68,
+              "original_text_chars": 68
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "15B",
+      "pair_id": "15",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "The novelist Nora Venn discussed Glass Harbor.",
+            "window": {
+              "text_start": 0,
+              "text_end": 46,
+              "original_text_chars": 46
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSU",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "unknown"
+          }
+        ],
+        "contradiction_only": "allow_uncertain",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "09B",
+      "pair_id": "09",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Pine Steps born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Pine Steps was written by the novelist Joanne.",
+            "window": {
+              "text_start": 0,
+              "text_end": 46,
+              "original_text_chars": 46
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Ann",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Ann birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "USCU",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "unknown"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "unknown"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "04B",
+      "pair_id": "04",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "Where was Nora Venn born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is a novelist.",
+            "window": {
+              "text_start": 0,
+              "text_end": 24,
+              "original_text_chars": 24
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SCSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "contradicted"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "13B",
+      "pair_id": "13",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the 1990 producer of Silver Bridge born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "The 1990 producer was Ivo Reed; the 2010 producer was Nora Venn.",
+            "window": {
+              "text_start": 0,
+              "text_end": 64,
+              "original_text_chars": 64
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people. Silver Bridge had exactly one producer in 1990 and exactly one producer in 2010.",
+            "window": {
+              "text_start": 0,
+              "text_end": 115,
+              "original_text_chars": 115
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "producer of Silver Bridge for the 1990 period specified in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSC",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "02A",
+      "pair_id": "02",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "Which event does Aurora reenact?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Aurora is a historical film.",
+            "window": {
+              "text_start": 0,
+              "text_end": 28,
+              "original_text_chars": 28
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Aurora",
+            "relation": "historical event reenacted"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Aurora historical event reenacted"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "film",
+            "requires_current_source": true,
+            "target_role": "entity directly named as the target in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "14B",
+      "pair_id": "14",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn is the sole author of Glass Harbor. Nora Venn is a person.",
+            "window": {
+              "text_start": 0,
+              "text_end": 68,
+              "original_text_chars": 68
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Ivo Reed, not Nora Venn, is the sole author of Glass Harbor.",
+            "window": {
+              "text_start": 0,
+              "text_end": 60,
+              "original_text_chars": 60
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSU",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "unknown"
+          }
+        ],
+        "contradiction_only": "allow_uncertain",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "06B",
+      "pair_id": "06",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "Who was born earlier, Nora Venn or Ivo Reed?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people.",
+            "window": {
+              "text_start": 0,
+              "text_end": 34,
+              "original_text_chars": 34
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "death year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn death year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "one explicitly named subject of the requested birth-time comparison"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SCSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "contradicted"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "12A",
+      "pair_id": "12",
+      "variant": "A",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the director of Silver Bridge born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn directed Silver Bridge; Ivo Reed starred in it.",
+            "window": {
+              "text_start": 0,
+              "text_end": 57,
+              "original_text_chars": 57
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people. Silver Bridge has exactly one director.",
+            "window": {
+              "text_start": 0,
+              "text_end": 74,
+              "original_text_chars": 74
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "director of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "allow",
+        "strict_unknown_reject": "allow"
+      }
+    },
+    {
+      "row_id": "05B",
+      "pair_id": "05",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Glass Harbor is a novel.",
+            "window": {
+              "text_start": 0,
+              "text_end": 24,
+              "original_text_chars": 24
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Glass Harbor",
+            "relation": "publication year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Glass Harbor publication year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "book",
+            "requires_current_source": true,
+            "target_role": "work whose author is requested in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SCSS",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "contradicted"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "supported"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "08B",
+      "pair_id": "08",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Glass Harbor is a novel. Its cover is blue.",
+            "window": {
+              "text_start": 0,
+              "text_end": 43,
+              "original_text_chars": 95
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "USCU",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "unknown"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "unknown"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    },
+    {
+      "row_id": "10B",
+      "pair_id": "10",
+      "variant": "B",
+      "input": {
+        "schema_version": "growrag-a1-check-input-v1",
+        "original_question": "In what year was the author of Glass Harbor born?",
+        "visible_evidence": [
+          {
+            "source_id": "E1",
+            "title": "Current synthetic evidence",
+            "text": "Ivo Reed wrote Glass Harbor. Nora Venn designed its cover.",
+            "window": {
+              "text_start": 0,
+              "text_end": 58,
+              "original_text_chars": 58
+            }
+          },
+          {
+            "source_id": "E2",
+            "title": "Current synthetic evidence",
+            "text": "Nora Venn and Ivo Reed are people. Glass Harbor has exactly one author and exactly one cover designer.",
+            "window": {
+              "text_start": 0,
+              "text_end": 102,
+              "original_text_chars": 102
+            }
+          }
+        ],
+        "previous_queries": [],
+        "remaining_retrievals": 1,
+        "proposal": {
+          "spec_id": "synthetic_typed_relation_lookup",
+          "spec_version": "1",
+          "template": "{entity} {relation}",
+          "gap": {
+            "entity": "Nora Venn",
+            "relation": "birth year"
+          },
+          "bindings": [],
+          "compiled_queries": [
+            {
+              "step_id": "lookup",
+              "source_id": "A1",
+              "query": "Nora Venn birth year"
+            }
+          ]
+        },
+        "slot_contracts": [
+          {
+            "slot": "gap.entity",
+            "kind": "entity",
+            "required_type": "person",
+            "requires_current_source": true,
+            "target_role": "author of the work named in the original question"
+          },
+          {
+            "slot": "gap.relation",
+            "kind": "relation_text",
+            "requires_current_source": false
+          }
+        ],
+        "required_checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity"
+          }
+        ]
+      },
+      "expected": {
+        "nominal_vector": "SSSC",
+        "checks": [
+          {
+            "kind": "T",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "R",
+            "slot": "action.lookup",
+            "status": "supported"
+          },
+          {
+            "kind": "P0",
+            "slot": "gap.entity",
+            "status": "supported"
+          },
+          {
+            "kind": "P1",
+            "slot": "gap.entity",
+            "status": "contradicted"
+          }
+        ],
+        "contradiction_only": "reject",
+        "strict_unknown_reject": "reject"
+      }
+    }
+  ]
+}
