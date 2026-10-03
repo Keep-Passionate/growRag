@@ -37,6 +37,7 @@ SHORT_READER_VERSION = "growrag-a0-reader-shortrefs-v1"
 class A0LocalOutputError(ValueError):
     """A completed model response failed parsing/semantic checks, not retrieval."""
 
+
 _FOCUSED_GUIDANCE = """
 A0 focused-query option (same grammar and original answering goal):
 Preserving the original task does NOT require copying the entire original question
