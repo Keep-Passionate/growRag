@@ -163,8 +163,8 @@ def test_wrong_amendment_fails_before_terminal_or_labels(tmp_path, monkeypatch):
 
 
 def test_gold_projection_excludes_five_missing_and_pins_every_shard(tmp_path, monkeypatch):
-    import pyarrow as pa
-    import pyarrow.parquet as pq
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
 
     ids = [f"{i:024x}" for i in range(50)]
     monkeypatch.setattr(partial.terminal, "FAILED_ID", ids[45])
