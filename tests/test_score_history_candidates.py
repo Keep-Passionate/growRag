@@ -634,8 +634,8 @@ def test_bad_gold_stays_unknown_with_valid_denominator(sealed):
 
 
 def test_gold_loader_exact_train50_projection_and_shard_pins(sealed):
-    import pyarrow as pa
-    import pyarrow.parquet as pq
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
 
     root, gold, _, manifest = sealed
     parent = root / "data/synthetic_train"
