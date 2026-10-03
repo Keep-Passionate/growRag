@@ -5,4 +5,6 @@ scripts/audits/score_history_candidate_partial.py -text
 knowledge/experiments/2026-10-02_A路线_45题分析修订.md -text
 src/growrag/experiments/a0_*.py -text
 src/growrag/experiments/prepare_a0_data.py -text
+src/growrag/experiments/prepare_a0_v2_data.py -text
+knowledge/experiments/2026-10-03_A0v2_接口修正版预登记.md -text
 knowledge/experiments/2026-10-02_A0_查询构造对照预登记.md -text

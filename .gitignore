@@ -57,6 +57,7 @@ archive/**
 *.npz
 wandb/
 mlruns/
+.test-artifacts/
 
 # OS
 .DS_Store
