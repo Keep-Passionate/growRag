@@ -1,0 +1,2384 @@
+{
+  "schema_version": "growrag-a1-slot-contracts-v1",
+  "stage": "not_frozen",
+  "library": {
+    "path": "runs/history_foundation_20261001_v1/combined.json",
+    "sha256": "73eab3f46d9d6edaf20c497cc39e6082086f1ab4c43afe45b606abf35397dd88",
+    "fingerprint": "8b6aa7f14baa54a7048d539ec791c7884e1029c0aa20afbce0693a55ce7934c7",
+    "record_filter": {
+      "status": "published"
+    },
+    "published_cards": 44
+  },
+  "interface_reference": "docs/experiments/2026-10-03_A1_实现接口.md",
+  "hash_definition": {
+    "algorithm": "SHA256",
+    "encoding": "UTF-8",
+    "serialization": {
+      "ensure_ascii": false,
+      "sort_keys": true,
+      "separators": [
+        ",",
+        ":"
+      ],
+      "allow_nan": false
+    },
+    "card_action_fields": [
+      "name",
+      "description",
+      "transformation_rule",
+      "operator_spec",
+      "conditions"
+    ],
+    "card_identity_hashed": false,
+    "excluded_fields": [
+      "examples",
+      "source_qids",
+      "source_ref",
+      "source_sha256",
+      "historical_or_current_results"
+    ],
+    "sidecar_sha256": null
+  },
+  "authoring": {
+    "mode": "action_text_review",
+    "reviewer": "Codex",
+    "authoring_version": "growrag-a1-action-text-review-v1",
+    "reviewed_at": "2026-10-03",
+    "human_reviewed": false,
+    "primary_review_status": "pending",
+    "api_calls": 0,
+    "trained_extractor": false,
+    "source_inputs": [
+      {
+        "path": "runs/history_foundation_20261001_v1/combined.json",
+        "semantic_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "identity_fields": [
+          "card_id",
+          "version"
+        ],
+        "selection_field": "status",
+        "excluded_semantic_inputs": [
+          "examples",
+          "source metadata or answers",
+          "new question or experiment results"
+        ]
+      },
+      {
+        "path": "docs/experiments/2026-10-03_A1_实现接口.md",
+        "sections": [
+          "2.1",
+          "3"
+        ]
+      }
+    ],
+    "prior_context_disclosure": "本会话先前审阅过封存 A0v1 结果，不声称结果盲审；本草稿逐槽分类仅依据指定动作正文投影和接口，不依据任何题目成败分数。本轮未打开来源示例、来源答案或 A0v2/新自然题结果。",
+    "limitations": [
+      "此为 Codex 编写的未冻结草稿，不冒充人工审查、训练输出或语义有效性验证。",
+      "44 卡完整登记只保证槽覆盖记录，不意味着 T/R/P0/P1 均有可判定信息。",
+      "target_role 是与当前原问或合法中间子目标待核对的角色描述，不是已满足关系的断言。"
+    ]
+  },
+  "coverage": {
+    "published_cards": 44,
+    "template_cards": 34,
+    "rewrite_rule_cards": 10,
+    "declared_gap_slots": 38,
+    "declared_binding_slots": 0,
+    "adapter_query_text_slots": 10,
+    "total_slot_contracts": 48,
+    "by_kind": {
+      "entity": 33,
+      "free_query": 11,
+      "relation_text": 2,
+      "unknown": 1,
+      "literal_constraint": 1
+    },
+    "entity_required_type_unknown": 33,
+    "empty_conditions_cards": 44,
+    "implicit_execution_fields_not_slot_contracts": [
+      "original_question"
+    ]
+  },
+  "uncertainties": [
+    {
+      "scope": "all_entity_slots",
+      "count": 33,
+      "field": "required_type",
+      "value": null,
+      "reason": "没有动作正文支持的排他必要语义类型；类型 unknown 不转成通过。"
+    },
+    {
+      "scope": "OP_c3f34063a442fc1e/gap.term",
+      "kind": "unknown",
+      "reason": "可为实体、关系词或约束，正文无法进一步区分。"
+    },
+    {
+      "scope": "OP_0bbbcfa7f9213309/gap.query_term and all 10 rewrite_rule/gap.query_text",
+      "count": 11,
+      "kind": "free_query",
+      "reason": "首版不拆查询，T/P0/P1 明确未覆盖。"
+    },
+    {
+      "scope": "OP_a2d5dd925f4bc1bb/gap.property and OP_fd457a0cd835fa75/gap.property",
+      "count": 2,
+      "kind": "relation_text",
+      "reason": "按接口作为关系文本；在冻结前仍须主审该普适投影是否过宽，若可能承载事实实体则重分类或 unknown。"
+    },
+    {
+      "scope": "OP_d031917d14319bca/gap.year",
+      "required_type": null,
+      "reason": "integer 仅为 DSL 语法类型，不是 T 语义对象类型；正文未确立独立必要语义类型，故 required_type=null。语法声明保留在 authoring.slot_reviews.declared_kind，不推定具体年份、日历体系、允许范围或当前题约束已成立。"
+    },
+    {
+      "scope": "all_target_roles",
+      "reason": "没有输入任何当前自然题；待运行观察时依据原问与冻结可见证据判断角色是否成立。"
+    }
+  ],
+  "cards": [
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_01acd530c619b529",
+      "card_version": "1",
+      "card_action_sha256": "eb7142c235e3a63c40adc912bac58d2fa17ba77d1261e12522e10933582b4b61",
+      "slots": [
+        {
+          "slot": "gap.memorial_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查建筑设计者的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "find_architect",
+            "template": "{memorial_name} architect"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.memorial_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "动作把槽值与 architect 组成查询，故投影为被查询对象；正文没有限定对象必须属于 memorial 类。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_06a401fc825c2327",
+      "card_version": "1",
+      "card_action_sha256": "bf18098d87aa0c8930408da3e9720fb9a4becc608a611e97eac3528e01ce2a55",
+      "slots": [
+        {
+          "slot": "gap.person_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查出生年份的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{person_name} birth year"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.person_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "动作查询槽值的 birth year；person_name 只是变量名，birth year 也不足以确立 person-only 类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_0bbbcfa7f9213309",
+      "card_version": "1",
+      "card_action_sha256": "8e8f9a490c2823dc391be260cf6343d4b01ad62bd239b07c2ccfc184c116005a",
+      "slots": [
+        {
+          "slot": "gap.query_term",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{query_term}"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_term",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "模板只有 {query_term}，槽值占整条查询而没有声明实体/关系拆分，按接口投影为 free_query。",
+              "requires_current_source": "未拆分自由查询不能被整体假定为当前事实实体；T/P0/P1 保留 unknown/uncovered_free_query。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_0ef95fc1d6273d3b",
+      "card_version": "1",
+      "card_action_sha256": "016086c013cac02266cad90b0cfcaaa2b24ba8b33120085f6bcb5b9d4d570a96",
+      "slots": [
+        {
+          "slot": "gap.movement_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查名称起源、典故与战争关联的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{movement_name} name origin allusion war"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.movement_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "name origin allusion war 是动作关系词；被命名对象需与当前目标对齐，不从 movement_name 推出运动类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_1f72d188d046e6ea",
+      "card_version": "1",
+      "card_action_sha256": "bfc8ade6198787dd1f5a54ef31c8c72cc168c27a2d2aa60446e3917c136db3be",
+      "slots": [
+        {
+          "slot": "gap.person",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查别名或昵称的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search_nicknames",
+            "template": "{person} nicknames aliases"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.person",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "nicknames aliases 作用于槽值，支持实体投影；别名并非人类专属，person 变量名不建立类型要求。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_23b7ccac831998d7",
+      "card_version": "1",
+      "card_action_sha256": "c3bf89ff6fe6533775b354f70a369f1b9351cea6ed1e35aeaadeca2bb6970f13",
+      "slots": [
+        {
+          "slot": "gap.actor_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问所需追加到查询中的候选对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{original_question} {actor_name}"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.actor_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "动作将候选值追加到原问，依接口投影为实体候选；正文没有额外关系词或类型约束，不从 actor_name 推出 person。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_2e69d896b0cfae1a",
+      "card_version": "1",
+      "card_action_sha256": "373049749bee6c23e76fea7fd9dacef8d1c92913007129a0187cd3d9f9ea5082",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查总部所在城市的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} headquarters city"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "headquarters city 指定所查关系，不确立被查对象必须为公司或某一组织子类。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_30af3e612ef2d4ab",
+      "card_version": "1",
+      "card_action_sha256": "598feb2234d8a2888103469d71dcd06a77e300435e7e1c512d96e11841de418a",
+      "slots": [
+        {
+          "slot": "gap.player_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中需核对助理经理关联的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{player_name} assistant manager"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.player_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "assistant manager 指定待查关联，但正文未限定该关联的方向或主体类型，不从 player_name 推出运动员。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_31262655872a7045",
+      "card_version": "1",
+      "card_action_sha256": "e9b3665ec8840a3e0e4156f62e9e1cea965c2d2b4d9ca7afa7f48fa0e027420e",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查出生日期的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} birth date"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "birth date 支持将槽值视为关系主体；不据出生关系自动限定为 person。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_44d90bededa51ed7",
+      "card_version": "1",
+      "card_action_sha256": "e52e8185901434cb7c17c85ebd8c51d5ff6fee8e2112064c66891672eaba29bb",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查国籍的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} nationality"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "nationality 是实际待查属性；正文没有显式 person-only 约束，类型保持未知。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_46346786999106e7",
+      "card_version": "1",
+      "card_action_sha256": "91d272175939b3bed6bd9b05293b753c345f5e42ad8a792d55b44ebf78d623ac",
+      "slots": [
+        {
+          "slot": "gap.series_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查创作者的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search_creator",
+            "template": "{series_name} created by"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.series_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "created by 指定待查创建关系，但不能从 series_name 或被创造关系推断唯一作品类别。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_5b0e1657428d1acd",
+      "card_version": "1",
+      "card_action_sha256": "6a9eb10629cde818c51b7896d0f7cc9f3bd0080e372af77134a247cab552a778",
+      "slots": [
+        {
+          "slot": "gap.film_title",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查所重演历史事件的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{film_title} historical event reenacted"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.film_title",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "historical event reenacted 是查询关系；film_title 的命名不是 film-only 合同，需在当前材料中核目标角色。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_72089b68da22c941",
+      "card_version": "1",
+      "card_action_sha256": "584ae93371ffcbf6656da71b21302f59ba8dfe0f2581dc1610152b6d172b56d2",
+      "slots": [
+        {
+          "slot": "gap.film_candidate",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问所需追加到查询中的候选对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{original_question} {film_candidate}"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.film_candidate",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "动作仅把候选值追加原问，按接口保留实体候选投影；film_candidate 不足以建立电影类型的硬要求。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_7271aecafb0c4e5b",
+      "card_version": "1",
+      "card_action_sha256": "3409c62b8cb3d9b7d8d45388eee6bffe2a0410b656220043b82c46e41b741693",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查出生年份的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} birth year"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "birth year 指定关系而不限定 person；正文没有其他必要语义类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_7afa5f469ed966a4",
+      "card_version": "1",
+      "card_action_sha256": "206f6aa89905ebaa1f763432bfe2dcb8f58ff92a022c6033b0199eb0a3cab61e",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查音乐流派的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} music genre"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "music genre 可用于不同音乐相关对象；只确立待查属性，不把对象收窄为歌手、乐队或作品。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_8c9aca522777ee87",
+      "card_version": "1",
+      "card_action_sha256": "fa2fc82bd0e1475790d4d5fa21622d08306b3d09bbbce8d60b6eeea54af1b2e3",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查死亡年份的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} death year"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "death year 指定待查关系；正文未写 person-only 类型必要条件。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_8eb01f3516997db9",
+      "card_version": "1",
+      "card_action_sha256": "a3e61679df0a6c5c67acc13d6d6bfaf7f6995639a2d1a67fdcafd3a4d63a5ab9",
+      "slots": [
+        {
+          "slot": "gap.event",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查持续时间或长度的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{original_question} {event} duration length"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.event",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "动作将槽值与原问及 duration length 合用；应核对实际时间或长度目标，不仅凭 event 名称判实体子类。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_942e3b75c57dd58d",
+      "card_version": "1",
+      "card_action_sha256": "8b653b895e0d4a1d61c6610a70f407067ca13d5583574a8c3e8afd1e34cc08dc",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查执教职位与联赛、并满足当前问时点约束的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} current coaching position league"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "current coaching position league 包含职位、联赛及时点关系；不能遗漏 current，也不凭执教词直接建立 person-only 必要类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_9b8f907f7b5d4497",
+      "card_version": "1",
+      "card_action_sha256": "b4490a5ca36ca4bb188f20479dc3592be798b937684be72406b4f90adbae555a",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查出生地与国籍联合关系的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} birthplace nationality"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "动作同时查询 birthplace 和 nationality；目标角色保留两个关系，不把出现其中一个词视为完整适用证明。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_9bf3d3c6bc8b8e73",
+      "card_version": "1",
+      "card_action_sha256": "0bb2cf99fb98eca2e494e587da32ba7b0a1d57aca35055e564a22d7a8fd731d7",
+      "slots": [
+        {
+          "slot": "gap.movie_title",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查演职人员的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "find_actress",
+            "template": "{movie_title} cast"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.movie_title",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "cast 指定待查关系；movie_title 及 find_actress 的命名不确立作品或人的唯一语义类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_9ff966c6a939058c",
+      "card_version": "1",
+      "card_action_sha256": "672c20c754de564c3d7396a07be8c39ab54471489db0936afc58ee2c845b1158",
+      "slots": [
+        {
+          "slot": "gap.landmark",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查所在城市的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{landmark} location city"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.landmark",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "location city 是查询关系，正文未把主体限定为 landmark 类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_a02eb554dd6e4a72",
+      "card_version": "1",
+      "card_action_sha256": "5975a9bdf332882ad6dd3de45192dda7c6ab1fbce927366785f0cec18eef80b3",
+      "slots": [
+        {
+          "slot": "gap.actor_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查传记、生涯或经历的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{actor_name} biography career history"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.actor_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "biography career history 是宽关系查询；不以查询较宽自动判错，不从 actor_name 自动建立 person-only 类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_a1b89586f372e517",
+      "card_version": "1",
+      "card_action_sha256": "5e130e2eced8945be723b3a4b6ec44ada0c7c3ad28ba20662aeb14e566ca9970",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查出生相关信息的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} born"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "born 只指定宽泛出生关系；目标需由当前原问细化，正文不建立 person-only 类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_a2d5dd925f4bc1bb",
+      "card_version": "1",
+      "card_action_sha256": "a9197ae4ca4c79c70f9f937789aec1e478de44c5615c7445add61d7409e03bd4",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中需联合核对 founded 与当前 property 的对象"
+        },
+        {
+          "slot": "gap.property",
+          "kind": "relation_text",
+          "requires_current_source": false
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} founded {property}"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "实际查询为实体、founded 与可填 property 的组合；不能只核 property，亦不把 founded 推成 organization-only 类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          },
+          {
+            "slot": "gap.property",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "模板把 property 用作 founded 后的关系文本，按接口 relation_text 投影；R 必须检查 founded 与实际 property 的联合含义。",
+              "requires_current_source": "普通关系检索词无需逐字存在于当前证据；若冻结前审查发现该槽实际携带事实实体，必须重分类或改 unknown，不在运行中临时改类。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_b315ab1ce2a51a1a",
+      "card_version": "1",
+      "card_action_sha256": "ce52e40e9b5f397272d5d38dbd37dacfa1c75d9ff27eda763be036cd2e905277",
+      "slots": [
+        {
+          "slot": "gap.entity_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查统治或在位年份的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity_name} reign years"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "reign years 指定待查关系；主体可能有不同层级，正文没有明确 person-only 或 monarch-only 限定。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_c3f34063a442fc1e",
+      "card_version": "1",
+      "card_action_sha256": "b9e689bda12968da0ebe2503a1294c671a0807057740f4e0371751972fac2ead",
+      "slots": [
+        {
+          "slot": "gap.term",
+          "kind": "unknown",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{original_question} {term}"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.term",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "{original_question} {term} 未限定追加项是实体、关系文本还是约束；仅凭 term 不能选择实体或关系类别。",
+              "requires_current_source": "槽语义尚未分类，不能建立来源要求或假定豁免；T/P0/P1 固定 unknown/unclassified_slot。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_c75bf0220559dbfa",
+      "card_version": "1",
+      "card_action_sha256": "78716a8650d7c180b869a997bc4b3074078ec750c666b4ddaf191018288487b9",
+      "slots": [
+        {
+          "slot": "gap.building_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查建造年份的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{building_name} built year"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.building_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "built year 指定所查属性；不从 building_name 单独推导建筑类型必要条件。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_ce6ff7a2538d8295",
+      "card_version": "1",
+      "card_action_sha256": "98982a88abdbfb91bdd0a3a389d06b6ea534fc988e412c1814add85973e44061",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查标志含义的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} logo meaning"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "logo meaning 是实际关系，正文没有限定主体为公司、组织或标志本身。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_d031917d14319bca",
+      "card_version": "1",
+      "card_action_sha256": "e4898b78322925a70dfeeba3d09cf8cb970388b527459e24f0095674a0202224",
+      "slots": [
+        {
+          "slot": "gap.city",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中在指定年份待查人口数量的地域对象"
+        },
+        {
+          "slot": "gap.year",
+          "kind": "literal_constraint",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问要求的人口统计时间约束，且与同动作的地域对象联合一致"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "population of {city} in {year}"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.city",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "population of ... in ... 指定人口与时间关系；不把 city 变量名收窄成 city-only 类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          },
+          {
+            "slot": "gap.year",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "integer",
+            "declared_required": true,
+            "reasons": {
+              "kind": "population of {city} in {year} 将该值用作人口统计的时间约束，而非实体或自由关系文本。",
+              "required_type": "operator_spec.gap_schema 的 kind=integer 仅是 DSL 语法类型，不构成 T 语义对象类型要求；正文未确立必要语义类型，required_type 保留 null。声明的 integer 只记录为 declared_kind，不据此推断日历体系、年份范围或具体取值。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "动作显式把该槽置于 population 的时间修饰位置；这是待核对的当前目标角色，不是已满足该角色的结论。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_ddcdaf3298f91594",
+      "card_version": "1",
+      "card_action_sha256": "49fc694e7b3460932cc9f96b7626ad9e7a5e6f1fb00021377fa218ef5830cd30",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查属分类的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} genus classification"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "genus classification 指定分类关系；正文没有给出唯一必需的生物分类层级，保留类型未知。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_e8418abae1c43f2f",
+      "card_version": "1",
+      "card_action_sha256": "4f2243cd1cb04ef2669048494cf0dfee9be403f27554229a96fc1beeb64e556a",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查所在国家的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} location country"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "location country 指定待查关系，不限定主体的实体类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_e8e689c3513a8365",
+      "card_version": "1",
+      "card_action_sha256": "31409b142add22826ce85f6daaab07907b26af00aa242350b2487203fc419bad",
+      "slots": [
+        {
+          "slot": "gap.actor_name",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中与另一已填对象共同定位上映年份的关联对象"
+        },
+        {
+          "slot": "gap.film_title",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中与另一已填对象共同定位上映年份的被查询对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{actor_name} {film_title} release year"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.actor_name",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "双槽联合 release year 查询要求分别核对两个对象的当前来源和目标角色；actor_name 不足以单独推出人的类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          },
+          {
+            "slot": "gap.film_title",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "该槽与 actor_name 联合构成 release year 查询；需分别核当前来源和目标角色，不能仅由 film_title 变量名判定 film-only 类型。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_f8693b624650d1db",
+      "card_version": "1",
+      "card_action_sha256": "aa2976e1298b5213be03e5ff02db52d7af5ec4b312a221ebea32e6e7543401da",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中待查起源、州、驻地或位置相关信息的对象"
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} origin state base location"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "origin state base location 含多种潜在关系；保留歧义供当前问核对，不把对象或关系方向强行收窄。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "OP_fd457a0cd835fa75",
+      "card_version": "1",
+      "card_action_sha256": "e1e6421ea07ee7196d7fe7b99d9c2cdf15413ca5b75cc1f774e043bfae38e9e8",
+      "slots": [
+        {
+          "slot": "gap.entity",
+          "kind": "entity",
+          "required_type": null,
+          "requires_current_source": true,
+          "target_role": "当前原问或允许的中间子目标中需查询当前 property 的对象"
+        },
+        {
+          "slot": "gap.property",
+          "kind": "relation_text",
+          "requires_current_source": false
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "template",
+        "action_excerpt": [
+          {
+            "step_id": "search",
+            "template": "{entity} {property}"
+          }
+        ],
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.entity",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "通用实体加属性查询没有固定实体类型；角色必须以当前问和实际 property 共同核对。",
+              "required_type": "指定动作正文没有确立排他的必要语义类型；不从变量名、关系词或任何来源示例推断实体类别。",
+              "requires_current_source": "此槽按接口投影为当前事实对象或字面约束，必须在当前原问或冻结可见证据中建立来源；模板文字本身不是事实来源。",
+              "target_role": "仅描述动作关系下、由当前原问或合法中间子目标限定的待核目标角色；不填入任何问题特定实体、答案或已成立的事实。"
+            }
+          },
+          {
+            "slot": "gap.property",
+            "declaration_origin": "operator_spec.gap_schema",
+            "declared_kind": "text",
+            "declared_required": true,
+            "reasons": {
+              "kind": "模板把 property 用作被查询属性文本，按接口 relation_text 投影；实际属性与当前目标的相容性由 R 检查。",
+              "requires_current_source": "普通关系检索词无需逐字存在于当前证据；若冻结前审查发现该槽实际携带事实实体，必须重分类或改 unknown，不在运行中临时改类。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_15a8c303cb0acf71",
+      "card_version": "1",
+      "card_action_sha256": "fa80d6c1d92e5cd87097131310e70f256de08ebdd6d230b23178f40f5d230380",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Replace or refine the main subject to better reflect the user's intent.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Clarify Subject 只声明整体改写行为：Replace or refine the main subject to better reflect the user's intent.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_1e9d48f3c7368701",
+      "card_version": "1",
+      "card_action_sha256": "568634d58cc336e02f73c69635a1c676e6d1f3ca15681bacc3a16418de52ff08",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Add relevant contextual information to the original query to make it more specific.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Contextual Expansion 只声明整体改写行为：Add relevant contextual information to the original query to make it more specific.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_26181a50501feb11",
+      "card_version": "1",
+      "card_action_sha256": "30018b221efefcbcdd1c499a440e57c0e3dd1729ce210a5d9fdd5386029871aa",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Specify the intended use or application to make the query more focused.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Purpose Specification 只声明整体改写行为：Specify the intended use or application to make the query more focused.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_4cf142078fc27281",
+      "card_version": "1",
+      "card_action_sha256": "8e2b1e19374ebb1908ed35e3a5d5a7942b53a0a19092f1b06b5f0018120f377b",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Limit the scope of the query by adding constraints or conditions that refine the search results.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Contextual Restriction 只声明整体改写行为：Limit the scope of the query by adding constraints or conditions that refine the search results.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_5934327ff144b42a",
+      "card_version": "1",
+      "card_action_sha256": "78718c33716db77e0ef30289588f841a9ada7524446e83f7e947a7b3d5aa19d9",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Modify the time-related terms to better align with the user's intent.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Temporal Adjustment 只声明整体改写行为：Modify the time-related terms to better align with the user's intent.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_72de36faeb1c708d",
+      "card_version": "1",
+      "card_action_sha256": "6bef0774879fb8f135982b5d7a988f66a8fa8349b7784a58f3d74287d59dcad1",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Specify the exact location or region to make the query more targeted.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Location Specification 只声明整体改写行为：Specify the exact location or region to make the query more targeted.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_74faa5f54fceb806",
+      "card_version": "1",
+      "card_action_sha256": "ebbba56bd10a5653e17880c04e7c03420d1dad46087376e851f2145a9c8cb7be",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Replace specific terms with more general ones that encompass a broader category.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Generalization 只声明整体改写行为：Replace specific terms with more general ones that encompass a broader category.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_db1da3103336862b",
+      "card_version": "1",
+      "card_action_sha256": "f412d2b0cd2672b843b842f5591466e1f4ee69b954ecee2c6a9a7c50a1e5f2e3",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Replace vague or ambiguous terms with more precise and contextually relevant terms.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Semantic Clarification 只声明整体改写行为：Replace vague or ambiguous terms with more precise and contextually relevant terms.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_ec2e2f1edd3776c4",
+      "card_version": "1",
+      "card_action_sha256": "02172302b7a3fb9af9ea1721dad03ead50dc6d2c9e320c823828817995b57ba7",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Replace the main subject or action with a closely related concept that better aligns with the user's intent.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Conceptual Shift 只声明整体改写行为：Replace the main subject or action with a closely related concept that better aligns with the user's intent.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": "growrag-a1-card-slot-contract-v1",
+      "card_id": "RF_eed9c3bf7463a1ee",
+      "card_version": "1",
+      "card_action_sha256": "16805d8568078a7afc89f823a0c3071ccac53b4db7a3f3d1cc2ed814fc6bcb53",
+      "slots": [
+        {
+          "slot": "gap.query_text",
+          "kind": "free_query",
+          "requires_current_source": null
+        }
+      ],
+      "authoring": {
+        "mode": "action_text_review",
+        "source_fields": [
+          "name",
+          "description",
+          "transformation_rule",
+          "operator_spec",
+          "conditions"
+        ],
+        "authoring_version": "growrag-a1-action-text-review-v1",
+        "reviewer": "Codex",
+        "reviewed_at": "2026-10-03",
+        "human_reviewed": false,
+        "review_status": "draft_pending_primary_review",
+        "action_kind": "rewrite_rule",
+        "action_excerpt": "Rephrase the query to directly address the user's intended action or information need.",
+        "declared_binding_slots": [],
+        "slot_reviews": [
+          {
+            "slot": "gap.query_text",
+            "declaration_origin": "runtime_rewrite_adapter",
+            "reasons": {
+              "kind": "规则 Clarify Intent 只声明整体改写行为：Rephrase the query to directly address the user's intended action or information need.；依接口首版将实际改写结果作为未拆分查询。",
+              "requires_current_source": "free_query 不假装完成实体或约束拆分；T/P0/P1 固定 unknown/uncovered_free_query，仅实际查询的 R 可观察。"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
