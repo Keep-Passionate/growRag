@@ -17,10 +17,11 @@ import hashlib
 import json
 from copy import deepcopy
 
+from .a1_structured_schema import two_stage_schema_registry
 from .operator_schemas import operator_schema_registry
 from .operator_schemas_v3 import action_list_schema_registry
 
-REGISTRY_VERSION = "growrag-output-schemas-v4"
+REGISTRY_VERSION = "growrag-output-schemas-v5"
 
 
 def _object(properties: dict) -> dict:
@@ -121,6 +122,7 @@ _REGISTRY = {
     "s2g-author-5d842a6-extract-api-v1": ("s2g_author_5d842a6_extract_api_v1", _S2G_AUTHOR_EXTRACT),
     **operator_schema_registry(),
     **action_list_schema_registry(),
+    **two_stage_schema_registry(),
 }
 
 

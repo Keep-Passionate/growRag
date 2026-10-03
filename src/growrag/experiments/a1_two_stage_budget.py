@@ -8,6 +8,7 @@ metadata is preserved; this module cannot grant a higher project spending cap.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from . import a1_catalog_budget as catalog
@@ -17,12 +18,16 @@ PREFIX = "2026-10-03_a1ts_"
 PROTOCOL = "growrag-a1-two-stage-observer-v1"
 
 
-def reviewed_history(runs: Path) -> dict:
+def reviewed_history(runs: Path, *, reviewed_other_series=None) -> dict:
     """Review all registered roots once, not cumulative copies or refunded costs.
 
     Call under the project serial lock before paid work. New unknown charges or
     unresolved journals still require the runner to stop; known legacy unknowns
     remain in the same conservative project total, never a fresh allocation.
+
+    Optional new registrations are explicit caller-reviewed names, not a grant
+    of spending authority. They cannot replace, overlap or mutate the legacy
+    registry; all new roots still require the exact frozen pilot model.
     """
     runs = Path(runs).resolve(strict=True)
     old = catalog.old
@@ -36,6 +41,33 @@ def reviewed_history(runs: Path) -> dict:
         catalog.PREFIX: catalog.A1_PROTOCOLS,
         PREFIX: frozenset({PROTOCOL}),
     }
+    if reviewed_other_series is not None:
+        if type(reviewed_other_series) is not dict:
+            raise ValueError("reviewed series must be an explicit mapping")
+        known_protocols = set().union(*series.values())
+        for prefix, protocols in sorted(
+            reviewed_other_series.items(), key=lambda item: str(item[0])
+        ):
+            if (
+                type(prefix) is not str
+                or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*_", prefix) is None
+            ):
+                raise ValueError("invalid reviewed series prefix")
+            if any(prefix.startswith(name) or name.startswith(prefix) for name in series):
+                raise ValueError("reviewed series prefix overlaps registered roots")
+            if type(protocols) not in (set, frozenset, tuple, list) or not protocols:
+                raise ValueError("reviewed protocols must be an explicit nonempty collection")
+            if any(
+                type(protocol) is not str
+                or re.fullmatch(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", protocol) is None
+                for protocol in protocols
+            ):
+                raise ValueError("invalid reviewed protocol name")
+            registered = frozenset(protocols)
+            if len(registered) != len(protocols) or registered & known_protocols:
+                raise ValueError("reviewed protocols duplicate or overlap registered protocols")
+            series[prefix] = registered
+            known_protocols.update(registered)
     extra = list(old.HISTORICAL_ROOTS)
     for prefix, protocols in series.items():
         for root in sorted(runs.glob(f"{prefix}*")):

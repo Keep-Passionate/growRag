@@ -71,7 +71,13 @@ def _without_elapsed(value):
     return value
 
 
-def audit_http(call, directory, plan, track, seen, prefix):
+def audit_http(call, directory, plan, track, seen, prefix, *, expected_response_format=None):
+    """Audit the exact wire request; the legacy JSON-object default is unchanged.
+
+    Strict-schema callers must provide the exact registered format. Its shape
+    and transport metadata are checked without rewriting the captured request.
+    This is a transport/provenance check, not semantic output validation.
+    """
     trace = call.get("trace_id", "")
     _require(trace.startswith(prefix) and trace not in seen, "duplicate/wrong API trace")
     seen.add(trace)
@@ -90,6 +96,29 @@ def audit_http(call, directory, plan, track, seen, prefix):
         "raw HTTP/ledger terminal mismatch",
     )
     request = data["request"]
+    response_format = {"type": "json_object"}
+    if expected_response_format is not None:
+        from .output_schemas import REGISTRY_VERSION, response_format_for, schema_fingerprint
+
+        _require(
+            type(expected_response_format) is dict
+            and set(expected_response_format) == {"type", "json_schema"}
+            and expected_response_format.get("type") == "json_schema"
+            and type(expected_response_format.get("json_schema")) is dict
+            and set(expected_response_format["json_schema"]) == {"name", "strict", "schema"}
+            and expected_response_format["json_schema"].get("strict") is True,
+            "explicit response format must be a strict JSON schema",
+        )
+        _require(
+            expected_response_format == response_format_for(call["prompt_version"]),
+            "strict response schema differs from its registered prompt version",
+        )
+        _require(
+            data.get("output_schema_registry_version") == REGISTRY_VERSION
+            and data.get("output_schema_sha256") == schema_fingerprint(call["prompt_version"]),
+            "strict schema transport metadata differs",
+        )
+        response_format = expected_response_format
     expected = {
         "model": plan["model"],
         "max_tokens": plan["max_output_tokens"],
@@ -97,7 +126,7 @@ def audit_http(call, directory, plan, track, seen, prefix):
         "enable_thinking": False,
         "temperature": 0,
         "top_p": 1,
-        "response_format": {"type": "json_object"},
+        "response_format": response_format,
     }
     _require(
         set(request) == {*expected, "messages"}

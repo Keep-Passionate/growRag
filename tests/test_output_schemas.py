@@ -10,6 +10,7 @@ from growrag.controller import (
     GAP_QUERY_PROMPT_VERSION,
     ROUTE_PROMPT_VERSION,
 )
+from growrag.experiments.a1_structured_schema import two_stage_schema_registry
 from growrag.experiments.operator_schemas import operator_schema_registry
 from growrag.experiments.operator_schemas_v3 import action_list_schema_registry
 from growrag.experiments.output_schemas import (
@@ -32,6 +33,7 @@ def test_registry_tracks_exact_current_prompts_without_alias_fallback():
         S2G_AUTHOR_VERSIONS["extract"],
         *operator_schema_registry(),
         *action_list_schema_registry(),
+        *two_stage_schema_registry(),
     }
     for version, item in manifest["schemas"].items():
         assert item["sha256"] == schema_fingerprint(version)
