@@ -6,7 +6,7 @@
 
 ## 与dot的GitHub协作入口
 
-用户要求用本仓库共享后续代码、笔记与实验摘要：[dot从这里开始](docs/collaboration/DOT_START_HERE.md)。当前开发分支为`codex/a1-structured-contract`，默认main不代表最新进度。只共享脱敏材料，不上传密钥或原始API/完整聊天日志；尚未收到dot回复。
+用户要求用本仓库共享后续代码、笔记与实验摘要：[dot从这里开始](docs/collaboration/DOT_START_HERE.md)。当前开发分支为`codex/a1-structured-contract`，默认main不代表最新进度。只共享脱敏材料；已读取 dot 的两份旧 PR，均未合并或执行，新 S2G 诊断工具尚未收到。
 
 最新真实单次严格结构探针：[数组外壳已符合，但引用编号仍失败](knowledge/experiments/2026-10-03_严格结构探针真实结果与协作交接.md)。1真实请求，未重试、不启动16题付费校准或新自然40题。
 
