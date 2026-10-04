@@ -1,5 +1,9 @@
 # GrowRAG
 
+## 当前先读（2026-10-04）
+
+当前主线调整为 **从 S2G 的小问题出发，边做边学科研**。先读 [教学主线与协作约定](knowledge/decisions/2026-10-04_S2G教学主线与协作约定.md) 和 [本轮交接](docs/collaboration/to_dot/2026-10-04_01_S2G教学主线与开发记录交接.md)。旧代码和实验全部保留；历史库、动态动作、路由与 A1 接口扩展暂缓。下方旧日期内容为历史快照。当前只核查旧 train 开发记录，无新增付费实验。
+
 ## 与dot的GitHub协作入口
 
 用户要求用本仓库共享后续代码、笔记与实验摘要：[dot从这里开始](docs/collaboration/DOT_START_HERE.md)。当前开发分支为`codex/a1-structured-contract`，默认main不代表最新进度。只共享脱敏材料，不上传密钥或原始API/完整聊天日志；尚未收到dot回复。
